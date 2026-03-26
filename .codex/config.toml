@@ -1,0 +1,4 @@
+model = "gpt-5-codex"
+
+[projects."/Users/korhan/Local Sites/repos/yacht-selector-plugin"]
+trust_level = "trusted"
