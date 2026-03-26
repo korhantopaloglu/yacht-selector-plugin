@@ -13,3 +13,18 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+// Constants
+define( 'YS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'YS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'YS_PLUGIN_VERSION', '0.1.0' );
+
+// Includes
+require_once YS_PLUGIN_PATH . 'includes/class-yacht-selector-plugin.php';
+
+// Init
+function ys_init_plugin() {
+	$plugin = new YS_Plugin();
+	$plugin->init();
+}
+add_action( 'plugins_loaded', 'ys_init_plugin' );
