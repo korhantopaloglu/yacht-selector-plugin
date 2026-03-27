@@ -24,6 +24,7 @@ class YS_Settings {
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_action( 'admin_notices', [ $this, 'maybe_add_admin_notice' ] );
 	}
 
 	/**
@@ -72,6 +73,14 @@ class YS_Settings {
 			__( 'General', 'yacht-selector' ),
 			[ $this, 'render_general_section' ],
 			'ys-settings'
+		);
+
+		add_settings_field(
+			'ys_use_existing_post_type',
+			__( 'Use Existing Post Type', 'yacht-selector' ),
+			[ $this, 'render_use_existing_post_type_field' ],
+			'ys-settings',
+			'ys_general_section'
 		);
 
 		add_settings_field(
@@ -275,10 +284,12 @@ class YS_Settings {
 		$input    = is_array( $input ) ? $input : [];
 		$output   = $defaults;
 
+		$output['ys_use_existing_post_type'] = ! empty( $input['ys_use_existing_post_type'] ) ? '1' : '0';
+
 		$selected_post_type = isset( $input['ys_selected_post_type'] ) ? sanitize_key( $input['ys_selected_post_type'] ) : '';
 		$public_post_types  = $this->get_available_post_types();
 
-		if ( '' !== $selected_post_type && isset( $public_post_types[ $selected_post_type ] ) ) {
+		if ( '1' === $output['ys_use_existing_post_type'] && '' !== $selected_post_type && isset( $public_post_types[ $selected_post_type ] ) ) {
 			$output['ys_selected_post_type'] = $selected_post_type;
 		} else {
 			$output['ys_selected_post_type'] = '';
@@ -443,6 +454,7 @@ class YS_Settings {
 		}
 
 		$settings                           = wp_parse_args( $stored, $defaults );
+		$settings['ys_use_existing_post_type'] = ! empty( $settings['ys_use_existing_post_type'] ) ? '1' : '0';
 		$settings['ys_model_options']       = $this->sanitize_repeatable_list( $settings['ys_model_options'] );
 		$settings['ys_extra_feature_options'] = $this->sanitize_repeatable_list( $settings['ys_extra_feature_options'] );
 		$settings['ys_location_taxonomy_slug'] = sanitize_key( $settings['ys_location_taxonomy_slug'] );
@@ -472,12 +484,73 @@ class YS_Settings {
 	}
 
 	/**
+	 * Get whether the plugin should use an existing post type.
+	 *
+	 * @return bool
+	 */
+	public function get_use_existing_post_type() {
+		return '1' === (string) $this->get_setting( 'ys_use_existing_post_type', '0' );
+	}
+
+	/**
+	 * Get the plugin-managed post type slug.
+	 *
+	 * @return string
+	 */
+	public function get_plugin_post_type() {
+		return 'ys_yacht';
+	}
+
+	/**
+	 * Get the saved selected post type.
+	 *
+	 * @return string
+	 */
+	public function get_selected_post_type() {
+		$post_type = sanitize_key( (string) $this->get_setting( 'ys_selected_post_type', '' ) );
+		$available = $this->get_available_post_types();
+
+		return isset( $available[ $post_type ] ) ? $post_type : '';
+	}
+
+	/**
+	 * Get the active post type used across the plugin.
+	 *
+	 * @return string
+	 */
+	public function get_active_post_type() {
+		if ( $this->get_use_existing_post_type() ) {
+			$selected = $this->get_selected_post_type();
+
+			return '' !== $selected ? $selected : '';
+		}
+
+		return $this->get_plugin_post_type();
+	}
+
+	/**
 	 * Render general section description.
 	 *
 	 * @return void
 	 */
 	public function render_general_section() {
-		echo '<p>' . esc_html__( 'Choose the content type this plugin will manage and set the global CTA destinations used across yacht records.', 'yacht-selector' ) . '</p>';
+		echo '<p>' . esc_html__( 'Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type, then set the global CTA destinations used across yacht records.', 'yacht-selector' ) . '</p>';
+	}
+
+	/**
+	 * Render use existing post type field.
+	 *
+	 * @return void
+	 */
+	public function render_use_existing_post_type_field() {
+		$enabled = $this->get_use_existing_post_type();
+		?>
+		<label>
+			<input type="checkbox" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[ys_use_existing_post_type]" value="1" <?php checked( $enabled ); ?> data-ys-use-existing-post-type />
+			<?php esc_html_e( 'Use an existing post type', 'yacht-selector' ); ?>
+		</label>
+		<p class="description"><?php esc_html_e( 'If enabled, Yacht Selector will attach to an existing registered post type. If disabled, the plugin will create and use its own yacht post type.', 'yacht-selector' ); ?></p>
+		<?php
 	}
 
 	/**
@@ -524,22 +597,29 @@ class YS_Settings {
 	public function render_selected_post_type_field() {
 		$settings           = $this->get_settings();
 		$saved_post_type    = $settings['ys_selected_post_type'];
+		$use_existing       = $this->get_use_existing_post_type();
 		$available_post_types = $this->get_available_post_types();
 		?>
-		<select name="<?php echo esc_attr( self::OPTION_KEY ); ?>[ys_selected_post_type]" class="regular-text">
-			<option value=""><?php esc_html_e( 'Select a post type', 'yacht-selector' ); ?></option>
-			<?php foreach ( $available_post_types as $post_type_slug => $post_type_obj ) : ?>
-				<option value="<?php echo esc_attr( $post_type_slug ); ?>" <?php selected( $saved_post_type, $post_type_slug ); ?>>
-					<?php echo esc_html( sprintf( '%1$s (%2$s)', $post_type_obj->labels->singular_name, $post_type_slug ) ); ?>
-				</option>
-			<?php endforeach; ?>
-			<?php if ( $saved_post_type && ! isset( $available_post_types[ $saved_post_type ] ) ) : ?>
-				<option value="<?php echo esc_attr( $saved_post_type ); ?>" selected>
-					<?php echo esc_html( sprintf( __( '%1$s (no longer available)', 'yacht-selector' ), $saved_post_type ) ); ?>
-				</option>
+		<div data-ys-existing-post-type-row>
+			<select name="<?php echo esc_attr( self::OPTION_KEY ); ?>[ys_selected_post_type]" class="regular-text" <?php disabled( ! $use_existing ); ?>>
+				<option value=""><?php esc_html_e( 'Select a post type', 'yacht-selector' ); ?></option>
+				<?php foreach ( $available_post_types as $post_type_slug => $post_type_obj ) : ?>
+					<option value="<?php echo esc_attr( $post_type_slug ); ?>" <?php selected( $saved_post_type, $post_type_slug ); ?>>
+						<?php echo esc_html( sprintf( '%1$s (%2$s)', $post_type_obj->labels->singular_name, $post_type_slug ) ); ?>
+					</option>
+				<?php endforeach; ?>
+				<?php if ( $saved_post_type && ! isset( $available_post_types[ $saved_post_type ] ) ) : ?>
+					<option value="<?php echo esc_attr( $saved_post_type ); ?>" selected>
+						<?php echo esc_html( sprintf( __( '%1$s (no longer available)', 'yacht-selector' ), $saved_post_type ) ); ?>
+					</option>
+				<?php endif; ?>
+			</select>
+			<?php if ( $use_existing ) : ?>
+				<p class="description"><?php esc_html_e( 'This post type will receive Yacht Selector taxonomy and meta box integrations.', 'yacht-selector' ); ?></p>
+			<?php else : ?>
+				<p class="description"><?php echo esc_html( sprintf( __( 'Yacht Selector will use its own built-in post type: %s', 'yacht-selector' ), $this->get_plugin_post_type() ) ); ?></p>
 			<?php endif; ?>
-		</select>
-		<p class="description"><?php esc_html_e( 'This post type will later receive Yacht Selector taxonomy and meta box integrations.', 'yacht-selector' ); ?></p>
+		</div>
 		<?php
 	}
 
@@ -948,7 +1028,7 @@ class YS_Settings {
 	 * @return void
 	 */
 	private function import_json_posts( $items ) {
-		$post_type = sanitize_key( $this->get_setting( 'ys_selected_post_type', '' ) );
+		$post_type = sanitize_key( $this->get_active_post_type() );
 
 		if ( '' === $post_type || ! post_type_exists( $post_type ) || ! is_array( $items ) ) {
 			add_settings_error(
@@ -1538,6 +1618,7 @@ JSON;
 	 */
 	private function get_default_settings() {
 		return [
+			'ys_use_existing_post_type' => '0',
 			'ys_selected_post_type'      => '',
 			'ys_location_taxonomy_slug'  => 'ys_location',
 			'ys_global_watch_video_url'  => '',
@@ -1578,8 +1659,34 @@ JSON;
 		);
 
 		unset( $post_types['attachment'] );
+		unset( $post_types[ $this->get_plugin_post_type() ] );
 
 		return $post_types;
+	}
+
+	/**
+	 * Show an admin notice when existing-post-type mode is misconfigured.
+	 *
+	 * @return void
+	 */
+	public function maybe_add_admin_notice() {
+		if ( ! is_admin() || ! current_user_can( 'manage_options' ) || ! $this->get_use_existing_post_type() ) {
+			return;
+		}
+
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && 'settings_page_ys-settings' === $screen->id ) {
+			return;
+		}
+
+		if ( '' !== $this->get_selected_post_type() ) {
+			return;
+		}
+		?>
+		<div class="notice notice-warning">
+			<p><?php esc_html_e( 'Yacht Selector is set to use an existing post type, but no valid post type is selected. Please update the plugin settings.', 'yacht-selector' ); ?></p>
+		</div>
+		<?php
 	}
 
 	/**

@@ -306,13 +306,14 @@ class YS_Shortcode {
 	}
 
 	/**
-	 * Get selector items using a WP_Query for the selected post type.
+	 * Get selector items using a WP_Query for the active post type.
 	 *
 	 * @param array $settings Saved settings.
 	 * @return array
 	 */
 	private function get_selector_items( $settings ) {
-		$post_type = isset( $settings['ys_selected_post_type'] ) ? sanitize_key( $settings['ys_selected_post_type'] ) : '';
+		unset( $settings );
+		$post_type = sanitize_key( $this->settings->get_active_post_type() );
 
 		if ( ! $this->data_provider->is_valid_post_type( $post_type ) ) {
 			return [];

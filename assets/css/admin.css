@@ -36,11 +36,6 @@
   }
 }
 
-.ys-meta-section + .ys-meta-section,
-.ys-field + .ys-field {
-  margin-top: 16px;
-}
-
 .ys-admin-panel {
   margin: -6px -12px -12px;
 }
@@ -95,9 +90,8 @@
 }
 
 .ys-admin-grid {
-  display: grid;
+  display: flex;
   gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ys-admin-card {
@@ -129,7 +123,7 @@
 }
 
 .ys-meta-grid {
-  display: grid;
+  display: flex;
   gap: 16px;
 }
 
@@ -149,12 +143,6 @@
   max-width: none;
 }
 
-.ys-booked-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px 12px;
-  margin-top: 12px;
-}
 
 .ys-booked-item,
 .ys-checkbox-item {
@@ -168,16 +156,12 @@
   background: #fff;
 }
 
-.ys-checkbox-list {
+.ys-checkbox-list,
+.ys-checkbox-grid,
+.ys-booked-grid {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ys-checkbox-grid {
-  display: grid;
+  flex-wrap: wrap;
   gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ys-taxonomy-container .categorydiv {
@@ -245,6 +229,113 @@
   margin-top: 8px;
 }
 
+.ys-contact-tool-fields h3 {
+  margin: 0 0 12px;
+}
+
+.ys-contact-tool-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ys-contact-tool-type {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+}
+
+.ys-contact-tool-group {
+  margin-top: 4px;
+}
+
+.ys-contact-tool-icon-help {
+  margin-top: 10px;
+}
+
+.ys-contact-tool-icon-help-label {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #646970;
+}
+
+.ys-contact-tool-icon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ys-contact-tool-icon-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  background: #f6f7f7;
+  color: #0a4b78;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.ys-contact-tool-icon-chip:hover,
+.ys-contact-tool-icon-chip:focus {
+  background: #eef4fb;
+  color: #083b5c;
+}
+
+.ys-contact-tool-post-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-right: 4px;
+}
+
+.ys-contact-tool-post-item {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.ys-contact-tool-post-item input[type="checkbox"] {
+  margin: 2px 0 0;
+}
+
+.ys-contact-tool-post-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ys-contact-tool-post-title {
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.ys-contact-tool-post-meta {
+  color: #646970;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ys-contact-tool-post-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef4fb;
+  color: #0a4b78;
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .ys-bulk-edit-fieldset .inline-edit-col {
   width: 100%;
 }
@@ -260,8 +351,70 @@
   overflow-y: auto;
 }
 
+.ys-crew-meta-box .ys-checkbox-list {
+  margin-top: 8px;
+}
+
+.ys-crew-contact-fields {
+  margin-top: 16px;
+}
+
+.ys-crew-contact-fields.is-inactive {
+  opacity: 0.55;
+}
+
+.ys-crew-top-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.ys-crew-hours-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ys-crew-hours-controls select {
+  min-width: 96px;
+  width: auto;
+}
+
+.ys-crew-hours-separator {
+  color: #646970;
+  font-weight: 600;
+}
+
+.ys-crew-days {
+  margin: 16px 0;
+}
+
+.ys-crew-day-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.ys-crew-days-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.ys-crew-days-list .ys-checkbox-item {
+  min-height: 0;
+  padding: 8px 10px;
+}
+
 .hidden {
   display: none !important;
+}
+
+[data-ys-existing-post-type-row].is-disabled {
+  opacity: 0.65;
 }
 
 @media screen and (max-width: 782px) {
@@ -274,8 +427,13 @@
   .ys-admin-grid,
   .ys-checkbox-grid,
   .ys-meta-grid-2,
-  .ys-booked-grid {
+  .ys-booked-grid,
+  .ys-crew-top-row {
     grid-template-columns: 1fr;
+  }
+
+  .ys-crew-hours-controls {
+    flex-wrap: wrap;
   }
 
   .ys-tab-button {

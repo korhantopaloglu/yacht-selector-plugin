@@ -92,12 +92,12 @@ class YS_Data_Provider {
 	}
 
 	/**
-	 * Get selected post type from settings.
+	 * Get active post type from settings.
 	 *
 	 * @return string
 	 */
 	public function get_selected_post_type() {
-		return sanitize_key( $this->settings->get_setting( 'ys_selected_post_type', '' ) );
+		return sanitize_key( $this->settings->get_active_post_type() );
 	}
 
 	/**

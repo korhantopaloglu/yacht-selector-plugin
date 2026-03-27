@@ -76,7 +76,7 @@ class YS_Meta_Boxes {
 
 		add_meta_box(
 			'ys_admin_panel',
-			__( 'Yacht Selector', 'yacht-selector' ),
+			__( 'Yacht Options', 'yacht-selector' ),
 			[ $this, 'render_admin_panel' ],
 			$post_type,
 			'normal',
@@ -210,6 +210,7 @@ class YS_Meta_Boxes {
 				<button type="button" class="ys-tab-button is-active" data-ys-tab="location" aria-selected="true"><?php esc_html_e( 'Location & Booked', 'yacht-selector' ); ?></button>
 				<button type="button" class="ys-tab-button" data-ys-tab="specs" aria-selected="false"><?php esc_html_e( 'Specifications', 'yacht-selector' ); ?></button>
 				<button type="button" class="ys-tab-button" data-ys-tab="features" aria-selected="false"><?php esc_html_e( 'Features', 'yacht-selector' ); ?></button>
+				<button type="button" class="ys-tab-button" data-ys-tab="crew" aria-selected="false"><?php esc_html_e( 'Crew Members', 'yacht-selector' ); ?></button>
 				<button type="button" class="ys-tab-button" data-ys-tab="media" aria-selected="false"><?php esc_html_e( 'Media & CTA', 'yacht-selector' ); ?></button>
 			</div>
 
@@ -222,6 +223,9 @@ class YS_Meta_Boxes {
 				</div>
 				<div class="ys-tab-panel" data-ys-panel="features" hidden>
 					<?php $this->render_features_tab( $post ); ?>
+				</div>
+				<div class="ys-tab-panel" data-ys-panel="crew" hidden>
+					<?php $this->render_crew_members_tab( $post ); ?>
 				</div>
 				<div class="ys-tab-panel" data-ys-panel="media" hidden>
 					<?php $this->render_media_tab( $post ); ?>
@@ -274,6 +278,7 @@ class YS_Meta_Boxes {
 		$this->save_scalar_meta( $post_id, 'ys_crew', $this->sanitize_integer_value( isset( $_POST['ys_crew'] ) ? wp_unslash( $_POST['ys_crew'] ) : '' ) );
 		$this->save_scalar_meta( $post_id, 'ys_priority', $this->sanitize_integer_value( isset( $_POST['ys_priority'] ) ? wp_unslash( $_POST['ys_priority'] ) : '' ) );
 		$this->save_array_meta( $post_id, 'ys_extra_features', $this->sanitize_extra_features_values( isset( $_POST['ys_extra_features'] ) ? wp_unslash( $_POST['ys_extra_features'] ) : [] ) );
+		$this->save_array_meta( $post_id, 'ys_assigned_crew', $this->sanitize_crew_ids( isset( $_POST['ys_assigned_crew'] ) ? wp_unslash( $_POST['ys_assigned_crew'] ) : [] ) );
 		$this->save_scalar_meta( $post_id, 'ys_card_image_id', $this->sanitize_attachment_id( isset( $_POST['ys_card_image_id'] ) ? wp_unslash( $_POST['ys_card_image_id'] ) : '' ) );
 		$this->save_scalar_meta( $post_id, 'ys_watch_video_url', $this->sanitize_url_value( isset( $_POST['ys_watch_video_url'] ) ? wp_unslash( $_POST['ys_watch_video_url'] ) : '' ) );
 		$this->save_scalar_meta( $post_id, 'ys_video_call_url', $this->sanitize_url_value( isset( $_POST['ys_video_call_url'] ) ? wp_unslash( $_POST['ys_video_call_url'] ) : '' ) );
@@ -331,12 +336,12 @@ class YS_Meta_Boxes {
 	}
 
 	/**
-	 * Get selected post type.
+	 * Get active post type.
 	 *
 	 * @return string
 	 */
 	public function get_selected_post_type() {
-		return sanitize_key( $this->settings->get_setting( 'ys_selected_post_type', '' ) );
+		return sanitize_key( $this->settings->get_active_post_type() );
 	}
 
 	/**
@@ -408,8 +413,8 @@ class YS_Meta_Boxes {
 		$saved_values  = $this->get_saved_booked_values( $post->ID );
 		?>
 		<div class="ys-admin-grid">
-			<section class="ys-admin-card ys-admin-card-full">
-				<div class="ys-admin-card-header">
+			<section class="ys-admin-card ys-admin-card-location">
+				<div class="ys-admin-card-header ">
 					<h3><?php esc_html_e( 'Location', 'yacht-selector' ); ?></h3>
 					<p><?php esc_html_e( 'Assign the yacht to a country and port using the plugin location taxonomy.', 'yacht-selector' ); ?></p>
 				</div>
@@ -418,7 +423,7 @@ class YS_Meta_Boxes {
 				</div>
 			</section>
 
-			<section class="ys-admin-card ys-admin-card-full">
+			<section class="ys-admin-card ys-admin-card-booked">
 				<div class="ys-admin-card-header">
 					<h3><?php esc_html_e( 'Booked Months', 'yacht-selector' ); ?></h3>
 					<p><?php esc_html_e( 'Select the months when this yacht is booked and unavailable. The list shows the current month plus the next 11 months.', 'yacht-selector' ); ?></p>
@@ -438,7 +443,7 @@ class YS_Meta_Boxes {
 					</div>
 				</section>
 
-			<section class="ys-admin-card ys-admin-card-full">
+			<section class="ys-admin-card ys-admin-card-priority">
 				<div class="ys-admin-card-header">
 					<h3><?php esc_html_e( 'Priority', 'yacht-selector' ); ?></h3>
 				</div>
@@ -460,7 +465,7 @@ class YS_Meta_Boxes {
 		$model_options = $this->get_model_options();
 		?>
 		<div class="ys-admin-grid">
-			<section class="ys-admin-card ys-admin-card-full">
+			<section class="ys-admin-card">
 				<div class="ys-admin-card-header">
 					<h3><?php esc_html_e( 'Model', 'yacht-selector' ); ?></h3>
 				</div>
@@ -547,6 +552,44 @@ class YS_Meta_Boxes {
 									<?php checked( in_array( $option, $saved, true ) ); ?>
 								/>
 								<span><?php echo esc_html( $option ); ?></span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</section>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render crew members tab.
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return void
+	 */
+	private function render_crew_members_tab( $post ) {
+		$crew   = $this->get_crew_posts();
+		$chosen = $this->get_assigned_crew_ids( $post->ID );
+		?>
+		<div class="ys-admin-grid">
+			<section class="ys-admin-card ys-admin-card-full">
+				<div class="ys-admin-card-header">
+					<h3><?php esc_html_e( 'Crew Members', 'yacht-selector' ); ?></h3>
+					<p><?php esc_html_e( 'Assign one or more crew members to this yacht.', 'yacht-selector' ); ?></p>
+				</div>
+				<?php if ( empty( $crew ) ) : ?>
+					<p class="description"><?php esc_html_e( 'No crew members found yet. Add crew members first.', 'yacht-selector' ); ?></p>
+				<?php else : ?>
+					<div class="ys-checkbox-list ys-checkbox-grid">
+						<?php foreach ( $crew as $crew_member ) : ?>
+							<label class="ys-checkbox-item">
+								<input
+									type="checkbox"
+									name="ys_assigned_crew[]"
+									value="<?php echo esc_attr( $crew_member->ID ); ?>"
+									<?php checked( in_array( (int) $crew_member->ID, $chosen, true ) ); ?>
+								/>
+								<span><?php echo esc_html( get_the_title( $crew_member ) ); ?></span>
 							</label>
 						<?php endforeach; ?>
 					</div>
@@ -887,6 +930,37 @@ class YS_Meta_Boxes {
 	}
 
 	/**
+	 * Get published crew posts.
+	 *
+	 * @return array
+	 */
+	private function get_crew_posts() {
+		$crew = get_posts(
+			[
+				'post_type'      => 'ys_crew',
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+			]
+		);
+
+		return is_array( $crew ) ? $crew : [];
+	}
+
+	/**
+	 * Get assigned crew IDs for a yacht post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array
+	 */
+	private function get_assigned_crew_ids( $post_id ) {
+		$values = get_post_meta( $post_id, 'ys_assigned_crew', true );
+
+		return is_array( $values ) ? array_map( 'absint', $values ) : [];
+	}
+
+	/**
 	 * Get the configured location taxonomy slug.
 	 *
 	 * @return string
@@ -1032,6 +1106,32 @@ class YS_Meta_Boxes {
 		}
 
 		return array_values( array_intersect( $values, $allowed ) );
+	}
+
+	/**
+	 * Sanitize assigned crew IDs.
+	 *
+	 * @param mixed $values Raw values.
+	 * @return array
+	 */
+	private function sanitize_crew_ids( $values ) {
+		if ( ! is_array( $values ) ) {
+			return [];
+		}
+
+		$sanitized = [];
+
+		foreach ( $values as $value ) {
+			$crew_id = absint( $value );
+
+			if ( ! $crew_id || 'ys_crew' !== get_post_type( $crew_id ) ) {
+				continue;
+			}
+
+			$sanitized[] = $crew_id;
+		}
+
+		return array_values( array_unique( $sanitized ) );
 	}
 
 	/**

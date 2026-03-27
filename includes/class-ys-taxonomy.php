@@ -239,12 +239,12 @@ class YS_Taxonomy {
 	}
 
 	/**
-	 * Get the selected post type setting.
+	 * Get the active post type setting.
 	 *
 	 * @return string
 	 */
 	public function get_selected_post_type() {
-		return sanitize_key( $this->settings->get_setting( 'ys_selected_post_type', '' ) );
+		return sanitize_key( $this->settings->get_active_post_type() );
 	}
 
 	/**
