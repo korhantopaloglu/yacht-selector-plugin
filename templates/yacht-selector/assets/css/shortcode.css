@@ -1,0 +1,604 @@
+/* ══════════════════════════════════════
+   YACHT PICKER — horizontal drag/snap strip
+   ══════════════════════════════════════ */
+.yacht-picker-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 100vw;
+  height: 320px;
+  transform: translateY(calc(-50% - 40px));
+  overflow: visible;
+  z-index: 3;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.yacht-picker-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+.yacht-picker-track.dragging { cursor: grabbing; }
+
+.yacht-picker-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  transform-origin: center center;
+  transition: all 0.45s cubic-bezier(0.23,1,0.32,1);
+  will-change: transform, width, height, opacity;
+}
+.yacht-picker-track.dragging .yacht-picker-item,
+.yacht-picker-track.no-transition .yacht-picker-item { transition: none !important; }
+.yacht-picker-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Navigation arrows on main image ── */
+.yacht-nav {
+  position: absolute;
+  top: 66%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.2s ease, background 0.2s ease;
+  padding: 0;
+}
+.yacht-nav svg {
+  width: 22px;
+  height: 22px;
+}
+.yacht-visual:hover .yacht-nav {
+  opacity: 1;
+}
+.yacht-nav:hover {
+  background: rgba(0,0,0,0.4);
+  transform: translateY(-50%) scale(1.08);
+}
+.yacht-nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+.yacht-nav-left { left: 16px; }
+.yacht-nav-right { right: 16px; }
+
+/* ══════════════════════════════════════
+   COUNTRY WATERMARK
+   ══════════════════════════════════════ */
+.country-watermark {
+  position: fixed;
+  right: 60px;
+  bottom: 40px;
+  font-family: 'EB Garamond', serif;
+  font-size: 42px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(13, 148, 136, 0.35);
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(0);
+}
+.country-watermark:empty {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* ══════════════════════════════════════
+   MAIN CARD
+   ══════════════════════════════════════ */
+.main-card {
+  position: relative;
+  width: 920px;
+  background: #fff;
+  border-radius: 40px 40px 20px 20px;
+  box-shadow: 0px 30px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   YACHT IMAGE AREA
+   ══════════════════════════════════════ */
+.yacht-visual {
+  position: relative;
+  width: 100%;
+  height: 637px;
+  overflow: hidden;
+  border-radius: 40px 40px 0 0;
+}
+.yacht-visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  transition: opacity 0.5s ease;
+  border-radius: 40px 40px 0 0;
+}
+#yachtImgB {
+  opacity: 0;
+}
+#transitionCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 40px 40px 0 0;
+}
+
+/* ── Dark gradient overlay at bottom of image ── */
+.yacht-visual::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 130px;
+  background: linear-gradient(to top, #2f2f2f, rgba(47,47,47,0));
+  opacity: 0.6;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── Frosted Header (tabs + slider, 180px) ── */
+.frosted-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 180px;
+  background: rgba(159,159,159,0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 30px 0;
+  gap: 22px;
+  border-radius: 40px 40px 0 0;
+}
+
+/* ── Country Tabs ── */
+.country-tabs {
+  display: flex;
+  gap: 20px;
+}
+.country-tab {
+  width: 200px;
+  height: 36px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+  white-space: nowrap;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.28px;
+}
+.country-tab:hover {
+  background: rgba(255,255,255,0.15);
+}
+.country-tab.active {
+  color: #000;
+  background: #fff;
+  border-color: #fff;
+  font-weight: 500;
+}
+.country-tab .flag-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+/* ══════════════════════════════════════
+   MONTH PICKER (inside frosted header, full width)
+   ══════════════════════════════════════ */
+.picker-wrapper {
+  position: relative;
+  width: calc(100% + 60px);
+  margin: 0 -30px;
+  height: 80px;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* All months shown at equal opacity — no fade-by-distance */
+
+/* Center selected card */
+.center-overlay {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  width: 110px;
+  height: 80px;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 14px;
+}
+.center-month {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  line-height: 1;
+}
+.center-bar-track {
+  width: 70px;
+  height: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.center-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.23,1,0.32,1), background 0.3s ease;
+}
+.center-pct-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+}
+.center-pct {
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.center-pct-label {
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+/* Scroll track */
+.picker-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: grab;
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
+  z-index: 2;
+  position: relative;
+}
+.picker-track.dragging { transition: none; cursor: grabbing; }
+.picker-track.no-transition { transition: none !important; }
+
+/* Month items — uniform appearance, no fade */
+.picker-item {
+  flex-shrink: 0;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  transition: opacity 0.3s ease;
+}
+.month-name {
+  font-size: 14px;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+}
+.picker-item.selected { opacity: 0; width: 120px; }
+
+.occ-bar-track {
+  width: 50px;
+  height: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.occ-bar-fill {
+  width: var(--occ-fill-width, 0%);
+  height: 100%;
+  border-radius: 4px;
+  background: var(--occ-fill-color, transparent);
+}
+
+.occ-pct {
+  font-size: 8px;
+  font-weight: 400;
+  color: #fff;
+  line-height: 1;
+}
+
+/* ── Yacht Name Overlay ── */
+.yacht-name-area {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 160px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 0;
+}
+/* Name row: left line + text + right line, all bottom-aligned */
+.yacht-name-row {
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  padding: 0 40px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.yacht-name-line {
+  width: 170px;
+  flex-shrink: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.7);
+  position: relative;
+  top: -6px;
+}
+.yacht-name-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 56px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 1.12px;
+  text-align: center;
+  line-height: normal;
+  transition: opacity 0.4s ease;
+  flex: 1;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD
+   ══════════════════════════════════════ */
+.dashboard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 40px 24px;
+  gap: 60px;
+}
+
+/* Left: Specs */
+.specs-left {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 170px;
+  flex-shrink: 0;
+}
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  gap: 12px;
+}
+.spec-label {
+  color: rgba(0,0,0,0.6);
+  font-weight: 400;
+}
+.spec-value {
+  color: #000;
+  font-weight: 400;
+  text-align: right;
+}
+
+/* Center: Stats — fixed width matching yacht name area */
+.specs-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-shrink: 0;
+  gap: 10px;
+}
+.stat-block {
+  text-align: center;
+  width: 120px;
+}
+.stat-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000;
+  letter-spacing: 0.96px;
+  margin-top: 4px;
+}
+
+/* Right: Amenities */
+.specs-right {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 170px;
+  flex-shrink: 0;
+}
+.amenity {
+  font-size: 14px;
+  color: #000;
+  font-weight: 400;
+  line-height: 1;
+}
+.amenity.more {
+  color: rgba(0,0,0,0.45);
+}
+
+/* ══════════════════════════════════════
+   CTA — Golden gradient bar
+   ══════════════════════════════════════ */
+.cta-area {
+  padding: 0;
+  position: relative;
+}
+.cta-bar {
+  width: 100%;
+  height: 93px;
+  background: linear-gradient(to top, #e5a15c, #ffd26b);
+  border-radius: 0 0 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cta-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  letter-spacing: 0.4px;
+  border: none;
+  background: none;
+  transition: background 0.2s ease;
+}
+/* Center CTA — wider */
+.cta-section.cta-primary {
+  flex: 2.4;
+}
+.cta-section:hover {
+  background: rgba(0,0,0,0.06);
+}
+.cta-section:active {
+  background: rgba(0,0,0,0.12);
+}
+.cta-section:first-child {
+  border-radius: 0 0 0 20px;
+}
+.cta-section:last-child {
+  border-radius: 0 0 20px 0;
+}
+.cta-divider {
+  width: 1px;
+  height: 50px;
+  background: rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+#debugPanel {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  width: 180px;
+  display: none;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  backdrop-filter: blur(10px);
+  font-family: Inter, sans-serif;
+}
+.debug-panel-title {
+  margin-bottom: 8px;
+  color: #0d9488;
+  font-size: 13px;
+  font-weight: 600;
+}
+.debug-panel-select {
+  width: 100%;
+  padding: 6px 8px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.debug-panel-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  background: #f0faf9;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — basic mobile awareness
+   ══════════════════════════════════════ */
+@media (max-width: 1500px) {
+  /* yacht-picker items sized by JS */
+}
+@media (max-width: 1100px) {
+  .yacht-picker-wrapper { display: none; }
+  .country-watermark { display: none; }
+  .logo { position: relative; left: auto; margin: 0 auto 16px; }
+  .page { padding: 20px 12px; }
+  .page-inner { flex-direction: column; }
+}
+@media (max-width: 960px) {
+  .main-card { width: 100%; border-radius: 28px 28px 16px 16px; }
+  .frosted-header { height: auto; padding: 16px 12px; border-radius: 28px 28px 0 0; }
+  .country-tabs { flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .country-tab { width: auto; min-width: 80px; padding: 0 16px; font-size: 14px; }
+  .yacht-visual { height: 480px; }
+  .yacht-name-text { font-size: 38px; }
+  .dashboard {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+  .specs-center { flex: none; }
+  .cta-bar { height: 70px; }
+  .cta-section { font-size: 16px; }
+  .cta-divider { height: 36px; }
+}

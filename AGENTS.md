@@ -9,9 +9,7 @@ Build a production-ready WordPress plugin that renders a yacht selection fronten
 - Do not target `main` directly for active development
 
 ## Frontend Rules
-- `templates/frontend-static-reference.html` is the visual source of truth
-- Preserve section order, class structure, and general layout unless explicitly asked
-- Convert static markup into dynamic PHP output with minimal visual deviation
+
 
 ## Code Rules
 - Prefer modular PHP classes under `/includes`

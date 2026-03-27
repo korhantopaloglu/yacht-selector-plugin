@@ -1,0 +1,268 @@
+.ys-settings-page {
+  max-width: 960px;
+}
+
+.ys-settings-intro {
+  max-width: 760px;
+  margin: 0 0 20px;
+}
+
+.ys-repeatable {
+  max-width: 640px;
+}
+
+.ys-repeatable-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ys-repeatable-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ys-repeatable-row .regular-text {
+  flex: 1;
+}
+
+@media screen and (max-width: 782px) {
+  .ys-repeatable-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.ys-meta-section + .ys-meta-section,
+.ys-field + .ys-field {
+  margin-top: 16px;
+}
+
+.ys-admin-panel {
+  margin: -6px -12px -12px;
+}
+
+.ys-admin-tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 16px 0;
+  border-bottom: 1px solid #e0e4ea;
+  background: linear-gradient(180deg, #f8fafc 0%, #f6f7f7 100%);
+}
+
+.ys-tab-button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #2c3338;
+  cursor: pointer;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  padding: 10px 14px;
+  transition: all 0.18s ease;
+}
+
+.ys-tab-button:hover,
+.ys-tab-button:focus {
+  background: #eef2f6;
+  color: #0a4b78;
+  outline: none;
+}
+
+.ys-tab-button.is-active {
+  background: #fff;
+  border-color: #d0d7de;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  color: #0a4b78;
+}
+
+.ys-admin-tabs-panels {
+  background: #f6f7f7;
+  padding: 16px;
+}
+
+.ys-tab-panel {
+  display: none;
+}
+
+.ys-tab-panel.is-active {
+  display: block;
+}
+
+.ys-admin-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ys-admin-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  padding: 18px;
+}
+
+.ys-admin-card-full,
+.ys-field-full {
+  grid-column: 1 / -1;
+}
+
+.ys-admin-card-header {
+  margin-bottom: 16px;
+}
+
+.ys-admin-card-header h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.ys-admin-card-header p {
+  color: #646970;
+  margin: 0;
+}
+
+.ys-meta-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.ys-meta-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ys-field label {
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.ys-field .regular-text,
+.ys-field .widefat,
+.ys-field select {
+  width: 100%;
+  max-width: none;
+}
+
+.ys-booked-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin-top: 12px;
+}
+
+.ys-booked-item,
+.ys-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.ys-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ys-checkbox-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ys-taxonomy-container .categorydiv {
+  margin: 0;
+}
+
+.ys-taxonomy-container .category-tabs,
+.ys-taxonomy-container .hide-if-no-js {
+  display: none;
+}
+
+.ys-taxonomy-container .tabs-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  max-height: 260px;
+  padding: 12px;
+}
+
+.ys-taxonomy-container .categorychecklist {
+  margin: 0;
+}
+
+.ys-image-preview-wrap {
+  margin-top: 10px;
+}
+
+.ys-image-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  height: auto;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+}
+
+.ys-image-placeholder {
+  display: inline-block;
+  padding: 18px;
+  border: 1px dashed #c3c4c7;
+  border-radius: 10px;
+  color: #646970;
+}
+
+.ys-image-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ys-bulk-edit-fieldset .inline-edit-col {
+  width: 100%;
+}
+
+.ys-bulk-booked-action {
+  min-width: 220px;
+  margin-top: 4px;
+}
+
+.ys-bulk-booked-grid {
+  margin-top: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media screen and (max-width: 782px) {
+  .ys-admin-tabs-nav,
+  .ys-admin-tabs-panels {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .ys-admin-grid,
+  .ys-checkbox-grid,
+  .ys-meta-grid-2,
+  .ys-booked-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ys-tab-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

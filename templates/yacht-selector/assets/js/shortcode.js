@@ -1,631 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NAVIGA — Yacht Selector</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-/* ══════════════════════════════════════
-   RESET & BASE
-   ══════════════════════════════════════ */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-html, body {
-  width: 100%;
-  height: 100%;
-}
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f0faf9;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
-
-/* Three.js placeholder canvas — Phase 2 */
-#bgCanvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* ══════════════════════════════════════
-   PAGE LAYOUT
-   ══════════════════════════════════════ */
-.page {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.page-inner {
-  position: relative;
-  width: 100%;
-  max-width: 1920px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ══════════════════════════════════════
-   LOGO
-   ══════════════════════════════════════ */
-.logo {
-  position: absolute;
-  top: 60px;
-  left: 160px;
-  z-index: 20;
-  width: 184px;
-  height: 71px;
-}
-.logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* ══════════════════════════════════════
-   YACHT PICKER — horizontal drag/snap strip
-   ══════════════════════════════════════ */
-.yacht-picker-wrapper {
-  position: fixed;
-  top: 50%;
-  left: 0;
-  width: 100vw;
-  height: 320px;
-  transform: translateY(calc(-50% - 40px));
-  overflow: visible;
-  z-index: 3;
-  -webkit-user-select: none;
-  user-select: none;
-  pointer-events: auto;
-}
-
-.yacht-picker-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
-}
-.yacht-picker-track.dragging { cursor: grabbing; }
-
-.yacht-picker-item {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  border-radius: 20px;
-  overflow: hidden;
-  cursor: pointer;
-  transform-origin: center center;
-  transition: all 0.45s cubic-bezier(0.23,1,0.32,1);
-  will-change: transform, width, height, opacity;
-}
-.yacht-picker-track.dragging .yacht-picker-item,
-.yacht-picker-track.no-transition .yacht-picker-item { transition: none !important; }
-.yacht-picker-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ── Navigation arrows on main image ── */
-.yacht-nav {
-  position: absolute;
-  top: 66%;
-  transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  cursor: pointer;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.25s ease, transform 0.2s ease, background 0.2s ease;
-  padding: 0;
-}
-.yacht-nav svg {
-  width: 22px;
-  height: 22px;
-}
-.yacht-visual:hover .yacht-nav {
-  opacity: 1;
-}
-.yacht-nav:hover {
-  background: rgba(0,0,0,0.4);
-  transform: translateY(-50%) scale(1.08);
-}
-.yacht-nav:active {
-  transform: translateY(-50%) scale(0.95);
-}
-.yacht-nav-left { left: 16px; }
-.yacht-nav-right { right: 16px; }
-
-/* ══════════════════════════════════════
-   COUNTRY WATERMARK
-   ══════════════════════════════════════ */
-.country-watermark {
-  position: fixed;
-  right: 60px;
-  bottom: 40px;
-  font-family: 'EB Garamond', serif;
-  font-size: 42px;
-  font-weight: 500;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: rgba(13, 148, 136, 0.35);
-  pointer-events: none;
-  z-index: 2;
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  transform: translateY(0);
-}
-.country-watermark:empty {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-/* ══════════════════════════════════════
-   MAIN CARD
-   ══════════════════════════════════════ */
-.main-card {
-  position: relative;
-  width: 920px;
-  background: #fff;
-  border-radius: 40px 40px 20px 20px;
-  box-shadow: 0px 30px 60px rgba(0,0,0,0.3);
-  overflow: hidden;
-  z-index: 10;
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════
-   YACHT IMAGE AREA
-   ══════════════════════════════════════ */
-.yacht-visual {
-  position: relative;
-  width: 100%;
-  height: 637px;
-  overflow: hidden;
-  border-radius: 40px 40px 0 0;
-}
-.yacht-visual-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-  transition: opacity 0.5s ease;
-  border-radius: 40px 40px 0 0;
-}
-
-/* ── Dark gradient overlay at bottom of image ── */
-.yacht-visual::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 130px;
-  background: linear-gradient(to top, #2f2f2f, rgba(47,47,47,0));
-  opacity: 0.6;
-  z-index: 3;
-  pointer-events: none;
-}
-
-/* ── Frosted Header (tabs + slider, 180px) ── */
-.frosted-header {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 180px;
-  background: rgba(159,159,159,0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 30px 0;
-  gap: 22px;
-  border-radius: 40px 40px 0 0;
-}
-
-/* ── Country Tabs ── */
-.country-tabs {
-  display: flex;
-  gap: 20px;
-}
-.country-tab {
-  width: 200px;
-  height: 36px;
-  font-size: 14px;
-  font-weight: 400;
-  font-family: 'Inter', sans-serif;
-  color: #fff;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.8);
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
-  white-space: nowrap;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  letter-spacing: 0.28px;
-}
-.country-tab:hover {
-  background: rgba(255,255,255,0.15);
-}
-.country-tab.active {
-  color: #000;
-  background: #fff;
-  border-color: #fff;
-  font-weight: 500;
-}
-.country-tab .flag-icon {
-  width: 16px;
-  height: 16px;
-  border-radius: 2px;
-  object-fit: cover;
-}
-
-/* ══════════════════════════════════════
-   MONTH PICKER (inside frosted header, full width)
-   ══════════════════════════════════════ */
-.picker-wrapper {
-  position: relative;
-  width: calc(100% + 60px);
-  margin: 0 -30px;
-  height: 80px;
-  overflow: hidden;
-  -webkit-user-select: none;
-  user-select: none;
-}
-/* All months shown at equal opacity — no fade-by-distance */
-
-/* Center selected card */
-.center-overlay {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%,-50%);
-  width: 110px;
-  height: 80px;
-  background: #fff;
-  border: 2px solid #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  z-index: 3;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 14px;
-}
-.center-month {
-  font-size: 16px;
-  font-weight: 500;
-  color: #000;
-  line-height: 1;
-}
-.center-bar-track {
-  width: 70px;
-  height: 4px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.center-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s cubic-bezier(0.23,1,0.32,1), background 0.3s ease;
-}
-.center-pct-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  line-height: 1;
-}
-.center-pct {
-  font-size: 12px;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-.center-pct-label {
-  font-size: 12px;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-/* Scroll track */
-.picker-track {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  cursor: grab;
-  will-change: transform;
-  transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
-  z-index: 2;
-  position: relative;
-}
-.picker-track.dragging { transition: none; cursor: grabbing; }
-.picker-track.no-transition { transition: none !important; }
-
-/* Month items — uniform appearance, no fade */
-.picker-item {
-  flex-shrink: 0;
-  width: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 0;
-  transition: opacity 0.3s ease;
-}
-.month-name {
-  font-size: 14px;
-  font-weight: 300;
-  color: #fff;
-  line-height: 1;
-}
-.picker-item.selected { opacity: 0; width: 120px; }
-
-.occ-bar-track {
-  width: 50px;
-  height: 4px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.occ-bar-fill { height: 100%; border-radius: 4px; }
-
-.occ-pct {
-  font-size: 8px;
-  font-weight: 400;
-  color: #fff;
-  line-height: 1;
-}
-
-/* ── Yacht Name Overlay ── */
-.yacht-name-area {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 160px;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 0;
-}
-/* Name row: left line + text + right line, all bottom-aligned */
-.yacht-name-row {
-  display: flex;
-  align-items: baseline;
-  width: 100%;
-  padding: 0 40px;
-  margin-bottom: 14px;
-  position: relative;
-  z-index: 2;
-}
-.yacht-name-line {
-  width: 170px;
-  flex-shrink: 0;
-  height: 1px;
-  background: rgba(255,255,255,0.7);
-  position: relative;
-  top: -6px;
-}
-.yacht-name-text {
-  font-family: 'EB Garamond', serif;
-  font-size: 56px;
-  font-weight: 600;
-  color: #fff;
-  text-transform: none;
-  letter-spacing: 1.12px;
-  text-align: center;
-  line-height: normal;
-  transition: opacity 0.4s ease;
-  flex: 1;
-  padding: 0 20px;
-  white-space: nowrap;
-}
-
-/* ══════════════════════════════════════
-   DASHBOARD
-   ══════════════════════════════════════ */
-.dashboard {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 28px 40px 24px;
-  gap: 60px;
-}
-
-/* Left: Specs */
-.specs-left {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 170px;
-  flex-shrink: 0;
-}
-.spec-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1;
-  gap: 12px;
-}
-.spec-label {
-  color: rgba(0,0,0,0.6);
-  font-weight: 400;
-}
-.spec-value {
-  color: #000;
-  font-weight: 400;
-  text-align: right;
-}
-
-/* Center: Stats — fixed width matching yacht name area */
-.specs-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: center;
-  flex-shrink: 0;
-  gap: 10px;
-}
-.stat-block {
-  text-align: center;
-  width: 120px;
-}
-.stat-number {
-  font-size: 48px;
-  font-weight: 700;
-  color: #000;
-  line-height: 1;
-}
-.stat-label {
-  font-size: 16px;
-  font-weight: 400;
-  color: #000;
-  letter-spacing: 0.96px;
-  margin-top: 4px;
-}
-
-/* Right: Amenities */
-.specs-right {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 170px;
-  flex-shrink: 0;
-}
-.amenity {
-  font-size: 14px;
-  color: #000;
-  font-weight: 400;
-  line-height: 1;
-}
-.amenity.more {
-  color: rgba(0,0,0,0.45);
-}
-
-/* ══════════════════════════════════════
-   CTA — Golden gradient bar
-   ══════════════════════════════════════ */
-.cta-area {
-  padding: 0;
-  position: relative;
-}
-.cta-bar {
-  width: 100%;
-  height: 93px;
-  background: linear-gradient(to top, #e5a15c, #ffd26b);
-  border-radius: 0 0 20px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cta-section {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  color: #000;
-  letter-spacing: 0.4px;
-  border: none;
-  background: none;
-  transition: background 0.2s ease;
-}
-/* Center CTA — wider */
-.cta-section.cta-primary {
-  flex: 2.4;
-}
-.cta-section:hover {
-  background: rgba(0,0,0,0.06);
-}
-.cta-section:active {
-  background: rgba(0,0,0,0.12);
-}
-.cta-section:first-child {
-  border-radius: 0 0 0 20px;
-}
-.cta-section:last-child {
-  border-radius: 0 0 20px 0;
-}
-.cta-divider {
-  width: 1px;
-  height: 50px;
-  background: rgba(0,0,0,0.15);
-  flex-shrink: 0;
-}
-
-/* ══════════════════════════════════════
-   RESPONSIVE — basic mobile awareness
-   ══════════════════════════════════════ */
-@media (max-width: 1500px) {
-  /* yacht-picker items sized by JS */
-}
-@media (max-width: 1100px) {
-  .yacht-picker-wrapper { display: none; }
-  .country-watermark { display: none; }
-  .logo { position: relative; left: auto; margin: 0 auto 16px; }
-  .page { padding: 20px 12px; }
-  .page-inner { flex-direction: column; }
-}
-@media (max-width: 960px) {
-  .main-card { width: 100%; border-radius: 28px 28px 16px 16px; }
-  .frosted-header { height: auto; padding: 16px 12px; border-radius: 28px 28px 0 0; }
-  .country-tabs { flex-wrap: wrap; justify-content: center; gap: 6px; }
-  .country-tab { width: auto; min-width: 80px; padding: 0 16px; font-size: 14px; }
-  .yacht-visual { height: 480px; }
-  .yacht-name-text { font-size: 38px; }
-  .dashboard {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 24px;
-  }
-  .specs-center { flex: none; }
-  .cta-bar { height: 70px; }
-  .cta-section { font-size: 16px; }
-  .cta-divider { height: 36px; }
-}
-</style>
-</head>
-<body>
-
-<!-- Three.js background — dot wave -->
-<canvas id="bgCanvas"></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
 (function() {
   const canvas = document.getElementById('bgCanvas');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -671,13 +43,13 @@ body {
     for (let c = 0; c < cols; c++) {
       const idx = r * cols + c;
       const i = idx * 3;
-      basePositions[i]     = (c - cols / 2) * spacing;
+      basePositions[i] = (c - cols / 2) * spacing;
       basePositions[i + 1] = 0;
       basePositions[i + 2] = (r - rows / 2) * spacing;
-      positions[i]     = basePositions[i];
+      positions[i] = basePositions[i];
       positions[i + 1] = 0;
       positions[i + 2] = basePositions[i + 2];
-      colors[i]     = baseColor.r;
+      colors[i] = baseColor.r;
       colors[i + 1] = baseColor.g;
       colors[i + 2] = baseColor.b;
       sizes[idx] = 1.0;
@@ -740,11 +112,11 @@ body {
         [10.2,4.0],[10.6,4.3],[11.0,4.0],[11.4,4.3],[11.8,4.6],
       ],
       harbors: {
-        'Bodrum':   [8.2, 4.8],
+        'Bodrum': [8.2, 4.8],
         'Marmaris': [8.7, 5.1],
-        'Fethiye':  [9.4, 4.0],
-        'Gocek':    [9.8, 3.7],
-        'Antalya':  [11.4, 4.3],
+        'Fethiye': [9.4, 4.0],
+        'Gocek': [9.8, 3.7],
+        'Antalya': [11.4, 4.3],
       },
     },
     greece: {
@@ -757,11 +129,11 @@ body {
         [7.7,3.3],[8.1,2.8],[8.5,2.3],[8.1,1.7],[7.6,1.2],
       ],
       harbors: {
-        'Athens':    [8.5, 2.3],
-        'Mykonos':  [9.0, 4.8],
-        'Santorini':[8.6, 4.3],
-        'Corfu':    [6.7, 2.4],
-        'Rhodes':   [8.0, 5.7],
+        'Athens': [8.5, 2.3],
+        'Mykonos': [9.0, 4.8],
+        'Santorini': [8.6, 4.3],
+        'Corfu': [6.7, 2.4],
+        'Rhodes': [8.0, 5.7],
       },
     },
     croatia: {
@@ -774,14 +146,13 @@ body {
       ],
       harbors: {
         'Dubrovnik': [6.3, 4.3],
-        'Split':     [5.8, 2.7],
-        'Hvar':      [6.2, 3.3],
-        'Zadar':     [6.1, 0.9],
+        'Split': [5.8, 2.7],
+        'Hvar': [6.2, 3.3],
+        'Zadar': [6.1, 0.9],
       },
     },
   };
 
-  // Interpolate outline for denser coastline
   function interpolateOutline(pts, density) {
     const result = [];
     for (let i = 0; i < pts.length - 1; i++) {
@@ -798,13 +169,10 @@ body {
     return result;
   }
 
-  // Build country objects: coastline (line) + harbor pins (large dots) + harbor rings
   const countryObjects = {};
 
   Object.keys(countryData).forEach(key => {
     const cd = countryData[key];
-
-    // ── Coastline as a thick dotted line ──
     const coastPts = interpolateOutline(cd.outline, 12);
     const cGeo = new THREE.BufferGeometry();
     const cPos = new Float32Array(coastPts.length * 3);
@@ -821,11 +189,11 @@ body {
     const cPoints = new THREE.Points(cGeo, cMat);
     scene.add(cPoints);
 
-    // ── Harbor pins — bright teal, much larger ──
     const harborEntries = Object.entries(cd.harbors);
     const hGeo = new THREE.BufferGeometry();
     const hPos = new Float32Array(harborEntries.length * 3);
-    harborEntries.forEach(([name, p], i) => {
+    harborEntries.forEach((entry, i) => {
+      const p = entry[1];
       hPos[i * 3] = p[0];
       hPos[i * 3 + 1] = 0.25;
       hPos[i * 3 + 2] = p[1];
@@ -838,10 +206,9 @@ body {
     const hPoints = new THREE.Points(hGeo, hMat);
     scene.add(hPoints);
 
-    // ── Harbor pulse rings — expanding circle per harbor ──
-    const ringGeos = [];
     const ringMeshes = [];
-    harborEntries.forEach(([name, p]) => {
+    harborEntries.forEach(entry => {
+      const p = entry[1];
       const ringGeo = new THREE.RingGeometry(0.08, 0.12, 32);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0x0d9488, transparent: true, opacity: 0, side: THREE.DoubleSide,
@@ -850,7 +217,6 @@ body {
       ring.position.set(p[0], 0.2, p[1]);
       ring.rotation.x = -Math.PI / 2;
       scene.add(ring);
-      ringGeos.push(ringGeo);
       ringMeshes.push({ mesh: ring, mat: ringMat, baseX: p[0], baseZ: p[1] });
     });
 
@@ -861,28 +227,19 @@ body {
     };
   });
 
-  // Country transition state
-  let activeCountry = 'all';
   let countryTargetAlpha = {};
   Object.keys(countryData).forEach(k => { countryTargetAlpha[k] = 0; });
 
   window.setBgCountry = function(country) {
-    activeCountry = country;
     Object.keys(countryData).forEach(k => {
       countryTargetAlpha[k] = (country !== 'all' && k === country) ? 1.0 : 0;
     });
-    // Update watermark label
     const wm = document.getElementById('countryWatermark');
     if (wm) {
-      if (country !== 'all' && countryData[country]) {
-        wm.textContent = countryData[country].label;
-      } else {
-        wm.textContent = '';
-      }
+      wm.textContent = country !== 'all' && countryData[country] ? countryData[country].label : '';
     }
   };
 
-  // Resize
   function onResize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -894,20 +251,17 @@ body {
   onResize();
   window.addEventListener('resize', onResize);
 
-  // Helper: wave Y at a world position
   function waveY(bx, bz, t) {
     return Math.sin(bx * 1.2 + t * 1.2) * 0.12
-         + Math.sin(bz * 0.9 + t * 0.9) * 0.1
-         + Math.sin((bx + bz) * 0.7 + t * 0.7) * 0.07
-         + Math.sin(bx * 2.5 - t * 1.5) * 0.04;
+      + Math.sin(bz * 0.9 + t * 0.9) * 0.1
+      + Math.sin((bx + bz) * 0.7 + t * 0.7) * 0.07
+      + Math.sin(bx * 2.5 - t * 1.5) * 0.04;
   }
 
-  // Animation loop
   function animate(time) {
     requestAnimationFrame(animate);
     const t = time * 0.001;
 
-    // Animate ocean dot grid
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const i = (r * cols + c) * 3;
@@ -916,18 +270,15 @@ body {
     }
     geometry.attributes.position.needsUpdate = true;
 
-    // Animate country overlays
     Object.keys(countryData).forEach(k => {
       const obj = countryObjects[k];
       const target = countryTargetAlpha[k];
       const coast = obj.coast;
       const harbor = obj.harbor;
 
-      // Smooth lerp
       coast.mat.opacity += (target * 0.9 - coast.mat.opacity) * 0.08;
       harbor.mat.opacity += (target * 1.0 - harbor.mat.opacity) * 0.08;
 
-      // Coastline rides the waves
       if (coast.mat.opacity > 0.005) {
         const cp = coast.geo.attributes.position.array;
         for (let i = 0; i < cp.length; i += 3) {
@@ -936,23 +287,21 @@ body {
         coast.geo.attributes.position.needsUpdate = true;
       }
 
-      // Harbor pins ride waves + gentle bob
       if (harbor.mat.opacity > 0.005) {
         const hp = harbor.geo.attributes.position.array;
         for (let i = 0; i < hp.length; i += 3) {
           hp[i + 1] = waveY(harbor.basePos[i], harbor.basePos[i + 2], t) + 0.3
-                    + Math.sin(t * 1.8 + i) * 0.04;
+            + Math.sin(t * 1.8 + i) * 0.04;
         }
         harbor.geo.attributes.position.needsUpdate = true;
       }
 
-      // Pulse rings
-      obj.rings.forEach((r, ri) => {
+      obj.rings.forEach((ring, ri) => {
         const ringAlpha = coast.mat.opacity;
-        r.mat.opacity = ringAlpha * 0.6 * (0.5 + 0.5 * Math.sin(t * 2.0 + ri * 1.5));
+        ring.mat.opacity = ringAlpha * 0.6 * (0.5 + 0.5 * Math.sin(t * 2.0 + ri * 1.5));
         const pulse = 1.0 + 0.3 * Math.sin(t * 2.0 + ri * 1.5);
-        r.mesh.scale.set(pulse, pulse, 1);
-        r.mesh.position.y = waveY(r.baseX, r.baseZ, t) + 0.22;
+        ring.mesh.scale.set(pulse, pulse, 1);
+        ring.mesh.position.y = waveY(ring.baseX, ring.baseZ, t) + 0.22;
       });
     });
 
@@ -960,146 +309,50 @@ body {
   }
   requestAnimationFrame(animate);
 })();
-</script>
 
-<div class="page">
-<div class="page-inner">
-
-  <!-- LOGO -->
-  <div class="logo">
-    <img src="assets/logo.svg" alt="Naviga Yachting">
-  </div>
-
-  <!-- YACHT PICKER — horizontal drag/snap strip behind the card -->
-  <div class="yacht-picker-wrapper" id="yachtPickerWrapper">
-    <div class="yacht-picker-track" id="yachtPickerTrack"></div>
-  </div>
-
-  <!-- COUNTRY WATERMARK -->
-  <div class="country-watermark" id="countryWatermark"></div>
-
-  <!-- ═══ MAIN CARD ═══ -->
-  <div class="main-card">
-
-    <!-- Yacht Image Area -->
-    <div class="yacht-visual" id="yachtVisual">
-      <img class="yacht-visual-img" id="yachtImgA" src="" alt="">
-      <img class="yacht-visual-img" id="yachtImgB" src="" alt="" style="opacity:0">
-      <canvas id="transitionCanvas" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0;border-radius:40px 40px 0 0;"></canvas>
-
-      <!-- Frosted Header: Tabs + Picker (180px) -->
-      <div class="frosted-header">
-        <div class="country-tabs" id="countryTabs">
-          <button class="country-tab active" data-country="all">All</button>
-          <button class="country-tab" data-country="greece">
-            <img class="flag-icon" src="assets/flags/greece.png" alt=""> Greece
-          </button>
-          <button class="country-tab" data-country="turkey">
-            <img class="flag-icon" src="assets/flags/turkey.png" alt=""> Turkey
-          </button>
-          <button class="country-tab" data-country="croatia">
-            <img class="flag-icon" src="assets/flags/croatia.png" alt=""> Croatia
-          </button>
-        </div>
-
-        <div class="picker-wrapper" id="monthPicker">
-          <div class="center-overlay">
-            <div class="center-month" id="centerMonth">July</div>
-            <div class="center-bar-track"><div class="center-bar-fill" id="centerBar"></div></div>
-            <div class="center-pct-row">
-              <span class="center-pct" id="centerPct">95%</span>
-              <span class="center-pct-label" id="centerPctLabel">Full</span>
-            </div>
-          </div>
-          <div class="picker-track"></div>
-        </div>
-      </div>
-
-      <!-- Yacht Name Overlay -->
-      <div class="yacht-name-area">
-        <div class="yacht-name-row">
-          <div class="yacht-name-line"></div>
-          <div class="yacht-name-text" id="yachtName">Dea Del Mare</div>
-          <div class="yacht-name-line"></div>
-        </div>
-      </div>
-
-      <!-- Navigation Arrows -->
-      <button class="yacht-nav yacht-nav-left" id="yachtNavLeft" aria-label="Previous yacht">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button class="yacht-nav yacht-nav-right" id="yachtNavRight" aria-label="Next yacht">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-    <!-- Dashboard -->
-    <div class="dashboard">
-      <div class="specs-left" id="specsLeft"></div>
-      <div class="specs-center" id="specsCenter"></div>
-      <div class="specs-right" id="specsRight"></div>
-    </div>
-
-    <!-- CTA -->
-    <div class="cta-area">
-      <div class="cta-bar">
-        <button class="cta-section">Watch Video</button>
-        <div class="cta-divider"></div>
-        <button class="cta-section cta-primary">Video Call Now</button>
-        <div class="cta-divider"></div>
-        <button class="cta-section">Schedule</button>
-      </div>
-    </div>
-
-  </div><!-- /main-card -->
-
-</div><!-- /page-inner -->
-</div><!-- /page -->
-
-<script>
 /* ══════════════════════════════════════
    DATA
    ══════════════════════════════════════ */
 const monthNames = [
-  { name: 'Jan', full: 'January' },  { name: 'Feb', full: 'February' },
-  { name: 'Mar', full: 'March' },    { name: 'Apr', full: 'April' },
-  { name: 'May', full: 'May' },      { name: 'Jun', full: 'June' },
-  { name: 'Jul', full: 'July' },     { name: 'Aug', full: 'August' },
-  { name: 'Sep', full: 'September' },{ name: 'Oct', full: 'October' },
+  { name: 'Jan', full: 'January' }, { name: 'Feb', full: 'February' },
+  { name: 'Mar', full: 'March' }, { name: 'Apr', full: 'April' },
+  { name: 'May', full: 'May' }, { name: 'Jun', full: 'June' },
+  { name: 'Jul', full: 'July' }, { name: 'Aug', full: 'August' },
+  { name: 'Sep', full: 'September' }, { name: 'Oct', full: 'October' },
   { name: 'Nov', full: 'November' }, { name: 'Dec', full: 'December' },
 ];
 
 const occData = {
-  all:     [23, 31, 45, 58, 72, 89, 95, 88, 64, 42, 35, 78],
-  greece:  [15, 20, 35, 52, 78, 92, 98, 94, 68, 38, 22, 55],
-  turkey:  [30, 38, 50, 60, 70, 85, 90, 82, 58, 45, 40, 82],
+  all: [23, 31, 45, 58, 72, 89, 95, 88, 64, 42, 35, 78],
+  greece: [15, 20, 35, 52, 78, 92, 98, 94, 68, 38, 22, 55],
+  turkey: [30, 38, 50, 60, 70, 85, 90, 82, 58, 45, 40, 82],
   croatia: [18, 25, 42, 55, 75, 91, 97, 90, 62, 35, 28, 70],
 };
 
 const yachtDB = {
   greece: [
-    { name: 'Almila', img: 'assets/yachts/almila.jpg', model: 'Gulet', size: '24m x 6m', motor: '2x250hp', year: '2018', port: 'Athens', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'SUP', 'Snorkeling'], months: [4,5,6,7,8,9] },
-    { name: 'Bella', img: 'assets/yachts/bella.jpg', model: 'Gulet', size: '20m x 5.5m', motor: '2x200hp', year: '2021', port: 'Mykonos', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Snorkeling'], months: [3,4,5,6,7,8,9,10] },
-    { name: 'Double Eagle', img: 'assets/yachts/double-eagle.jpg', model: 'Motor Yacht', size: '30m x 7m', motor: '2x400hp', year: '2020', port: 'Santorini', cabins: 5, guests: 10, crew: 4, amenities: ['Jacuzzi', 'Jet Ski', 'Gym', 'Spa', 'Cinema'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
-    { name: 'Gulmaria', img: 'assets/yachts/gulmaria.jpg', model: 'Gulet', size: '22m x 5.5m', motor: '2x180hp', year: '2019', port: 'Corfu', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Fishing'], months: [5,6,7,8] },
-    { name: 'Casa Dell Arte', img: 'assets/yachts/casa-dell-arte.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x300hp', year: '2022', port: 'Rhodes', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Jacuzzi', 'Drone'], months: [4,5,6,7,8,9,10] },
+    { name: 'Almila', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/almila.jpg', model: 'Gulet', size: '24m x 6m', motor: '2x250hp', year: '2018', port: 'Athens', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'SUP', 'Snorkeling'], months: [4,5,6,7,8,9] },
+    { name: 'Bella', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/bella.jpg', model: 'Gulet', size: '20m x 5.5m', motor: '2x200hp', year: '2021', port: 'Mykonos', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Snorkeling'], months: [3,4,5,6,7,8,9,10] },
+    { name: 'Double Eagle', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/double-eagle.jpg', model: 'Motor Yacht', size: '30m x 7m', motor: '2x400hp', year: '2020', port: 'Santorini', cabins: 5, guests: 10, crew: 4, amenities: ['Jacuzzi', 'Jet Ski', 'Gym', 'Spa', 'Cinema'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
+    { name: 'Gulmaria', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/gulmaria.jpg', model: 'Gulet', size: '22m x 5.5m', motor: '2x180hp', year: '2019', port: 'Corfu', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Fishing'], months: [5,6,7,8] },
+    { name: 'Casa Dell Arte', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/casa-dell-arte.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x300hp', year: '2022', port: 'Rhodes', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Jacuzzi', 'Drone'], months: [4,5,6,7,8,9,10] },
   ],
   turkey: [
-    { name: 'Dea Del Mare', img: 'assets/yachts/dea-del-mare.jpg', model: 'Gulet', size: '28m x 6m', motor: '2x280hp', year: '2009 /21', port: 'Bodrum', cabins: 5, guests: 10, crew: 4, amenities: ['İnternet, TV', 'Bot (Joker 90hp)', 'Minder, Duş', 'Knee, Kano, Jetski', 'SUP', 'Snorkeling'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
-    { name: 'Good Life', img: 'assets/yachts/good-life.jpg', model: 'Gulet', size: '35m x 7.5m', motor: '2x450hp', year: '2020', port: 'Gocek', cabins: 6, guests: 12, crew: 5, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Jet Ski', 'SUP'], months: [3,4,5,6,7,8,9,10] },
-    { name: 'Calm Down', img: 'assets/yachts/calm-down.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x300hp', year: '2017', port: 'Marmaris', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Snorkeling', 'Kayak'], months: [4,5,6,7,8,9] },
-    { name: 'Freedom', img: 'assets/yachts/freedom.jpg', model: 'Gulet', size: '24m x 5.5m', motor: '2x220hp', year: '2015', port: 'Fethiye', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Fishing', 'Kayak'], months: [4,5,6,7,8,9,10] },
-    { name: 'Bellamare', img: 'assets/yachts/bellamare.jpg', model: 'Gulet', size: '30m x 7m', motor: '2x350hp', year: '2019', port: 'Bodrum', cabins: 5, guests: 10, crew: 4, amenities: ['WiFi', 'Jacuzzi', 'Jet Ski', 'Diving'], months: [3,4,5,6,7,8,9,10] },
-    { name: 'Cobra King', img: 'assets/yachts/cobra-king.jpg', model: 'Motor Yacht', size: '22m x 5.5m', motor: '2x400hp', year: '2023', port: 'Antalya', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Jacuzzi', 'Drone', 'SUP'], months: [5,6,7,8,9] },
-    { name: 'Bedia Sultan', img: 'assets/yachts/bedia-sultan.jpg', model: 'Gulet', size: '32m x 7m', motor: '2x300hp', year: '2012/22', port: 'Bodrum', cabins: 6, guests: 12, crew: 5, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Kano'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
-    { name: 'Cielo', img: 'assets/yachts/cielo.jpg', model: 'Gulet', size: '25m x 6m', motor: '2x260hp', year: '2016', port: 'Gocek', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Snorkeling', 'Fishing'], months: [4,5,6,7,8,9] },
+    { name: 'Dea Del Mare', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/dea-del-mare.jpg', model: 'Gulet', size: '28m x 6m', motor: '2x280hp', year: '2009 /21', port: 'Bodrum', cabins: 5, guests: 10, crew: 4, amenities: ['İnternet, TV', 'Bot (Joker 90hp)', 'Minder, Duş', 'Knee, Kano, Jetski', 'SUP', 'Snorkeling'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
+    { name: 'Good Life', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/good-life.jpg', model: 'Gulet', size: '35m x 7.5m', motor: '2x450hp', year: '2020', port: 'Gocek', cabins: 6, guests: 12, crew: 5, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Jet Ski', 'SUP'], months: [3,4,5,6,7,8,9,10] },
+    { name: 'Calm Down', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/calm-down.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x300hp', year: '2017', port: 'Marmaris', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Snorkeling', 'Kayak'], months: [4,5,6,7,8,9] },
+    { name: 'Freedom', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/freedom.jpg', model: 'Gulet', size: '24m x 5.5m', motor: '2x220hp', year: '2015', port: 'Fethiye', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Fishing', 'Kayak'], months: [4,5,6,7,8,9,10] },
+    { name: 'Bellamare', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/bellamare.jpg', model: 'Gulet', size: '30m x 7m', motor: '2x350hp', year: '2019', port: 'Bodrum', cabins: 5, guests: 10, crew: 4, amenities: ['WiFi', 'Jacuzzi', 'Jet Ski', 'Diving'], months: [3,4,5,6,7,8,9,10] },
+    { name: 'Cobra King', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/cobra-king.jpg', model: 'Motor Yacht', size: '22m x 5.5m', motor: '2x400hp', year: '2023', port: 'Antalya', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Jacuzzi', 'Drone', 'SUP'], months: [5,6,7,8,9] },
+    { name: 'Bedia Sultan', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/bedia-sultan.jpg', model: 'Gulet', size: '32m x 7m', motor: '2x300hp', year: '2012/22', port: 'Bodrum', cabins: 6, guests: 12, crew: 5, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Kano'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
+    { name: 'Cielo', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/cielo.jpg', model: 'Gulet', size: '25m x 6m', motor: '2x260hp', year: '2016', port: 'Gocek', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'SUP', 'Snorkeling', 'Fishing'], months: [4,5,6,7,8,9] },
   ],
   croatia: [
-    { name: 'Arabella', img: 'assets/yachts/arabella.jpg', model: 'Gulet', size: '24m x 6m', motor: '2x250hp', year: '2018', port: 'Dubrovnik', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Drone', 'SUP'], months: [3,4,5,6,7,8,9,10] },
-    { name: 'Babylon', img: 'assets/yachts/babylon.jpg', model: 'Gulet', size: '28m x 6.5m', motor: '2x300hp', year: '2020', port: 'Split', cabins: 5, guests: 10, crew: 4, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Jet Ski'], months: [4,5,6,7,8,9] },
-    { name: 'FX 38', img: 'assets/yachts/fx-38.jpg', model: 'Motor Yacht', size: '38m x 8m', motor: '2x600hp', year: '2024', port: 'Hvar', cabins: 6, guests: 12, crew: 5, amenities: ['Cinema', 'Gym', 'Spa', 'Jet Ski', 'Helipad'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
-    { name: 'DE Love', img: 'assets/yachts/de-love.jpg', model: 'Gulet', size: '22m x 5.5m', motor: '2x200hp', year: '2019', port: 'Zadar', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Fishing', 'SUP'], months: [5,6,7,8] },
-    { name: 'Alfa Mario', img: 'assets/yachts/alfa-mario.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x280hp', year: '2021', port: 'Dubrovnik', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Snorkeling', 'Drone'], months: [3,4,5,6,7,8,9,10] },
+    { name: 'Arabella', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/arabella.jpg', model: 'Gulet', size: '24m x 6m', motor: '2x250hp', year: '2018', port: 'Dubrovnik', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Drone', 'SUP'], months: [3,4,5,6,7,8,9,10] },
+    { name: 'Babylon', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/babylon.jpg', model: 'Gulet', size: '28m x 6.5m', motor: '2x300hp', year: '2020', port: 'Split', cabins: 5, guests: 10, crew: 4, amenities: ['WiFi', 'Jacuzzi', 'Water Ski', 'Jet Ski'], months: [4,5,6,7,8,9] },
+    { name: 'FX 38', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/fx-38.jpg', model: 'Motor Yacht', size: '38m x 8m', motor: '2x600hp', year: '2024', port: 'Hvar', cabins: 6, guests: 12, crew: 5, amenities: ['Cinema', 'Gym', 'Spa', 'Jet Ski', 'Helipad'], months: [0,1,2,3,4,5,6,7,8,9,10,11] },
+    { name: 'DE Love', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/de-love.jpg', model: 'Gulet', size: '22m x 5.5m', motor: '2x200hp', year: '2019', port: 'Zadar', cabins: 3, guests: 6, crew: 2, amenities: ['WiFi', 'Kayak', 'Fishing', 'SUP'], months: [5,6,7,8] },
+    { name: 'Alfa Mario', img: '/wp-content/plugins/yacht-selector-plugin/templates/assets/yachts/alfa-mario.jpg', model: 'Gulet', size: '26m x 6m', motor: '2x280hp', year: '2021', port: 'Dubrovnik', cabins: 4, guests: 8, crew: 3, amenities: ['WiFi', 'Jacuzzi', 'Snorkeling', 'Drone'], months: [3,4,5,6,7,8,9,10] },
   ],
 };
 
@@ -1111,7 +364,6 @@ function buildMonths(country) {
 function getYachts(country, monthIdx) {
   let pool = [];
   if (country === 'all') {
-    // Turkey first so Dea Del Mare is the default hero yacht
     ['turkey', 'greece', 'croatia'].forEach(c => pool.push(...yachtDB[c]));
   } else {
     pool = yachtDB[country] || [];
@@ -1120,11 +372,7 @@ function getYachts(country, monthIdx) {
   return available.length > 0 ? available : pool.slice(0, 3);
 }
 
-/* ══════════════════════════════════════
-   OCCUPANCY COLOR
-   ══════════════════════════════════════ */
 function occColor(pct) {
-  // Green → Yellow → Orange → Red
   if (pct <= 30) return '#c7ff39';
   if (pct <= 50) return '#ffdb39';
   if (pct <= 70) return '#ff7e39';
@@ -1132,19 +380,20 @@ function occColor(pct) {
   return '#ff0000';
 }
 
-/* ══════════════════════════════════════
-   MONTH PICKER (from ios-horizontal-picker-demo)
-   ══════════════════════════════════════ */
 let months = buildMonths('all');
 
 function createMonthItem(m) {
   const el = document.createElement('div');
   el.className = 'picker-item';
-  const barW = Math.max(10, m.occ) + '%';
+  const fillWidth = Math.max(10, m.occ) + '%';
+  const fillColor = occColor(m.occ);
   el.innerHTML =
     '<div class="month-name">' + m.name + '</div>' +
-    '<div class="occ-bar-track"><div class="occ-bar-fill" style="width:' + barW + ';background:' + occColor(m.occ) + '"></div></div>' +
+    '<div class="occ-bar-track"><div class="occ-bar-fill"></div></div>' +
     '<div class="occ-pct">' + m.occ + '%</div>';
+  const fill = el.querySelector('.occ-bar-fill');
+  fill.style.setProperty('--occ-fill-width', fillWidth);
+  fill.style.setProperty('--occ-fill-color', fillColor);
   return el;
 }
 
@@ -1165,8 +414,12 @@ function createMonthPicker(wrapperId, data_, defaultIndex, onChange) {
   }
 
   const allItems = track.querySelectorAll('.picker-item');
+  const distOpacity = [1, 1, 1, 1, 1];
   let virtualIndex = centerCopyStart + defaultIndex;
-  let startX = 0, startTranslate = 0, isDragging = false, hasMoved = false;
+  let startX = 0;
+  let startTranslate = 0;
+  let isDragging = false;
+  let hasMoved = false;
 
   function getTranslate(vi) {
     return wrapperCenter - (vi * smallWidth + bigWidth / 2);
@@ -1186,11 +439,10 @@ function createMonthPicker(wrapperId, data_, defaultIndex, onChange) {
     track.classList.add('no-transition');
     updateStyles(virtualIndex);
     track.style.transform = 'translateX(' + getTranslate(virtualIndex) + 'px)';
-    track.offsetHeight; // force reflow
+    track.offsetHeight;
     track.classList.remove('no-transition');
   }
 
-  // All items same opacity — no fade-by-distance
   function updateStyles(vi) {
     allItems.forEach((el, i) => {
       el.classList.remove('selected');
@@ -1286,8 +538,8 @@ function createMonthPicker(wrapperId, data_, defaultIndex, onChange) {
       el.querySelector('.month-name').textContent = m.name;
       el.querySelector('.occ-pct').textContent = m.occ + '%';
       const fill = el.querySelector('.occ-bar-fill');
-      fill.style.width = Math.max(10, m.occ) + '%';
-      fill.style.background = occColor(m.occ);
+      fill.style.setProperty('--occ-fill-width', Math.max(10, m.occ) + '%');
+      fill.style.setProperty('--occ-fill-color', occColor(m.occ));
     });
     onChange(data[realIndex(virtualIndex)], realIndex(virtualIndex));
   }
@@ -1299,13 +551,10 @@ function createMonthPicker(wrapperId, data_, defaultIndex, onChange) {
   };
 }
 
-/* ══════════════════════════════════════
-   YACHT PICKER — same pattern as month picker
-   ══════════════════════════════════════ */
 let currentYachts = [];
 let activeYacht = 0;
 let currentCountry = 'all';
-let currentMonthIdx = 6; // July default
+let currentMonthIdx = 6;
 let yachtPicker = null;
 
 function createYachtItem(yacht) {
@@ -1325,13 +574,12 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
   const track = document.getElementById('yachtPickerTrack');
   track.innerHTML = '';
 
-  // Distance-based specs from Figma (d0 = selected/hidden, d1-d4 = visible)
   const distSpecs = [
-    { w: 328, h: 421, r: 20, offset: 0 },    // d0: selected (hidden)
-    { w: 328, h: 421, r: 20, offset: 371 },   // d1: closest
-    { w: 272, h: 351, r: 20, offset: 449 },   // d2
-    { w: 200, h: 257, r: 10, offset: 505 },   // d3
-    { w: 154, h: 197, r: 10, offset: 538 },   // d4: farthest
+    { w: 328, h: 421, r: 20, offset: 0 },
+    { w: 328, h: 421, r: 20, offset: 371 },
+    { w: 272, h: 351, r: 20, offset: 449 },
+    { w: 200, h: 257, r: 10, offset: 505 },
+    { w: 154, h: 197, r: 10, offset: 538 },
   ];
   const maxDist = 4;
 
@@ -1347,21 +595,22 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
 
   let allItems = Array.from(track.querySelectorAll('.yacht-picker-item'));
   let virtualIndex = centerCopyStart + defaultIndex;
-  let startX = 0, dragOffset = 0, isDragging = false, hasMoved = false;
+  let startX = 0;
+  let dragOffset = 0;
+  let isDragging = false;
+  let hasMoved = false;
 
   function realIndex(vi) {
     return ((vi % N) + N) % N;
   }
 
   function positionItems(centerVi, fractional) {
-    // fractional: 0 = snapped, negative = dragging left, positive = dragging right
     allItems.forEach((el, i) => {
       const rawDist = i - centerVi + (fractional || 0);
       const absDist = Math.abs(rawDist);
-      const side = rawDist < 0 ? -1 : 1; // -1 = left, +1 = right
+      const side = rawDist < 0 ? -1 : 1;
 
       if (absDist < 0.01) {
-        // Selected item — hidden behind main card
         el.style.width = distSpecs[0].w + 'px';
         el.style.height = distSpecs[0].h + 'px';
         el.style.opacity = '0';
@@ -1373,14 +622,12 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
       }
 
       if (absDist > maxDist + 0.5) {
-        // Beyond visible range
         el.style.opacity = '0';
         el.style.pointerEvents = 'none';
         el.style.transform = 'translate(-50%, -50%) translateX(' + (side * 600) + 'px)';
         return;
       }
 
-      // Interpolate between distance slots for smooth dragging
       const floor = Math.max(1, Math.floor(absDist));
       const ceil = Math.min(maxDist, Math.ceil(absDist));
       const t = absDist - Math.floor(absDist);
@@ -1394,7 +641,6 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
       const off = s0.offset + (s1.offset - s0.offset) * t;
       const z = maxDist + 1 - Math.round(absDist);
 
-      // Fade out beyond max distance
       let opacity = 1;
       if (absDist > maxDist) {
         opacity = Math.max(0, 1 - (absDist - maxDist) * 2);
@@ -1467,20 +713,17 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
       return;
     }
     const diff = x - startX;
-    // Convert pixel drag to fractional item offset
-    // ~200px drag = 1 item shift (tuned for feel)
     const fractional = -diff / 200;
     dragOffset = fractional;
     positionItems(virtualIndex, fractional);
 
-    // Update main card preview during drag
     const nearest = Math.round(virtualIndex + fractional);
     if (nearest >= 0 && nearest < totalItems) {
       onChange(data[realIndex(nearest)], realIndex(nearest));
     }
   }
 
-  function onPointerUp(e) {
+  function onPointerUp() {
     if (!pointerDown) return;
     pointerDown = false;
     if (!isDragging) return;
@@ -1523,19 +766,17 @@ function createYachtPicker(wrapperId, data_, defaultIndex, onChange) {
         data.forEach(y => track.appendChild(createYachtItem(y)));
       }
       allItems = Array.from(track.querySelectorAll('.yacht-picker-item'));
-      virtualIndex = centerCopyStart + 0;
+      virtualIndex = centerCopyStart;
       snapTo(virtualIndex);
     },
   };
 }
 
-// Cross-dissolve state
-let crossDissolveLayer = 'A'; // which layer is currently visible
+let crossDissolveLayer = 'A';
 
 function updateYachtDetail(yacht) {
   if (!yacht) return;
 
-  // Cross-dissolve: fade new image in on top while old fades out
   const imgA = document.getElementById('yachtImgA');
   const imgB = document.getElementById('yachtImgB');
   const currentImg = crossDissolveLayer === 'A' ? imgA : imgB;
@@ -1544,11 +785,10 @@ function updateYachtDetail(yacht) {
   if (currentImg.src && !currentImg.src.endsWith('/') && currentImg.getAttribute('data-current') !== yacht.img) {
     const fromSrc = currentImg.src;
     const fxActive = typeof triggerTransition === 'function' && fromSrc
-                   && document.getElementById('fxSelect')
-                   && document.getElementById('fxSelect').value !== 'none';
+      && document.getElementById('fxSelect')
+      && document.getElementById('fxSelect').value !== 'none';
 
     if (fxActive) {
-      // Canvas transition: preload next image silently, swap underneath once canvas is up
       triggerTransition(fromSrc, yacht.img, function onCanvasReady() {
         nextImg.src = yacht.img;
         nextImg.setAttribute('data-current', yacht.img);
@@ -1562,7 +802,6 @@ function updateYachtDetail(yacht) {
         currentImg.style.transition = '';
       });
     } else {
-      // CSS cross-dissolve (no canvas effect)
       nextImg.src = yacht.img;
       nextImg.setAttribute('data-current', yacht.img);
       nextImg.style.zIndex = '2';
@@ -1572,16 +811,13 @@ function updateYachtDetail(yacht) {
     }
     crossDissolveLayer = crossDissolveLayer === 'A' ? 'B' : 'A';
   } else if (!currentImg.getAttribute('data-current')) {
-    // First load — no transition
     currentImg.src = yacht.img;
     currentImg.setAttribute('data-current', yacht.img);
     currentImg.style.opacity = '1';
   }
 
-  // Update name (title case per v4 design)
   document.getElementById('yachtName').textContent = yacht.name;
 
-  // Specs left
   document.getElementById('specsLeft').innerHTML =
     '<div class="spec-row"><span class="spec-label">Model</span><span class="spec-value">' + yacht.model + '</span></div>' +
     '<div class="spec-row"><span class="spec-label">Ölçüler</span><span class="spec-value">' + yacht.size + '</span></div>' +
@@ -1589,26 +825,21 @@ function updateYachtDetail(yacht) {
     '<div class="spec-row"><span class="spec-label">Üretim /R</span><span class="spec-value">' + yacht.year + '</span></div>' +
     '<div class="spec-row"><span class="spec-label">Liman</span><span class="spec-value">' + yacht.port + '</span></div>';
 
-  // Stats center
   document.getElementById('specsCenter').innerHTML =
     '<div class="stat-block"><div class="stat-number">' + yacht.cabins + '</div><div class="stat-label">Kabin</div></div>' +
     '<div class="stat-block"><div class="stat-number">' + yacht.guests + '</div><div class="stat-label">Misafir</div></div>' +
     '<div class="stat-block"><div class="stat-number">' + yacht.crew + '</div><div class="stat-label">Mürettebat</div></div>';
 
-  // Amenities right
   const max = 4;
   const a = yacht.amenities || [];
   let html = a.slice(0, max).map(x => '<div class="amenity">' + x + '</div>').join('');
   if (a.length > max) html += '<div class="amenity more">+' + (a.length - max) + ' Fazlası</div>';
   document.getElementById('specsRight').innerHTML = html;
-
-  // Country watermark managed by setBgCountry()
 }
 
 function refreshYachts() {
   currentYachts = getYachts(currentCountry, currentMonthIdx);
   activeYacht = 0;
-  // Rebuild picker with new yacht data
   yachtPicker = createYachtPicker('yachtPickerWrapper', currentYachts, 0, function(yacht, idx) {
     activeYacht = idx;
     updateYachtDetail(yacht);
@@ -1618,13 +849,11 @@ function refreshYachts() {
   }
 }
 
-// Keyboard navigation
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft' && yachtPicker) yachtPicker.snapTo(((activeYacht - 1) + currentYachts.length) % currentYachts.length);
   if (e.key === 'ArrowRight' && yachtPicker) yachtPicker.snapTo((activeYacht + 1) % currentYachts.length);
 });
 
-// Arrow button navigation on main image
 document.getElementById('yachtNavLeft').addEventListener('click', () => {
   if (yachtPicker) yachtPicker.snapTo(((activeYacht - 1) + currentYachts.length) % currentYachts.length);
 });
@@ -1632,9 +861,6 @@ document.getElementById('yachtNavRight').addEventListener('click', () => {
   if (yachtPicker) yachtPicker.snapTo((activeYacht + 1) % currentYachts.length);
 });
 
-/* ══════════════════════════════════════
-   CENTER OVERLAY UPDATE
-   ══════════════════════════════════════ */
 const centerMonthEl = document.getElementById('centerMonth');
 const centerBarEl = document.getElementById('centerBar');
 const centerPctEl = document.getElementById('centerPct');
@@ -1662,12 +888,8 @@ function updateCenter(item, monthIdx) {
   }
 }
 
-/* ══════════════════════════════════════
-   INIT
-   ══════════════════════════════════════ */
 const picker = createMonthPicker('monthPicker', months, 6, updateCenter);
 
-// Country tabs
 document.querySelectorAll('#countryTabs .country-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('#countryTabs .country-tab').forEach(t => t.classList.remove('active'));
@@ -1680,17 +902,14 @@ document.querySelectorAll('#countryTabs .country-tab').forEach(tab => {
   });
 });
 
-// Initial load
 refreshYachts();
 
-// Align picker vertically with exposed yacht image center (below frosted header)
 function alignPicker() {
   const visual = document.getElementById('yachtVisual');
   const header = document.querySelector('.frosted-header');
   if (!visual) return;
   const vRect = visual.getBoundingClientRect();
   const headerH = header ? header.offsetHeight : 0;
-  // Exposed image runs from (visual.top + headerH) to visual.bottom
   const exposedCenter = vRect.top + headerH + (vRect.height - headerH) / 2;
   const wrapper = document.getElementById('yachtPickerWrapper');
   wrapper.style.top = exposedCenter + 'px';
@@ -1699,10 +918,6 @@ function alignPicker() {
 alignPicker();
 window.addEventListener('resize', alignPicker);
 
-/* ══════════════════════════════════════
-   IMAGE TRANSITION ENGINE + DEBUG PANEL
-   Canvas 2D — universally reliable
-   ══════════════════════════════════════ */
 (function() {
   const canvas = document.getElementById('transitionCanvas');
   const visual = document.getElementById('yachtVisual');
@@ -1715,22 +930,21 @@ window.addEventListener('resize', alignPicker);
   resize();
   window.addEventListener('resize', resize);
 
-  // ── Noise helper (deterministic hash) ──
   function hash(x, y) {
     return ((Math.sin(x * 127.1 + y * 311.7) * 43758.5453) % 1 + 1) % 1;
   }
 
-  // ── Draw image with "cover" behavior (like CSS object-fit: cover) ──
   function drawCover(c, img, dx, dy, dw, dh) {
     var iw = img.naturalWidth || img.width;
     var ih = img.naturalHeight || img.height;
     var scale = Math.max(dw / iw, dh / ih);
-    var sw = dw / scale, sh = dh / scale;
-    var sx = (iw - sw) / 2, sy = (ih - sh) / 2;
+    var sw = dw / scale;
+    var sh = dh / scale;
+    var sx = (iw - sw) / 2;
+    var sy = (ih - sh) / 2;
     c.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
   }
 
-  // ── Effect renderers: each takes (ctx, img1, img2, progress, w, h) ──
   const effects = {
     'cross-dissolve': {
       label: 'Cross Dissolve',
@@ -1769,7 +983,7 @@ window.addEventListener('resize', alignPicker);
         c.restore();
       },
     },
-    'blinds': {
+    blinds: {
       label: 'Blinds',
       render: function(c, i1, i2, p, w, h) {
         drawCover(c, i1, 0, 0, w, h);
@@ -1787,11 +1001,10 @@ window.addEventListener('resize', alignPicker);
         c.restore();
       },
     },
-    'pixelate': {
+    pixelate: {
       label: 'Pixelate',
       render: function(c, i1, i2, p, w, h) {
         var blockSize = Math.max(1, Math.round(Math.sin(p * Math.PI) * 40 + 1));
-        // Draw source with cover, then pixelate by redrawing small→large
         drawCover(c, p < 0.5 ? i1 : i2, 0, 0, w, h);
         c.imageSmoothingEnabled = false;
         var tw = Math.max(1, Math.round(w / blockSize));
@@ -1804,30 +1017,30 @@ window.addEventListener('resize', alignPicker);
     'noise-dissolve': {
       label: 'Noise Dissolve',
       render: function(c, i1, i2, p, w, h) {
-        // Pre-generate noise pattern (cached)
         if (!effects['noise-dissolve']._noise || effects['noise-dissolve']._nw !== w) {
           var cols = Math.ceil(w / 8);
           var rows = Math.ceil(h / 8);
           var n = [];
-          for (var r = 0; r < rows; r++)
-            for (var cl = 0; cl < cols; cl++)
+          for (var r = 0; r < rows; r++) {
+            for (var cl = 0; cl < cols; cl++) {
               n.push(hash(cl, r));
+            }
+          }
           effects['noise-dissolve']._noise = n;
           effects['noise-dissolve']._cols = cols;
           effects['noise-dissolve']._rows = rows;
           effects['noise-dissolve']._nw = w;
         }
         drawCover(c, i1, 0, 0, w, h);
-        var n = effects['noise-dissolve']._noise;
-        var cols = effects['noise-dissolve']._cols;
-        var rows = effects['noise-dissolve']._rows;
-        // Clip to revealed regions (where noise < progress)
+        var noise = effects['noise-dissolve']._noise;
+        var colsCount = effects['noise-dissolve']._cols;
+        var rowsCount = effects['noise-dissolve']._rows;
         c.save();
         c.beginPath();
-        for (var r = 0; r < rows; r++) {
-          for (var cl = 0; cl < cols; cl++) {
-            if (n[r * cols + cl] < p) {
-              c.rect(cl * 8, r * 8, 8, 8);
+        for (var row = 0; row < rowsCount; row++) {
+          for (var col = 0; col < colsCount; col++) {
+            if (noise[row * colsCount + col] < p) {
+              c.rect(col * 8, row * 8, 8, 8);
             }
           }
         }
@@ -1836,14 +1049,12 @@ window.addEventListener('resize', alignPicker);
         c.restore();
       },
     },
-    'displacement': {
+    displacement: {
       label: 'Displacement',
       render: function(c, i1, i2, p, w, h) {
-        // Draw base with cover, then slice-shift for wave distortion
         drawCover(c, p < 0.5 ? i1 : i2, 0, 0, w, h);
         var sliceH = 4;
         var amp = Math.sin(p * Math.PI) * 20;
-        // Copy current canvas content to shift slices
         var imgData = c.getImageData(0, 0, w, h);
         c.clearRect(0, 0, w, h);
         c.putImageData(imgData, 0, 0);
@@ -1856,10 +1067,9 @@ window.addEventListener('resize', alignPicker);
         c.globalAlpha = 1;
       },
     },
-    'ripple': {
+    ripple: {
       label: 'Ripple',
       render: function(c, i1, i2, p, w, h) {
-        // Draw base with cover, then slice-shift for ripple
         drawCover(c, p < 0.5 ? i1 : i2, 0, 0, w, h);
         var amp = Math.sin(p * Math.PI) * 12;
         var sliceH = 3;
@@ -1878,13 +1088,11 @@ window.addEventListener('resize', alignPicker);
       label: 'RGB Shift',
       render: function(c, i1, i2, p, w, h) {
         var shift = Math.sin(p * Math.PI) * 15;
-        // Draw base
         c.globalAlpha = 1 - p;
         drawCover(c, i1, 0, 0, w, h);
         c.globalAlpha = p;
         drawCover(c, i2, 0, 0, w, h);
         c.globalAlpha = 1;
-        // RGB channel shift overlay
         c.globalCompositeOperation = 'lighter';
         c.globalAlpha = 0.15;
         c.drawImage(p < 0.5 ? i1 : i2, shift, 0, w, h);
@@ -1897,7 +1105,6 @@ window.addEventListener('resize', alignPicker);
       label: 'Particle Dissolve',
       render: function(c, i1, i2, p, w, h) {
         drawCover(c, i2, 0, 0, w, h);
-        // Draw old image in scattered blocks that disappear
         var blockSize = 12;
         var cols = Math.ceil(w / blockSize);
         var rows = Math.ceil(h / blockSize);
@@ -1915,19 +1122,24 @@ window.addEventListener('resize', alignPicker);
   };
 
   const effectKeys = Object.keys(effects);
-
-  // ── Image loading + cache ──
   const imgCache = {};
+
   function loadImg(url, cb) {
-    if (imgCache[url]) { cb(imgCache[url]); return; }
+    if (imgCache[url]) {
+      cb(imgCache[url]);
+      return;
+    }
     var img = new Image();
-    img.onload = function() { imgCache[url] = img; cb(img); };
+    img.onload = function() {
+      imgCache[url] = img;
+      cb(img);
+    };
     img.src = url;
   }
 
-  // ── Transition state ──
   let currentEffect = 'cross-dissolve';
-  let img1 = null, img2 = null;
+  let img1 = null;
+  let img2 = null;
   let transitioning = false;
   let transitionStart = 0;
   const DURATION = 1200;
@@ -1936,10 +1148,10 @@ window.addEventListener('resize', alignPicker);
     if (!transitioning || !img1 || !img2) return;
     var elapsed = performance.now() - transitionStart;
     var raw = Math.min(1.0, elapsed / DURATION);
-    // Ease in-out
     var p = raw < 0.5 ? 2 * raw * raw : 1 - Math.pow(-2 * raw + 2, 2) / 2;
 
-    var w = canvas.width, h = canvas.height;
+    var w = canvas.width;
+    var h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
     var fx = effects[currentEffect];
@@ -1953,7 +1165,6 @@ window.addEventListener('resize', alignPicker);
     }
   }
 
-  // ── Public API ──
   window.triggerTransition = function(fromUrl, toUrl, onCanvasReady) {
     if (currentEffect === 'none') return;
     resize();
@@ -1961,11 +1172,9 @@ window.addEventListener('resize', alignPicker);
     function check() {
       loaded++;
       if (loaded === 2 && img1 && img2) {
-        // Show canvas with first frame (old image) BEFORE swapping underlying imgs
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawCover(ctx, img1, 0, 0, canvas.width, canvas.height);
         canvas.style.opacity = '1';
-        // Now safe to swap underlying images — canvas covers them
         if (onCanvasReady) onCanvasReady();
         transitionStart = performance.now();
         transitioning = true;
@@ -1976,18 +1185,17 @@ window.addEventListener('resize', alignPicker);
     loadImg(toUrl, function(i) { img2 = i; check(); });
   };
 
-  // ── DEBUG PANEL ──
   var panel = document.createElement('div');
   panel.id = 'debugPanel';
   panel.innerHTML =
-    '<div style="font-weight:600;margin-bottom:8px;font-size:13px;color:#0d9488;">Transition FX</div>' +
-    '<select id="fxSelect" style="width:100%;padding:6px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.15);font-size:12px;background:#fff;cursor:pointer;">' +
+    '<div class="debug-panel-title">Transition FX</div>' +
+    '<select id="fxSelect" class="debug-panel-select">' +
     '<option value="none">None (CSS fade)</option>' +
-    effectKeys.map(function(k) { return '<option value="' + k + '"' + (k === currentEffect ? ' selected' : '') + '>' + effects[k].label + '</option>'; }).join('') +
+    effectKeys.map(function(k) {
+      return '<option value="' + k + '"' + (k === currentEffect ? ' selected' : '') + '>' + effects[k].label + '</option>';
+    }).join('') +
     '</select>' +
-    '<button id="fxTest" style="width:100%;margin-top:8px;padding:6px;border-radius:6px;border:1px solid rgba(0,0,0,0.15);font-size:12px;background:#f0faf9;cursor:pointer;">Test Transition</button>';
-  panel.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:9999;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:12px;padding:14px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.15);font-family:Inter,sans-serif;width:180px;';
-  panel.style.display = 'none';
+    '<button id="fxTest" class="debug-panel-button">Test Transition</button>';
   document.body.appendChild(panel);
 
   document.getElementById('fxSelect').addEventListener('change', function() {
@@ -2008,6 +1216,3 @@ window.addEventListener('resize', alignPicker);
     }
   });
 })();
-</script>
-</body>
-</html>
