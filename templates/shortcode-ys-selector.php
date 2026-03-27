@@ -17,12 +17,6 @@ $month_stats         = [
 	'total'      => count( $initial_items ),
 	'percentage' => 0,
 ];
-$flag_map            = [
-	'greece'  => $template_assets_url . 'flags/greece.png',
-	'turkey'  => $template_assets_url . 'flags/turkey.png',
-	'croatia' => $template_assets_url . 'flags/croatia.png',
-];
-
 foreach ( $countries as $country ) {
 	if ( isset( $country['slug'] ) && $country['slug'] === $selected_country ) {
 		$country_label = isset( $country['name'] ) ? (string) $country['name'] : '';
@@ -106,13 +100,17 @@ if ( $month_stats['total'] > 0 ) {
 							<?php foreach ( $countries as $country ) : ?>
 								<?php
 								$is_active = isset( $country['slug'] ) && $country['slug'] === $selected_country;
-								$flag_url  = isset( $flag_map[ $country['slug'] ] ) ? $flag_map[ $country['slug'] ] : '';
+								$flag_url  = isset( $country['flag'] ) ? (string) $country['flag'] : '';
 								?>
 								<button class="country-tab<?php echo $is_active ? ' active' : ''; ?>" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>" type="button">
-									<?php if ( $flag_url ) : ?>
-										<img class="flag-icon" src="<?php echo esc_url( $flag_url ); ?>" alt="">
-									<?php endif; ?>
-									<?php echo esc_html( $country['name'] ?? '' ); ?>
+									<span class="ys-country-option__flag-wrap">
+										<?php if ( '' !== $flag_url ) : ?>
+											<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
+										<?php else : ?>
+											<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
+										<?php endif; ?>
+									</span>
+									<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
 								</button>
 							<?php endforeach; ?>
 						</div>

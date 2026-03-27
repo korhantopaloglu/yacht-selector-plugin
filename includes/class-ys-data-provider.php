@@ -157,7 +157,7 @@ class YS_Data_Provider {
 
 		$location = $this->resolve_location_terms( $post->ID );
 
-		if ( empty( $location['country'] ) || empty( $location['port'] ) ) {
+		if ( empty( $location['country'] ) ) {
 			return null;
 		}
 
@@ -215,7 +215,8 @@ class YS_Data_Provider {
 	 * @return array|null
 	 */
 	public function resolve_country_port( $terms ) {
-		$child_terms = [];
+		$child_terms  = [];
+		$parent_terms = [];
 
 		foreach ( $terms as $term ) {
 			if ( ! $term instanceof WP_Term ) {
@@ -224,43 +225,59 @@ class YS_Data_Provider {
 
 			if ( $term->parent > 0 ) {
 				$child_terms[] = $term;
+			} else {
+				$parent_terms[] = $term;
 			}
 		}
 
-		if ( empty( $child_terms ) ) {
+		$sort_terms = static function( &$items ) {
+			usort(
+				$items,
+				static function( $left, $right ) {
+					$name_compare = strcasecmp( $left->name, $right->name );
+
+					if ( 0 !== $name_compare ) {
+						return $name_compare;
+					}
+
+					return $left->term_id <=> $right->term_id;
+				}
+			);
+		};
+
+		if ( empty( $child_terms ) && empty( $parent_terms ) ) {
 			return null;
 		}
 
-		usort(
-			$child_terms,
-			static function( $left, $right ) {
-				$name_compare = strcasecmp( $left->name, $right->name );
+		$port_term    = null;
+		$country_term = null;
 
-				if ( 0 !== $name_compare ) {
-					return $name_compare;
-				}
-
-				return $left->term_id <=> $right->term_id;
-			}
-		);
-
-		$port_term    = $child_terms[0];
-		$country_term = get_term( $port_term->parent, $port_term->taxonomy );
+		if ( ! empty( $child_terms ) ) {
+			$sort_terms( $child_terms );
+			$port_term    = $child_terms[0];
+			$country_term = get_term( $port_term->parent, $port_term->taxonomy );
+		} else {
+			$sort_terms( $parent_terms );
+			$country_term = $parent_terms[0];
+		}
 
 		if ( ! $country_term instanceof WP_Term || $country_term->term_id <= 0 ) {
 			return null;
 		}
+
+		$flag_url = $this->taxonomy instanceof YS_Taxonomy ? $this->taxonomy->get_term_flag_url( $country_term->term_id, 'thumbnail' ) : '';
 
 		return [
 			'country' => [
 				'id'   => (int) $country_term->term_id,
 				'name' => $country_term->name,
 				'slug' => $country_term->slug,
+				'flag' => $flag_url,
 			],
 			'port'    => [
-				'id'   => (int) $port_term->term_id,
-				'name' => $port_term->name,
-				'slug' => $port_term->slug,
+				'id'   => $port_term instanceof WP_Term ? (int) $port_term->term_id : 0,
+				'name' => $port_term instanceof WP_Term ? $port_term->name : '',
+				'slug' => $port_term instanceof WP_Term ? $port_term->slug : '',
 			],
 		];
 	}

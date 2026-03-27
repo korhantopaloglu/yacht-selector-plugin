@@ -30,6 +30,33 @@
   color: #fff;
 }
 
+.ys-country-option__flag-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.ys-country-option__flag {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.ys-country-option__flag--placeholder {
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+.ys-country-option__label {
+  display: inline-flex;
+  align-items: center;
+}
+
 .ys-month {
   flex-direction: column;
   align-items: flex-start;

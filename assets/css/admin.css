@@ -228,6 +228,23 @@
   margin-top: 10px;
 }
 
+.ys-image-preview-wrap-small {
+  max-width: 80px;
+}
+
+.ys-image-preview-small {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: cover;
+  border-radius: 999px;
+}
+
+.ys-term-flag-field .ys-image-actions {
+  margin-top: 8px;
+}
+
 .ys-bulk-edit-fieldset .inline-edit-col {
   width: 100%;
 }

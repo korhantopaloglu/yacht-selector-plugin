@@ -45,6 +45,33 @@
   opacity: 0.55;
 }
 
+.ys-yacht-selector .ys-country-option__flag-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.ys-yacht-selector .ys-country-option__flag {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.ys-yacht-selector .ys-country-option__flag--placeholder {
+  background: #d9dee6;
+  border: 1px solid #c9d0db;
+}
+
+.ys-yacht-selector .country-tab .ys-country-option__label {
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (max-width: 960px) {
   .ys-yacht-selector .yacht-picker-track.is-static .yacht-picker-item {
     width: 180px;

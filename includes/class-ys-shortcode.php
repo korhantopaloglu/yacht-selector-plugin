@@ -258,6 +258,7 @@ class YS_Shortcode {
 				'id'   => (int) $item['country']['id'],
 				'name' => (string) $item['country']['name'],
 				'slug' => $slug,
+				'flag' => isset( $item['country']['flag'] ) ? (string) $item['country']['flag'] : '',
 			];
 		}
 
@@ -386,6 +387,7 @@ class YS_Shortcode {
 				'id'   => (int) $term->term_id,
 				'name' => (string) $term->name,
 				'slug' => (string) $term->slug,
+				'flag' => $this->taxonomy->get_term_flag_url( $term->term_id, 'thumbnail' ),
 			];
 		}
 

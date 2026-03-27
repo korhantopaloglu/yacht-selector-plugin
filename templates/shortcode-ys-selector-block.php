@@ -14,9 +14,24 @@ $empty_text     = isset( $empty_text ) ? (string) $empty_text : 'No results foun
 ?>
 <div id="<?php echo esc_attr( $container_id ); ?>" class="ys-selector-block-container">
 	<div class="ys-countries-container">
-		<a href="#" class="active" data-country="all"><?php echo esc_html( $all_label_text ); ?></a>
+		<a href="#" class="active" data-country="all">
+			<span class="ys-country-option__flag-wrap">
+				<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
+			</span>
+			<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
+		</a>
 		<?php foreach ( $countries as $country ) : ?>
-			<a href="#" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>"><?php echo esc_html( $country['name'] ?? '' ); ?></a>
+			<?php $flag_url = isset( $country['flag'] ) ? (string) $country['flag'] : ''; ?>
+			<a href="#" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>">
+				<span class="ys-country-option__flag-wrap">
+					<?php if ( '' !== $flag_url ) : ?>
+						<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
+					<?php else : ?>
+						<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
+					<?php endif; ?>
+				</span>
+				<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
+			</a>
 		<?php endforeach; ?>
 	</div>
 

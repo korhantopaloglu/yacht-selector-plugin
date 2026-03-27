@@ -121,7 +121,7 @@ document.querySelectorAll('[data-ys-admin-panel]').forEach(function(panel) {
 document.addEventListener('click', function(event) {
   var selectButton = event.target.closest('[data-ys-media-select]');
   if (selectButton) {
-    var wrapper = selectButton.closest('.ys-field');
+    var wrapper = selectButton.closest('[data-ys-media-field], .ys-field');
     if (!wrapper || typeof wp === 'undefined' || !wp.media) {
       return;
     }
@@ -133,9 +133,9 @@ document.addEventListener('click', function(event) {
     var previewWrap = wrapper.querySelector('[data-ys-image-preview-wrap]');
 
     var frame = wp.media({
-      title: 'Select Card Image',
+      title: selectButton.getAttribute('data-ys-media-title') || 'Select Card Image',
       button: {
-        text: 'Use image'
+        text: selectButton.getAttribute('data-ys-media-button') || 'Use image'
       },
       library: {
         type: 'image'
@@ -165,7 +165,7 @@ document.addEventListener('click', function(event) {
         previewWrap.classList.remove('is-empty');
       }
 
-      selectButton.textContent = 'Replace Image';
+      selectButton.textContent = selectButton.getAttribute('data-ys-media-replace') || 'Replace Image';
     });
 
     frame.open();
@@ -174,7 +174,7 @@ document.addEventListener('click', function(event) {
 
   var removeButton = event.target.closest('[data-ys-media-remove]');
   if (removeButton) {
-    var field = removeButton.closest('.ys-field');
+    var field = removeButton.closest('[data-ys-media-field], .ys-field');
     if (!field) {
       return;
     }
@@ -203,7 +203,7 @@ document.addEventListener('click', function(event) {
     }
 
     if (selectButton) {
-      selectButton.textContent = 'Select Image';
+      selectButton.textContent = selectButton.getAttribute('data-ys-media-default') || 'Select Image';
     }
 
     removeButton.classList.add('hidden');
