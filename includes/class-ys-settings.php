@@ -185,6 +185,14 @@ class YS_Settings {
 		);
 
 		add_settings_field(
+			'ys_booked_text',
+			__( 'Booked Label Text', 'yacht-selector' ),
+			[ $this, 'render_booked_text_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
 			'ys_all_label_text',
 			__( 'All Label Text', 'yacht-selector' ),
 			[ $this, 'render_all_label_text_field' ],
@@ -365,6 +373,7 @@ class YS_Settings {
 		$output['ys_watch_me_text']          = isset( $input['ys_watch_me_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_watch_me_text'] ) ) : $defaults['ys_watch_me_text'];
 		$output['ys_book_now_text']          = isset( $input['ys_book_now_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_book_now_text'] ) ) : $defaults['ys_book_now_text'];
 		$output['ys_call_crew_text']         = isset( $input['ys_call_crew_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_call_crew_text'] ) ) : $defaults['ys_call_crew_text'];
+		$output['ys_booked_text']            = isset( $input['ys_booked_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_booked_text'] ) ) : $defaults['ys_booked_text'];
 		$output['ys_all_label_text']         = isset( $input['ys_all_label_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_all_label_text'] ) ) : $defaults['ys_all_label_text'];
 		$output['ys_empty_state_text']       = isset( $input['ys_empty_state_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_empty_state_text'] ) ) : $defaults['ys_empty_state_text'];
 		$output['ys_connect_with_top_title'] = isset( $input['ys_connect_with_top_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_connect_with_top_title'] ) ) : $defaults['ys_connect_with_top_title'];
@@ -526,6 +535,7 @@ class YS_Settings {
 		$settings['ys_watch_me_text']          = sanitize_text_field( (string) $settings['ys_watch_me_text'] );
 		$settings['ys_book_now_text']          = sanitize_text_field( (string) $settings['ys_book_now_text'] );
 		$settings['ys_call_crew_text']         = sanitize_text_field( (string) $settings['ys_call_crew_text'] );
+		$settings['ys_booked_text']            = sanitize_text_field( (string) $settings['ys_booked_text'] );
 		$settings['ys_connect_with_top_title'] = sanitize_text_field( (string) $settings['ys_connect_with_top_title'] );
 		$settings['ys_crew_group_title']       = sanitize_text_field( (string) $settings['ys_crew_group_title'] );
 		$settings['ys_crew_group_subtitle']    = sanitize_text_field( (string) $settings['ys_crew_group_subtitle'] );
@@ -807,6 +817,18 @@ class YS_Settings {
 		$this->render_text_field(
 			'ys_call_crew_text',
 			__( 'Text used for the Call button.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render booked text field.
+	 *
+	 * @return void
+	 */
+	public function render_booked_text_field() {
+		$this->render_text_field(
+			'ys_booked_text',
+			__( 'Text shown on yacht cards when the selected month is booked.', 'yacht-selector' )
 		);
 	}
 
@@ -1802,6 +1824,7 @@ JSON;
 			'ys_watch_me_text'           => 'Watch Me',
 			'ys_book_now_text'           => 'Book Now',
 			'ys_call_crew_text'          => 'Call the Crew',
+			'ys_booked_text'             => 'Booked',
 			'ys_all_label_text'          => 'All',
 			'ys_empty_state_text'        => 'No results found',
 			'ys_connect_with_top_title'  => 'Connect with',

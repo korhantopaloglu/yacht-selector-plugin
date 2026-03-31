@@ -178,6 +178,127 @@ function syncCardAvailabilityState(card) {
   });
 }
 
+function updateMonthState(selectedMonthLink) {
+  if (!selectedMonthLink) {
+    return;
+  }
+
+  var selectedMonth = selectedMonthLink.getAttribute('data-month') || '';
+  var monthContainer = selectedMonthLink.closest('.ys-months-container');
+
+  if (monthContainer) {
+    monthContainer.querySelectorAll('.ys-month').forEach(function(link) {
+      var isSelected = link === selectedMonthLink;
+      link.classList.toggle('selected', isSelected);
+      link.classList.toggle('active', isSelected);
+    });
+  }
+
+  document.querySelectorAll('.ys-card').forEach(function(card) {
+    var monthValues = (card.getAttribute('data-months') || '').split(',');
+    var isBooked = monthValues.indexOf(selectedMonth) !== -1;
+
+    card.classList.toggle('booked', isBooked);
+  });
+}
+
+function getVisibleCards() {
+  return Array.prototype.slice.call(document.querySelectorAll('.ys-card')).filter(function(card) {
+    return !card.classList.contains('location-hide');
+  });
+}
+
+function getWrappedIndex(index, length) {
+  if (!length) {
+    return 0;
+  }
+
+  return ((index % length) + length) % length;
+}
+
+function setSelectedCard(card) {
+  if (!card) {
+    return;
+  }
+
+  document.querySelectorAll('.ys-card.selected').forEach(function(selectedCard) {
+    selectedCard.classList.remove('selected');
+  });
+
+  card.classList.add('selected');
+}
+
+function getActiveCardIndex(cards) {
+  if (!cards.length) {
+    return -1;
+  }
+
+  var activeIndex = cards.findIndex(function(card) {
+    return card.classList.contains('selected');
+  });
+
+  if (activeIndex === -1) {
+    setSelectedCard(cards[0]);
+    return 0;
+  }
+
+  return activeIndex;
+}
+
+function applySliderWindowState() {
+  var cards = getVisibleCards();
+  var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'slider-outside-window'];
+
+  document.querySelectorAll('.ys-card').forEach(function(card) {
+    sliderStateClasses.forEach(function(className) {
+      card.classList.remove(className);
+    });
+  });
+
+  if (!cards.length) {
+    return;
+  }
+
+  var activeIndex = getActiveCardIndex(cards);
+  var total = cards.length;
+
+  cards.forEach(function(card, index) {
+    var forwardDistance = getWrappedIndex(index - activeIndex, total);
+    var backwardDistance = getWrappedIndex(activeIndex - index, total);
+
+    if (index === activeIndex) {
+      card.classList.add('is-active');
+      return;
+    }
+
+    if (forwardDistance <= 3 && (forwardDistance < backwardDistance || backwardDistance > 3)) {
+      card.classList.add('is-pos-' + forwardDistance);
+      return;
+    }
+
+    if (backwardDistance <= 3) {
+      card.classList.add('is-neg-' + backwardDistance);
+      return;
+    }
+
+    card.classList.add('slider-outside-window');
+  });
+}
+
+function goToRelativeCard(step) {
+  var cards = getVisibleCards();
+
+  if (!cards.length) {
+    return;
+  }
+
+  var activeIndex = getActiveCardIndex(cards);
+  var nextIndex = getWrappedIndex(activeIndex + step, cards.length);
+
+  setSelectedCard(cards[nextIndex]);
+  applySliderWindowState();
+}
+
 document.addEventListener('change', function(event) {
   if (event.target.matches('.ys-card-crew-member-select')) {
     syncCardAvailabilityState(event.target.closest('.ys-card'));
@@ -213,6 +334,16 @@ document.addEventListener('click', function(event) {
       }
     });
 
+    applySliderWindowState();
+
+    event.preventDefault();
+    return;
+  }
+
+  var monthLink = event.target.closest('.ys-months-container a[data-month]');
+  if (monthLink) {
+    updateMonthState(monthLink);
+    applySliderWindowState();
     event.preventDefault();
     return;
   }
@@ -232,6 +363,11 @@ document.addEventListener('click', function(event) {
   if (panelTrigger) {
     var triggerCard = panelTrigger.closest('.ys-card');
     var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-crew-group') : null;
+
+    if (triggerCard) {
+      setSelectedCard(triggerCard);
+      applySliderWindowState();
+    }
 
     if (triggerPanel) {
       triggerPanel.classList.toggle('show');
@@ -253,6 +389,27 @@ document.addEventListener('click', function(event) {
     return;
   }
 
+  var prevButton = event.target.closest('.ys-card-nav-container .ys-prev');
+  if (prevButton) {
+    goToRelativeCard(-1);
+    event.preventDefault();
+    return;
+  }
+
+  var nextButton = event.target.closest('.ys-card-nav-container .ys-next');
+  if (nextButton) {
+    goToRelativeCard(1);
+    event.preventDefault();
+    return;
+  }
+
+  var selectedCard = event.target.closest('.ys-card');
+  if (selectedCard && !selectedCard.classList.contains('location-hide')) {
+    setSelectedCard(selectedCard);
+    applySliderWindowState();
+    return;
+  }
+
   var toolCard = event.target.closest('.ys-tool-card');
   if (!toolCard) {
     return;
@@ -267,4 +424,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.ys-card').forEach(function(card) {
     syncCardAvailabilityState(card);
   });
+
+  var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
+  if (activeMonthLink) {
+    updateMonthState(activeMonthLink);
+  }
+
+  applySliderWindowState();
 });

@@ -25,6 +25,7 @@
 
 .ys-countries-container a.active,
 .ys-countries-container a.selected,
+.ys-months-container .ys-month.selected,
 .ys-months-container .ys-month.active {
   border-color: #0a7a7a;
   background: #0a7a7a;
@@ -85,17 +86,27 @@
 
 .ys-cards-container {
   display: grid;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, auto) auto;
+  justify-items: center;
+  align-items: start;
+  gap: 20px;
+  overflow: hidden;
+  --ys-slider-step: clamp(120px, 14vw, 220px);
 }
 
 .ys-card {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   gap: 18px;
+  grid-column: 1;
+  grid-row: 1;
+  width: min(100%, 920px);
   padding: 18px;
   border: 1px solid #dcdcde;
   border-radius: 18px;
   background: #fff;
+  transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .ys-card.selected {
@@ -103,8 +114,91 @@
   box-shadow: 0 10px 24px rgba(10, 122, 122, 0.12);
 }
 
+.booked-text {
+  display: none;
+  align-self: start;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.ys-card.booked .booked-text {
+  display: inline-flex;
+}
+
 .ys-card.location-hide {
   display: none;
+}
+
+.ys-card.slider-outside-window {
+  display: none;
+}
+
+.ys-card.is-active,
+.ys-card.selected {
+  z-index: 7;
+}
+
+.ys-card.is-active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.ys-card.is-pos-1,
+.ys-card.is-pos-2,
+.ys-card.is-pos-3,
+.ys-card.is-neg-1,
+.ys-card.is-neg-2,
+.ys-card.is-neg-3 {
+  grid-template-columns: 1fr;
+  width: clamp(120px, 16vw, 200px);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.ys-card.is-pos-1,
+.ys-card.is-neg-1 {
+  opacity: 0.8;
+  z-index: 6;
+}
+
+.ys-card.is-pos-2,
+.ys-card.is-neg-2 {
+  opacity: 0.5;
+  z-index: 5;
+}
+
+.ys-card.is-pos-3,
+.ys-card.is-neg-3 {
+  opacity: 0.2;
+  z-index: 4;
+}
+
+.ys-card.is-pos-1 {
+  transform: translateX(var(--ys-slider-step));
+}
+
+.ys-card.is-pos-2 {
+  transform: translateX(calc(var(--ys-slider-step) * 2));
+}
+
+.ys-card.is-pos-3 {
+  transform: translateX(calc(var(--ys-slider-step) * 3));
+}
+
+.ys-card.is-neg-1 {
+  transform: translateX(calc(var(--ys-slider-step) * -1));
+}
+
+.ys-card.is-neg-2 {
+  transform: translateX(calc(var(--ys-slider-step) * -2));
+}
+
+.ys-card.is-neg-3 {
+  transform: translateX(calc(var(--ys-slider-step) * -3));
 }
 
 .ys-card-image-container img {
@@ -119,6 +213,24 @@
 .ys-card-content-container {
   display: grid;
   gap: 14px;
+}
+
+.ys-card.is-pos-1 .ys-card-content-container,
+.ys-card.is-pos-2 .ys-card-content-container,
+.ys-card.is-pos-3 .ys-card-content-container,
+.ys-card.is-neg-1 .ys-card-content-container,
+.ys-card.is-neg-2 .ys-card-content-container,
+.ys-card.is-neg-3 .ys-card-content-container {
+  display: none;
+}
+
+.ys-card.is-pos-1 .ys-card-image-container img,
+.ys-card.is-pos-2 .ys-card-image-container img,
+.ys-card.is-pos-3 .ys-card-image-container img,
+.ys-card.is-neg-1 .ys-card-image-container img,
+.ys-card.is-neg-2 .ys-card-image-container img,
+.ys-card.is-neg-3 .ys-card-image-container img {
+  min-height: 220px;
 }
 
 .ys-card-content-container h3,
@@ -149,6 +261,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.ys-card-nav-container {
+  grid-column: 1;
+  grid-row: 2;
+  justify-content: center;
 }
 
 .ys-watch-button,
@@ -230,7 +348,30 @@
 }
 
 @media (max-width: 782px) {
+  .ys-cards-container {
+    --ys-slider-step: clamp(72px, 18vw, 120px);
+  }
+
   .ys-card {
     grid-template-columns: 1fr;
+  }
+
+  .ys-card.is-pos-1,
+  .ys-card.is-pos-2,
+  .ys-card.is-pos-3,
+  .ys-card.is-neg-1,
+  .ys-card.is-neg-2,
+  .ys-card.is-neg-3 {
+    width: clamp(92px, 24vw, 140px);
+    padding: 8px;
+  }
+
+  .ys-card.is-pos-1 .ys-card-image-container img,
+  .ys-card.is-pos-2 .ys-card-image-container img,
+  .ys-card.is-pos-3 .ys-card-image-container img,
+  .ys-card.is-neg-1 .ys-card-image-container img,
+  .ys-card.is-neg-2 .ys-card-image-container img,
+  .ys-card.is-neg-3 .ys-card-image-container img {
+    min-height: 140px;
   }
 }

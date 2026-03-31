@@ -11,6 +11,7 @@ $container_id   = isset( $container_id ) ? (string) $container_id : '';
 $watch_text     = isset( $watch_text ) ? (string) $watch_text : 'Watch Me';
 $call_text      = isset( $call_text ) ? (string) $call_text : 'Call the Crew';
 $book_text      = isset( $book_text ) ? (string) $book_text : 'Book Now';
+$booked_text    = isset( $booked_text ) ? (string) $booked_text : 'Booked';
 $all_label_text = isset( $all_label_text ) ? (string) $all_label_text : 'All';
 $empty_text     = isset( $empty_text ) ? (string) $empty_text : 'No results found';
 $crew_top_title = isset( $crew_top_title ) ? (string) $crew_top_title : 'Connect with';
@@ -44,38 +45,40 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 }
 ?>
 <div id="<?php echo esc_attr( $container_id ); ?>" class="ys-selector-block-container">
-	<div class="ys-countries-container">
-		<a href="#" class="active" data-country="all">
-			<span class="ys-country-option__flag-wrap">
-				<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
-			</span>
-			<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
-		</a>
-		<?php foreach ( $countries as $country ) : ?>
-			<?php $flag_url = isset( $country['flag'] ) ? (string) $country['flag'] : ''; ?>
-			<a href="#" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>">
+	<div class="ys-header-wrapper">
+		<div class="ys-countries-container">
+			<a href="#" class="ys-country active" data-country="all">
 				<span class="ys-country-option__flag-wrap">
-					<?php if ( '' !== $flag_url ) : ?>
-						<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
-					<?php else : ?>
-						<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
-					<?php endif; ?>
+					<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
 				</span>
-				<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
+				<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
 			</a>
-		<?php endforeach; ?>
-	</div>
+			<?php foreach ( $countries as $country ) : ?>
+				<?php $flag_url = isset( $country['flag'] ) ? (string) $country['flag'] : ''; ?>
+				<a href="#" class="ys-country" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>">
+					<span class="ys-country-option__flag-wrap">
+						<?php if ( '' !== $flag_url ) : ?>
+							<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
+						<?php else : ?>
+							<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
+						<?php endif; ?>
+					</span>
+					<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
+				</a>
+			<?php endforeach; ?>
+		</div>
 
-	<div class="ys-months-container">
-		<?php foreach ( $months as $month ) : ?>
-			<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>">
-				<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
-				<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
-				<span class="ys-month-bar">
-					<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
-				</span>
-			</a>
-		<?php endforeach; ?>
+		<div class="ys-months-container">
+			<?php foreach ( $months as $month ) : ?>
+				<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>">
+					<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
+					<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
+					<span class="ys-month-bar">
+						<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
+					</span>
+				</a>
+			<?php endforeach; ?>
+		</div>
 	</div>
 
 	<?php if ( ! empty( $items ) ) : ?>
@@ -163,6 +166,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 
 					<div class="ys-card-content-container">
 						<h3><?php echo esc_html( $title ); ?></h3>
+						<span class="booked-text"><?php echo esc_html( $booked_text ); ?></span>
 						<div class="ys-card-specifications-group">
 							<div class="ys-card-group-title"><?php esc_html_e( 'Specifications', 'yacht-selector' ); ?></div>
 							<div class="ys-card-specifications-items">

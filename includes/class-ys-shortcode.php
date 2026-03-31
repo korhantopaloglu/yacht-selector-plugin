@@ -173,6 +173,7 @@ class YS_Shortcode {
 		$watch_text     = isset( $settings['ys_watch_me_text'] ) && '' !== $settings['ys_watch_me_text'] ? $settings['ys_watch_me_text'] : 'Watch Me';
 		$call_text      = isset( $settings['ys_call_crew_text'] ) && '' !== $settings['ys_call_crew_text'] ? $settings['ys_call_crew_text'] : 'Call the Crew';
 		$book_text      = isset( $settings['ys_book_now_text'] ) && '' !== $settings['ys_book_now_text'] ? $settings['ys_book_now_text'] : 'Book Now';
+		$booked_text    = isset( $settings['ys_booked_text'] ) && '' !== $settings['ys_booked_text'] ? $settings['ys_booked_text'] : 'Booked';
 		$all_label_text = isset( $settings['ys_all_label_text'] ) && '' !== $settings['ys_all_label_text'] ? $settings['ys_all_label_text'] : 'All';
 		$empty_text     = isset( $settings['ys_empty_state_text'] ) && '' !== $settings['ys_empty_state_text'] ? $settings['ys_empty_state_text'] : 'No results found';
 		$crew_top_title = isset( $settings['ys_connect_with_top_title'] ) && '' !== $settings['ys_connect_with_top_title'] ? $settings['ys_connect_with_top_title'] : 'Connect with';
@@ -193,6 +194,7 @@ class YS_Shortcode {
 				'watch_text'     => $watch_text,
 				'call_text'      => $call_text,
 				'book_text'      => $book_text,
+				'booked_text'    => $booked_text,
 				'all_label_text' => $all_label_text,
 				'empty_text'     => $empty_text,
 				'crew_top_title' => $crew_top_title,
