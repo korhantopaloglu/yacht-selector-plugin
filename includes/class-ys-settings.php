@@ -192,6 +192,54 @@ class YS_Settings {
 			'ys_frontend_text_settings_section'
 		);
 
+		add_settings_field(
+			'ys_connect_with_top_title',
+			__( 'Crew Top Title', 'yacht-selector' ),
+			[ $this, 'render_connect_with_top_title_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
+			'ys_crew_group_title',
+			__( 'Crew Group Title', 'yacht-selector' ),
+			[ $this, 'render_crew_group_title_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
+			'ys_crew_group_subtitle',
+			__( 'Crew Group Subtitle', 'yacht-selector' ),
+			[ $this, 'render_crew_group_subtitle_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
+			'ys_currently_on_board_text',
+			__( 'Currently On Board Text', 'yacht-selector' ),
+			[ $this, 'render_currently_on_board_text_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
+			'ys_currently_offline_text',
+			__( 'Currently Offline Text', 'yacht-selector' ),
+			[ $this, 'render_currently_offline_text_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
+			'ys_online_status_icon',
+			__( 'Online Status Icon', 'yacht-selector' ),
+			[ $this, 'render_online_status_icon_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
 		add_settings_section(
 			'ys_json_data_import_section',
 			__( 'JSON Data Import', 'yacht-selector' ),
@@ -241,6 +289,8 @@ class YS_Settings {
 			YS_PLUGIN_VERSION,
 			true
 		);
+
+		wp_enqueue_media();
 	}
 
 	/**
@@ -308,6 +358,12 @@ class YS_Settings {
 		$output['ys_book_now_text']          = isset( $input['ys_book_now_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_book_now_text'] ) ) : $defaults['ys_book_now_text'];
 		$output['ys_all_label_text']         = isset( $input['ys_all_label_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_all_label_text'] ) ) : $defaults['ys_all_label_text'];
 		$output['ys_empty_state_text']       = isset( $input['ys_empty_state_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_empty_state_text'] ) ) : $defaults['ys_empty_state_text'];
+		$output['ys_connect_with_top_title'] = isset( $input['ys_connect_with_top_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_connect_with_top_title'] ) ) : $defaults['ys_connect_with_top_title'];
+		$output['ys_crew_group_title']       = isset( $input['ys_crew_group_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_crew_group_title'] ) ) : $defaults['ys_crew_group_title'];
+		$output['ys_crew_group_subtitle']    = isset( $input['ys_crew_group_subtitle'] ) ? sanitize_text_field( wp_unslash( $input['ys_crew_group_subtitle'] ) ) : $defaults['ys_crew_group_subtitle'];
+		$output['ys_currently_on_board_text']= isset( $input['ys_currently_on_board_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_currently_on_board_text'] ) ) : $defaults['ys_currently_on_board_text'];
+		$output['ys_currently_offline_text'] = isset( $input['ys_currently_offline_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_currently_offline_text'] ) ) : $defaults['ys_currently_offline_text'];
+		$output['ys_online_status_icon']     = $this->sanitize_attachment_id( isset( $input['ys_online_status_icon'] ) ? wp_unslash( $input['ys_online_status_icon'] ) : '' );
 		$output['ys_model_options']          = $this->sanitize_repeatable_list( isset( $input['ys_model_options'] ) ? $input['ys_model_options'] : [] );
 		$output['ys_extra_feature_options']  = $this->sanitize_repeatable_list( isset( $input['ys_extra_feature_options'] ) ? $input['ys_extra_feature_options'] : [] );
 
@@ -460,6 +516,12 @@ class YS_Settings {
 		$settings['ys_location_taxonomy_slug'] = sanitize_key( $settings['ys_location_taxonomy_slug'] );
 		$settings['ys_watch_me_text']          = sanitize_text_field( (string) $settings['ys_watch_me_text'] );
 		$settings['ys_book_now_text']          = sanitize_text_field( (string) $settings['ys_book_now_text'] );
+		$settings['ys_connect_with_top_title'] = sanitize_text_field( (string) $settings['ys_connect_with_top_title'] );
+		$settings['ys_crew_group_title']       = sanitize_text_field( (string) $settings['ys_crew_group_title'] );
+		$settings['ys_crew_group_subtitle']    = sanitize_text_field( (string) $settings['ys_crew_group_subtitle'] );
+		$settings['ys_currently_on_board_text']= sanitize_text_field( (string) $settings['ys_currently_on_board_text'] );
+		$settings['ys_currently_offline_text'] = sanitize_text_field( (string) $settings['ys_currently_offline_text'] );
+		$settings['ys_online_status_icon']     = $this->sanitize_attachment_id( $settings['ys_online_status_icon'] );
 		$settings['ys_all_label_text']         = sanitize_text_field( (string) $settings['ys_all_label_text'] );
 		$settings['ys_empty_state_text']       = sanitize_text_field( (string) $settings['ys_empty_state_text'] );
 
@@ -751,6 +813,81 @@ class YS_Settings {
 	}
 
 	/**
+	 * Render connect with top title field.
+	 *
+	 * @return void
+	 */
+	public function render_connect_with_top_title_field() {
+		$this->render_text_field(
+			'ys_connect_with_top_title',
+			__( 'Top title shown above the crew section.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render crew group title field.
+	 *
+	 * @return void
+	 */
+	public function render_crew_group_title_field() {
+		$this->render_text_field(
+			'ys_crew_group_title',
+			__( 'Main title shown inside the crew section.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render crew group subtitle field.
+	 *
+	 * @return void
+	 */
+	public function render_crew_group_subtitle_field() {
+		$this->render_text_field(
+			'ys_crew_group_subtitle',
+			__( 'Subtitle shown below the crew section title.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render currently on board text field.
+	 *
+	 * @return void
+	 */
+	public function render_currently_on_board_text_field() {
+		$this->render_text_field(
+			'ys_currently_on_board_text',
+			__( 'Status line template. Use {crew_member} as the placeholder.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render currently offline text field.
+	 *
+	 * @return void
+	 */
+	public function render_currently_offline_text_field() {
+		$this->render_text_field(
+			'ys_currently_offline_text',
+			__( 'Offline status line template. Use {crew_member} as the placeholder.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render online status icon field.
+	 *
+	 * @return void
+	 */
+	public function render_online_status_icon_field() {
+		$this->render_media_field(
+			'ys_online_status_icon',
+			__( 'Optional image shown before the crew status text.', 'yacht-selector' ),
+			__( 'Select Icon', 'yacht-selector' ),
+			__( 'Change Icon', 'yacht-selector' ),
+			__( 'Use icon', 'yacht-selector' )
+		);
+	}
+
+	/**
 	 * Render JSON data textarea field.
 	 *
 	 * @return void
@@ -858,6 +995,60 @@ class YS_Settings {
 		/>
 		<p class="description"><?php echo esc_html( $description ); ?></p>
 		<?php
+	}
+
+	/**
+	 * Render a settings media field.
+	 *
+	 * @param string $key Field key.
+	 * @param string $description Description text.
+	 * @param string $select_label Select button label.
+	 * @param string $replace_label Replace button label.
+	 * @param string $button_text Media frame button text.
+	 * @return void
+	 */
+	private function render_media_field( $key, $description, $select_label, $replace_label, $button_text ) {
+		$image_id  = absint( $this->get_setting( $key, 0 ) );
+		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+		?>
+		<div class="ys-field ys-term-media-field" data-ys-media-field>
+			<input type="hidden" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $image_id ); ?>" data-ys-image-id />
+			<div class="ys-image-preview-wrap ys-image-preview-wrap-small<?php echo $image_url ? '' : ' is-empty'; ?>" data-ys-image-preview-wrap>
+				<?php if ( $image_url ) : ?>
+					<img src="<?php echo esc_url( $image_url ); ?>" alt="" class="ys-image-preview ys-image-preview-small" data-ys-image-preview />
+					<span class="ys-image-placeholder" data-ys-image-placeholder hidden><?php esc_html_e( 'No image selected.', 'yacht-selector' ); ?></span>
+				<?php else : ?>
+					<img src="" alt="" class="ys-image-preview ys-image-preview-small" data-ys-image-preview hidden />
+					<span class="ys-image-placeholder" data-ys-image-placeholder><?php esc_html_e( 'No image selected.', 'yacht-selector' ); ?></span>
+				<?php endif; ?>
+			</div>
+			<div class="ys-image-actions">
+				<button type="button" class="button" data-ys-media-select data-ys-media-title="<?php echo esc_attr( $select_label ); ?>" data-ys-media-button="<?php echo esc_attr( $button_text ); ?>" data-ys-media-replace="<?php echo esc_attr( $replace_label ); ?>" data-ys-media-default="<?php echo esc_attr( $select_label ); ?>">
+					<?php echo $image_id ? esc_html( $replace_label ) : esc_html( $select_label ); ?>
+				</button>
+				<button type="button" class="button-link-delete<?php echo $image_id ? '' : ' hidden'; ?>" data-ys-media-remove>
+					<?php esc_html_e( 'Remove', 'yacht-selector' ); ?>
+				</button>
+			</div>
+			<p class="description"><?php echo esc_html( $description ); ?></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Sanitize attachment ID.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private function sanitize_attachment_id( $value ) {
+		$attachment_id = absint( $value );
+
+		if ( ! $attachment_id || 'attachment' !== get_post_type( $attachment_id ) ) {
+			return '';
+		}
+
+		return (string) $attachment_id;
 	}
 
 	/**
@@ -1628,6 +1819,12 @@ JSON;
 			'ys_book_now_text'           => 'Book Now',
 			'ys_all_label_text'          => 'All',
 			'ys_empty_state_text'        => 'No results found',
+			'ys_connect_with_top_title'  => 'Connect with',
+			'ys_crew_group_title'        => 'The Crew',
+			'ys_crew_group_subtitle'     => 'See the yacht live - choose how you’d like to connect. The crew is currently on board.',
+			'ys_currently_on_board_text' => 'Currently on board: {crew_member}',
+			'ys_currently_offline_text'  => 'Currently offline: {crew_member}',
+			'ys_online_status_icon'      => '',
 			'ys_model_options'           => [
 				'Gulet',
 				'Motor Yat',

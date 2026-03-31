@@ -168,22 +168,37 @@ class YS_Shortcode {
 		$items          = $this->get_selector_items( $settings );
 		$countries      = $this->get_selector_country_terms();
 		$months         = $this->get_selector_months( $items );
+		$contact_tools  = $this->data_provider->get_registered_contact_tools();
 		$container_id   = $this->get_container_id();
 		$watch_text     = isset( $settings['ys_watch_me_text'] ) && '' !== $settings['ys_watch_me_text'] ? $settings['ys_watch_me_text'] : 'Watch Me';
 		$book_text      = isset( $settings['ys_book_now_text'] ) && '' !== $settings['ys_book_now_text'] ? $settings['ys_book_now_text'] : 'Book Now';
 		$all_label_text = isset( $settings['ys_all_label_text'] ) && '' !== $settings['ys_all_label_text'] ? $settings['ys_all_label_text'] : 'All';
 		$empty_text     = isset( $settings['ys_empty_state_text'] ) && '' !== $settings['ys_empty_state_text'] ? $settings['ys_empty_state_text'] : 'No results found';
+		$crew_top_title = isset( $settings['ys_connect_with_top_title'] ) && '' !== $settings['ys_connect_with_top_title'] ? $settings['ys_connect_with_top_title'] : 'Connect with';
+		$crew_title     = isset( $settings['ys_crew_group_title'] ) && '' !== $settings['ys_crew_group_title'] ? $settings['ys_crew_group_title'] : 'The Crew';
+		$crew_subtitle  = isset( $settings['ys_crew_group_subtitle'] ) && '' !== $settings['ys_crew_group_subtitle'] ? $settings['ys_crew_group_subtitle'] : 'See the yacht live - choose how you’d like to connect. The crew is currently on board.';
+		$on_board_text  = isset( $settings['ys_currently_on_board_text'] ) && '' !== $settings['ys_currently_on_board_text'] ? $settings['ys_currently_on_board_text'] : 'Currently on board: {crew_member}';
+		$offline_text   = isset( $settings['ys_currently_offline_text'] ) && '' !== $settings['ys_currently_offline_text'] ? $settings['ys_currently_offline_text'] : 'Currently offline: {crew_member}';
+		$online_icon_id = isset( $settings['ys_online_status_icon'] ) ? absint( $settings['ys_online_status_icon'] ) : 0;
+		$online_icon    = $online_icon_id ? wp_get_attachment_image_url( $online_icon_id, 'thumbnail' ) : '';
 
 		return $this->render_template(
 			[
 				'items'          => $items,
 				'countries'      => $countries,
 				'months'         => $months,
+				'contact_tools'  => $contact_tools,
 				'container_id'   => $container_id,
 				'watch_text'     => $watch_text,
 				'book_text'      => $book_text,
 				'all_label_text' => $all_label_text,
 				'empty_text'     => $empty_text,
+				'crew_top_title' => $crew_top_title,
+				'crew_title'     => $crew_title,
+				'crew_subtitle'  => $crew_subtitle,
+				'on_board_text'  => $on_board_text,
+				'offline_text'   => $offline_text,
+				'online_icon'    => $online_icon,
 			],
 			YS_PLUGIN_PATH . 'templates/shortcode-ys-selector-block.php'
 		);

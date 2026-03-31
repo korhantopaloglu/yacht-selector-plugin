@@ -62,6 +62,13 @@ class YS_Crew_Meta_Boxes {
 	];
 
 	/**
+	 * Allowed URL schemes for crew contact tools.
+	 *
+	 * @var array
+	 */
+	private $allowed_contact_url_protocols = [ 'http', 'https', 'mailto', 'tel', 'facetime' ];
+
+	/**
 	 * Register hooks.
 	 *
 	 * @return void
@@ -136,6 +143,9 @@ class YS_Crew_Meta_Boxes {
 		$days          = get_post_meta( $post->ID, 'ys_crew_online_days', true );
 		$utc_offset    = get_post_meta( $post->ID, 'ys_crew_utc_offset', true );
 		$days          = is_array( $days ) ? $days : [];
+		$selected_tools  = $this->get_selected_contact_tools( $post->ID );
+		$saved_tool_urls = $this->get_saved_contact_tool_urls( $post->ID );
+		$all_tools       = $this->get_all_contact_tools();
 
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		?>
@@ -148,7 +158,8 @@ class YS_Crew_Meta_Boxes {
 			</p>
 			<p class="description"><?php esc_html_e( 'Enable this if this crew member can be used later as a contact person.', 'yacht-selector' ); ?></p>
 
-			<div class="ys-crew-contact-fields<?php echo $is_contact ? '' : ' is-inactive'; ?>" data-ys-crew-contact-fields>
+			<div class="ys-crew-contact-fields" data-ys-crew-contact-fields>
+				<div class="ys-crew-contact-availability-fields<?php echo $is_contact ? '' : ' is-inactive'; ?>" data-ys-crew-contact-availability-fields>
 				<div class="ys-crew-top-row">
 					<div class="ys-field ys-crew-hours-field">
 						<label><strong><?php esc_html_e( 'Online Hours', 'yacht-selector' ); ?></strong></label>
@@ -204,6 +215,79 @@ class YS_Crew_Meta_Boxes {
 						<?php endforeach; ?>
 					</div>
 				</div>
+				</div>
+
+				<div class="ys-crew-contact-tools-section">
+					<p><strong><?php esc_html_e( 'Contact Tools', 'yacht-selector' ); ?></strong></p>
+					<p class="description"><?php esc_html_e( 'Select one or more contact tools for this crew member. Each selected tool reveals its own direct URL field immediately.', 'yacht-selector' ); ?></p>
+					<?php if ( class_exists( 'YS_Contact_Tools' ) ) : ?>
+						<?php wp_nonce_field( YS_Contact_Tools::NONCE_ACTION, YS_Contact_Tools::NONCE_NAME ); ?>
+					<?php endif; ?>
+
+					<div class="ys-crew-contact-urls-header">
+						<p><strong><?php esc_html_e( 'Tool Contact URLs', 'yacht-selector' ); ?></strong></p>
+						<button type="button" class="button-link ys-crew-contact-url-help-toggle" data-ys-crew-contact-url-help-toggle aria-expanded="false"><?php esc_html_e( 'Contact URL Help', 'yacht-selector' ); ?></button>
+					</div>
+
+					<div class="ys-crew-contact-url-help-panel hidden" data-ys-crew-contact-url-help-panel hidden>
+						<p><?php esc_html_e( 'Enter the direct communication URL for this crew member and selected tool. This URL will open when the related contact tool card is clicked on the frontend. The fields below are generated dynamically from the currently selected contact tools.', 'yacht-selector' ); ?></p>
+						<ul class="ys-crew-contact-url-help-list">
+							<li><strong><?php esc_html_e( 'Phone', 'yacht-selector' ); ?></strong>: <code>tel:+905551112233</code></li>
+							<li><strong><?php esc_html_e( 'Email', 'yacht-selector' ); ?></strong>: <code>mailto:hello@example.com</code>, <code>mailto:hello@example.com?subject=Yacht%20Inquiry</code></li>
+							<li><strong><?php esc_html_e( 'WhatsApp', 'yacht-selector' ); ?></strong>: <code>https://wa.me/905551112233</code>, <code>https://wa.me/905551112233?text=Hello%20I%20want%20to%20connect</code></li>
+							<li><strong><?php esc_html_e( 'Google Meet', 'yacht-selector' ); ?></strong>: <code>https://meet.google.com/abc-defg-hij</code></li>
+							<li><strong><?php esc_html_e( 'FaceTime', 'yacht-selector' ); ?></strong>: <code>facetime:email@example.com</code>, <code>facetime:+905551112233</code></li>
+							<li><strong><?php esc_html_e( 'Zoom', 'yacht-selector' ); ?></strong>: <code>https://zoom.us/j/1234567890</code></li>
+							<li><strong><?php esc_html_e( 'Telegram', 'yacht-selector' ); ?></strong>: <code>https://t.me/username</code></li>
+							<li><strong><?php esc_html_e( 'Signal', 'yacht-selector' ); ?></strong>: <?php esc_html_e( 'Use a direct profile or invite URL when available.', 'yacht-selector' ); ?></li>
+							<li><strong><?php esc_html_e( 'Generic', 'yacht-selector' ); ?></strong>: <?php esc_html_e( 'For web links use https://. For email use mailto:. For phone use tel:. For supported apps use their official direct link format.', 'yacht-selector' ); ?></li>
+						</ul>
+					</div>
+
+					<?php if ( empty( $all_tools ) ) : ?>
+						<p class="description"><?php esc_html_e( 'No contact tools found. Create terms in the Contact Tools taxonomy first.', 'yacht-selector' ); ?></p>
+					<?php else : ?>
+						<div class="ys-contact-tool-post-list ys-crew-contact-tool-list" data-ys-crew-contact-tool-list>
+						<?php foreach ( $all_tools as $tool ) : ?>
+							<?php
+							$tool_key = $tool instanceof WP_Term ? (string) $tool->slug : '';
+							$is_selected = isset( $selected_tools[ $tool_key ] );
+							$tool_value = isset( $saved_tool_urls[ $tool_key ] ) && is_string( $saved_tool_urls[ $tool_key ] ) ? $saved_tool_urls[ $tool_key ] : '';
+							$tool_meta = $this->get_contact_tool_admin_meta( $tool );
+							?>
+							<div class="ys-contact-tool-post-item ys-crew-contact-tool-item" data-ys-crew-contact-tool-item="<?php echo esc_attr( $tool_key ); ?>">
+								<div class="ys-crew-contact-tool-checkbox">
+									<input type="checkbox" id="ys_contact_tool_<?php echo esc_attr( $tool_key ); ?>" name="tax_input[ys_contact_tool][]" value="<?php echo esc_attr( $tool_key ); ?>" data-ys-contact-tool-term-id="<?php echo esc_attr( (string) $tool->term_id ); ?>" data-ys-contact-tool-key="<?php echo esc_attr( $tool_key ); ?>" <?php checked( $is_selected ); ?> />
+								</div>
+								<div class="ys-contact-tool-post-content ys-crew-contact-tool-content">
+									<label class="ys-contact-tool-post-title ys-crew-contact-tool-label" for="ys_contact_tool_<?php echo esc_attr( $tool_key ); ?>"><?php echo esc_html( $tool->name ); ?></label>
+									<?php if ( '' !== $tool_meta['icon_name'] ) : ?>
+										<span class="ys-contact-tool-post-meta"><?php echo esc_html( $tool_meta['icon_name'] ); ?></span>
+									<?php endif; ?>
+									<?php if ( '' !== $tool_meta['description'] ) : ?>
+										<span class="ys-contact-tool-post-meta"><?php echo esc_html( $tool_meta['description'] ); ?></span>
+									<?php endif; ?>
+									<?php if ( $tool_meta['online_sensitive'] ) : ?>
+										<span class="ys-contact-tool-post-badge"><?php esc_html_e( 'Online-sensitive', 'yacht-selector' ); ?></span>
+									<?php endif; ?>
+									<div class="ys-crew-contact-tool-url-wrap<?php echo $is_selected ? '' : ' hidden'; ?>" data-ys-contact-tool-url-item="<?php echo esc_attr( $tool_key ); ?>" <?php echo $is_selected ? '' : 'hidden'; ?>>
+										<input
+											type="text"
+											id="ys_contact_tool_urls_<?php echo esc_attr( $tool_key ); ?>"
+											name="ys_contact_tool_urls[<?php echo esc_attr( $tool_key ); ?>]"
+											class="widefat ys-crew-contact-tool-url-input"
+											value="<?php echo esc_attr( $tool_value ); ?>"
+											placeholder="<?php echo esc_attr( $this->get_contact_tool_url_placeholder( $tool ) ); ?>"
+											<?php disabled( ! $is_selected ); ?>
+										/>
+										<p class="description ys-crew-contact-url-help"><?php echo esc_html( $this->get_contact_tool_url_help_text( $tool ) ); ?></p>
+									</div>
+								</div>
+							</div>
+						<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+				</div>
 			</div>
 		</div>
 		<?php
@@ -248,22 +332,259 @@ class YS_Crew_Meta_Boxes {
 			delete_post_meta( $post_id, 'ys_crew_online_hours_start' );
 			delete_post_meta( $post_id, 'ys_crew_online_hours_end' );
 			delete_post_meta( $post_id, 'ys_crew_timezone' );
+		} else {
+			$range      = $this->sanitize_online_hours_range(
+				isset( $_POST['ys_crew_online_hours_start'] ) ? wp_unslash( $_POST['ys_crew_online_hours_start'] ) : '',
+				isset( $_POST['ys_crew_online_hours_end'] ) ? wp_unslash( $_POST['ys_crew_online_hours_end'] ) : ''
+			);
+			$days       = $this->sanitize_online_days( isset( $_POST['ys_crew_online_days'] ) ? wp_unslash( $_POST['ys_crew_online_days'] ) : [] );
+			$utc_offset = $this->sanitize_utc_offset_value( isset( $_POST['ys_crew_utc_offset'] ) ? wp_unslash( $_POST['ys_crew_utc_offset'] ) : '' );
+
+			$this->save_scalar_meta( $post_id, 'ys_crew_online_hours_range', $range );
+			$this->save_array_meta( $post_id, 'ys_crew_online_days', $days );
+			$this->save_scalar_meta( $post_id, 'ys_crew_utc_offset', $utc_offset );
+			delete_post_meta( $post_id, 'ys_crew_online_hours_start' );
+			delete_post_meta( $post_id, 'ys_crew_online_hours_end' );
+			delete_post_meta( $post_id, 'ys_crew_timezone' );
+		}
+
+		$this->save_contact_tool_urls( $post_id );
+	}
+
+	/**
+	 * Get all contact tool terms.
+	 *
+	 * @return WP_Term[]
+	 */
+	private function get_all_contact_tools() {
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'ys_contact_tool',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
+
+		return is_array( $terms ) ? $terms : [];
+	}
+
+	/**
+	 * Get selected contact tool terms keyed by slug.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array
+	 */
+	private function get_selected_contact_tools( $post_id ) {
+		$terms = get_the_terms( $post_id, 'ys_contact_tool' );
+
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return [];
+		}
+
+		$selected = [];
+
+		foreach ( $terms as $term ) {
+			if ( $term instanceof WP_Term ) {
+				$selected[ (string) $term->slug ] = $term;
+			}
+		}
+
+		return $selected;
+	}
+
+	/**
+	 * Get saved contact tool URL map, with legacy fallback.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array
+	 */
+	private function get_saved_contact_tool_urls( $post_id ) {
+		$saved_tool_urls = get_post_meta( $post_id, 'ys_contact_tool_urls', true );
+		$saved_tool_urls = is_array( $saved_tool_urls ) ? $saved_tool_urls : [];
+
+		if ( ! empty( $saved_tool_urls ) ) {
+			return $saved_tool_urls;
+		}
+
+		$legacy_values = get_post_meta( $post_id, 'ys_crew_contact_tool_urls', true );
+		$legacy_values = is_array( $legacy_values ) ? $legacy_values : [];
+
+		if ( empty( $legacy_values ) ) {
+			return [];
+		}
+
+		$normalized = [];
+		$selected_tools = $this->get_selected_contact_tools( $post_id );
+
+		foreach ( $selected_tools as $tool_key => $term ) {
+			if ( isset( $legacy_values[ $tool_key ] ) && is_string( $legacy_values[ $tool_key ] ) ) {
+				$normalized[ $tool_key ] = $legacy_values[ $tool_key ];
+				continue;
+			}
+
+			$legacy_id = $term instanceof WP_Term ? (string) (int) $term->term_id : '';
+
+			if ( '' !== $legacy_id && isset( $legacy_values[ $legacy_id ] ) && is_string( $legacy_values[ $legacy_id ] ) ) {
+				$normalized[ $tool_key ] = $legacy_values[ $legacy_id ];
+			}
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Get compact admin meta values for a contact tool term.
+	 *
+	 * @param WP_Term $term Tool term.
+	 * @return array
+	 */
+	private function get_contact_tool_admin_meta( $term ) {
+		if ( ! $term instanceof WP_Term ) {
+			return [
+				'icon_name'        => '',
+				'description'      => '',
+				'online_sensitive' => false,
+			];
+		}
+
+		return [
+			'icon_name'        => (string) get_term_meta( $term->term_id, 'ys_contact_tool_icon', true ),
+			'description'      => isset( $term->description ) ? wp_strip_all_tags( (string) $term->description ) : '',
+			'online_sensitive' => '1' === (string) get_term_meta( $term->term_id, 'ys_contact_tool_respects_online_status', true ),
+		];
+	}
+
+	/**
+	 * Get URL placeholder text for a tool.
+	 *
+	 * @param WP_Term $tool Tool term.
+	 * @return string
+	 */
+	private function get_contact_tool_url_placeholder( $tool ) {
+		$slug = $tool instanceof WP_Term ? sanitize_title( $tool->slug ) : '';
+
+		switch ( $slug ) {
+			case 'phone':
+				return 'tel:+905551112233';
+			case 'email':
+			case 'mail':
+				return 'mailto:hello@example.com';
+			case 'whatsapp':
+				return 'https://wa.me/905551112233';
+			case 'google-meet':
+			case 'meet':
+				return 'https://meet.google.com/abc-defg-hij';
+			case 'facetime':
+				return 'facetime:email@example.com';
+			case 'zoom':
+				return 'https://zoom.us/j/1234567890';
+			case 'telegram':
+				return 'https://t.me/username';
+			default:
+				return 'https://example.com/...';
+		}
+	}
+
+	/**
+	 * Get helper text for a tool URL.
+	 *
+	 * @param WP_Term $tool Tool term.
+	 * @return string
+	 */
+	private function get_contact_tool_url_help_text( $tool ) {
+		$slug = $tool instanceof WP_Term ? sanitize_title( $tool->slug ) : '';
+
+		switch ( $slug ) {
+			case 'phone':
+				return __( 'Use tel: links for supported devices.', 'yacht-selector' );
+			case 'email':
+			case 'mail':
+				return __( 'Use mailto: links. You can include a subject parameter if needed.', 'yacht-selector' );
+			case 'whatsapp':
+				return __( 'Use the direct wa.me format, with an optional prefilled message.', 'yacht-selector' );
+			case 'facetime':
+				return __( 'Use the facetime: scheme with an email address or phone number.', 'yacht-selector' );
+			default:
+				return __( 'Use a full valid URL or supported scheme for this contact method.', 'yacht-selector' );
+		}
+	}
+
+	/**
+	 * Save tool-specific contact URLs for the crew member.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	private function save_contact_tool_urls( $post_id ) {
+		$selected_slugs = isset( $_POST['tax_input']['ys_contact_tool'] ) ? wp_unslash( $_POST['tax_input']['ys_contact_tool'] ) : [];
+		$selected_slugs = is_array( $selected_slugs ) ? array_values( array_filter( array_map( 'sanitize_title', $selected_slugs ) ) ) : [];
+
+		if ( empty( $selected_slugs ) ) {
+			delete_post_meta( $post_id, 'ys_contact_tool_urls' );
+			delete_post_meta( $post_id, 'ys_crew_contact_tool_urls' );
 			return;
 		}
 
-		$range      = $this->sanitize_online_hours_range(
-			isset( $_POST['ys_crew_online_hours_start'] ) ? wp_unslash( $_POST['ys_crew_online_hours_start'] ) : '',
-			isset( $_POST['ys_crew_online_hours_end'] ) ? wp_unslash( $_POST['ys_crew_online_hours_end'] ) : ''
+		$selected_terms = get_terms(
+			[
+				'taxonomy'   => 'ys_contact_tool',
+				'hide_empty' => false,
+				'slug'       => $selected_slugs,
+			]
 		);
-		$days       = $this->sanitize_online_days( isset( $_POST['ys_crew_online_days'] ) ? wp_unslash( $_POST['ys_crew_online_days'] ) : [] );
-		$utc_offset = $this->sanitize_utc_offset_value( isset( $_POST['ys_crew_utc_offset'] ) ? wp_unslash( $_POST['ys_crew_utc_offset'] ) : '' );
 
-		$this->save_scalar_meta( $post_id, 'ys_crew_online_hours_range', $range );
-		$this->save_array_meta( $post_id, 'ys_crew_online_days', $days );
-		$this->save_scalar_meta( $post_id, 'ys_crew_utc_offset', $utc_offset );
-		delete_post_meta( $post_id, 'ys_crew_online_hours_start' );
-		delete_post_meta( $post_id, 'ys_crew_online_hours_end' );
-		delete_post_meta( $post_id, 'ys_crew_timezone' );
+		if ( is_wp_error( $selected_terms ) || ! is_array( $selected_terms ) ) {
+			delete_post_meta( $post_id, 'ys_contact_tool_urls' );
+			delete_post_meta( $post_id, 'ys_crew_contact_tool_urls' );
+			return;
+		}
+
+		$raw_values = isset( $_POST['ys_contact_tool_urls'] ) ? wp_unslash( $_POST['ys_contact_tool_urls'] ) : [];
+		$raw_values = is_array( $raw_values ) ? $raw_values : [];
+		$saved = [];
+
+		foreach ( $selected_terms as $term ) {
+			if ( ! $term instanceof WP_Term ) {
+				continue;
+			}
+
+			$tool_key = sanitize_title( $term->slug );
+			$value = isset( $raw_values[ $tool_key ] ) ? $this->sanitize_contact_tool_url( $raw_values[ $tool_key ] ) : '';
+
+			if ( '' !== $value ) {
+				$saved[ $tool_key ] = $value;
+			}
+		}
+
+		if ( empty( $saved ) ) {
+			delete_post_meta( $post_id, 'ys_contact_tool_urls' );
+			delete_post_meta( $post_id, 'ys_crew_contact_tool_urls' );
+			return;
+		}
+
+		update_post_meta( $post_id, 'ys_contact_tool_urls', $saved );
+		delete_post_meta( $post_id, 'ys_crew_contact_tool_urls' );
+	}
+
+	/**
+	 * Sanitize a contact tool URL while preserving supported schemes.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	private function sanitize_contact_tool_url( $value ) {
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		return esc_url_raw( $value, $this->allowed_contact_url_protocols );
 	}
 
 	/**

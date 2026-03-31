@@ -127,7 +127,7 @@ function syncCrewContactFields(scope) {
       return;
     }
 
-    var fields = wrapper.querySelector('[data-ys-crew-contact-fields]');
+    var fields = wrapper.querySelector('[data-ys-crew-contact-availability-fields]');
     if (!fields) {
       return;
     }
@@ -137,6 +137,40 @@ function syncCrewContactFields(scope) {
 
     fields.querySelectorAll('input, select, textarea').forEach(function(field) {
       field.disabled = !enabled;
+    });
+
+    syncCrewContactUrlFields(wrapper);
+  });
+}
+
+function syncCrewContactUrlFields(scope) {
+  var container = scope || document;
+
+  container.querySelectorAll('.ys-crew-meta-box').forEach(function(wrapper) {
+    var toolList = wrapper.querySelector('[data-ys-crew-contact-tool-list]');
+
+    if (!toolList) {
+      return;
+    }
+
+    var selectedIds = [];
+
+    wrapper.querySelectorAll('input[name="tax_input[ys_contact_tool][]"]:checked').forEach(function(checkbox) {
+      var toolKey = checkbox.getAttribute('data-ys-contact-tool-key');
+      if (toolKey) {
+        selectedIds.push(toolKey);
+      }
+    });
+
+    toolList.querySelectorAll('[data-ys-contact-tool-url-item]').forEach(function(item) {
+      var toolKey = item.getAttribute('data-ys-contact-tool-url-item');
+      var visible = selectedIds.indexOf(toolKey) !== -1;
+      item.classList.toggle('hidden', !visible);
+      item.hidden = !visible;
+
+      item.querySelectorAll('input, select, textarea').forEach(function(field) {
+        field.disabled = !visible;
+      });
     });
   });
 }
@@ -151,6 +185,14 @@ function syncContactToolFields(scope) {
     wrapper.querySelectorAll('[data-ys-contact-tool-group]').forEach(function(group) {
       var isActive = group.getAttribute('data-ys-contact-tool-group') === activeType;
       group.classList.toggle('hidden', !isActive);
+
+      group.querySelectorAll('input, select, textarea, button').forEach(function(field) {
+        if (field.matches('input[type="radio"]')) {
+          return;
+        }
+
+        field.disabled = !isActive;
+      });
     });
   });
 }
@@ -198,20 +240,34 @@ document.addEventListener('change', function(event) {
     return;
   }
 
+  if (event.target.matches('input[name="tax_input[ys_contact_tool][]"], [data-ys-contact-tool-key]')) {
+    syncCrewContactUrlFields(event.target.closest('.ys-crew-meta-box') || document);
+    return;
+  }
+
   if (event.target.matches('input[name="ys_contact_tool_icon_type"]')) {
-    syncContactToolFields(event.target.closest('[data-ys-contact-tool-fields]') || document);
+    syncContactToolFields(document);
   }
 });
 
 document.addEventListener('click', function(event) {
+  var contactToolCheckbox = event.target.closest('input[name="tax_input[ys_contact_tool][]"], [data-ys-contact-tool-key]');
+  if (contactToolCheckbox) {
+    window.setTimeout(function() {
+      syncCrewContactUrlFields(contactToolCheckbox.closest('.ys-crew-meta-box') || document);
+    }, 0);
+  }
+
   var dayPresetButton = event.target.closest('[data-ys-crew-days-select]');
   if (dayPresetButton) {
+    event.preventDefault();
     applyCrewDayPreset(dayPresetButton);
     return;
   }
 
   var iconFillButton = event.target.closest('[data-ys-contact-tool-icon-fill]');
   if (iconFillButton) {
+    event.preventDefault();
     var group = iconFillButton.closest('[data-ys-contact-tool-group="icon"]');
     var input = group ? group.querySelector('[data-ys-contact-tool-icon-input]') : null;
 
@@ -221,12 +277,29 @@ document.addEventListener('click', function(event) {
 
     input.value = iconFillButton.getAttribute('data-ys-contact-tool-icon-fill') || '';
     input.focus();
+    return;
+  }
+
+  var contactUrlHelpToggle = event.target.closest('[data-ys-crew-contact-url-help-toggle]');
+  if (contactUrlHelpToggle) {
+    event.preventDefault();
+    var metaBox = contactUrlHelpToggle.closest('.ys-crew-meta-box');
+    var panel = metaBox ? metaBox.querySelector('[data-ys-crew-contact-url-help-panel]') : null;
+    if (!panel) {
+      return;
+    }
+
+    var expanded = contactUrlHelpToggle.getAttribute('aria-expanded') === 'true';
+    contactUrlHelpToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    panel.hidden = expanded;
+    panel.classList.toggle('hidden', expanded);
   }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
   syncExistingPostTypeField();
   syncCrewContactFields(document);
+  syncCrewContactUrlFields(document);
   syncContactToolFields(document);
 });
 
@@ -247,18 +320,19 @@ document.querySelectorAll('[data-ys-admin-panel]').forEach(function(panel) {
 document.addEventListener('click', function(event) {
   var selectButton = event.target.closest('[data-ys-media-select]');
   if (selectButton) {
-    var wrapper = selectButton.closest('[data-ys-media-field], .ys-field');
+    event.preventDefault();
+
+    var wrapper = selectButton.closest('[data-ys-contact-tool-image-field], [data-ys-media-field], .ys-field');
     if (!wrapper || typeof wp === 'undefined' || !wp.media) {
       return;
     }
 
-    var input = wrapper.querySelector('[data-ys-image-id]');
-    var preview = wrapper.querySelector('[data-ys-image-preview]');
+    var input = wrapper.querySelector('[data-ys-contact-tool-image-id], [data-ys-image-id]');
+    var preview = wrapper.querySelector('.ys-contact-tool-image-preview, [data-ys-image-preview]');
     var placeholder = wrapper.querySelector('[data-ys-image-placeholder]');
-    var removeButton = wrapper.querySelector('[data-ys-media-remove]');
-    var previewWrap = wrapper.querySelector('[data-ys-image-preview-wrap]');
-
-    var frame = wp.media({
+    var removeButton = wrapper.querySelector('.ys-contact-tool-image-remove, [data-ys-media-remove]');
+    var previewWrap = wrapper.querySelector('.ys-contact-tool-image-preview-wrap, [data-ys-image-preview-wrap]');
+    var frame = selectButton._ysMediaFrame || wp.media({
       title: selectButton.getAttribute('data-ys-media-title') || 'Select Card Image',
       button: {
         text: selectButton.getAttribute('data-ys-media-button') || 'Use image'
@@ -268,6 +342,8 @@ document.addEventListener('click', function(event) {
       },
       multiple: false
     });
+
+    selectButton._ysMediaFrame = frame;
 
     frame.on('select', function() {
       var attachment = frame.state().get('selection').first().toJSON();
@@ -300,16 +376,18 @@ document.addEventListener('click', function(event) {
 
   var removeButton = event.target.closest('[data-ys-media-remove]');
   if (removeButton) {
-    var field = removeButton.closest('[data-ys-media-field], .ys-field');
+    event.preventDefault();
+
+    var field = removeButton.closest('[data-ys-contact-tool-image-field], [data-ys-media-field], .ys-field');
     if (!field) {
       return;
     }
 
-    var input = field.querySelector('[data-ys-image-id]');
-    var preview = field.querySelector('[data-ys-image-preview]');
+    var input = field.querySelector('[data-ys-contact-tool-image-id], [data-ys-image-id]');
+    var preview = field.querySelector('.ys-contact-tool-image-preview, [data-ys-image-preview]');
     var placeholder = field.querySelector('[data-ys-image-placeholder]');
     var selectButton = field.querySelector('[data-ys-media-select]');
-    var previewWrap = field.querySelector('[data-ys-image-preview-wrap]');
+    var previewWrap = field.querySelector('.ys-contact-tool-image-preview-wrap, [data-ys-image-preview-wrap]');
 
     if (input) {
       input.value = '';

@@ -182,6 +182,7 @@ class YS_Data_Provider {
 			'guests'       => $this->get_integer_meta( $post->ID, 'ys_guests' ),
 			'crew'         => $this->get_integer_meta( $post->ID, 'ys_crew' ),
 			'features'     => $this->get_array_meta( $post->ID, 'ys_extra_features' ),
+			'assigned_crew'=> $this->get_assigned_crew( $post->ID ),
 			'cta'          => $this->resolve_cta( $post->ID ),
 		];
 	}
@@ -446,6 +447,245 @@ class YS_Data_Provider {
 		}
 
 		return array_values( array_unique( $sanitized ) );
+	}
+
+	/**
+	 * Get normalized assigned crew data for a yacht.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array
+	 */
+	public function get_assigned_crew( $post_id ) {
+		$crew_ids = get_post_meta( $post_id, 'ys_assigned_crew', true );
+
+		if ( ! is_array( $crew_ids ) ) {
+			return [];
+		}
+
+		$crew_members = [];
+
+		foreach ( array_values( array_unique( array_map( 'absint', $crew_ids ) ) ) as $crew_id ) {
+			if ( ! $crew_id || 'ys_crew' !== get_post_type( $crew_id ) || 'publish' !== get_post_status( $crew_id ) ) {
+				continue;
+			}
+
+			$contact_tools = $this->get_contact_tools_for_crew( $crew_id );
+			$tool_urls_raw = get_post_meta( $crew_id, 'ys_contact_tool_urls', true );
+			$tool_urls_raw = is_array( $tool_urls_raw ) ? $tool_urls_raw : [];
+			if ( empty( $tool_urls_raw ) ) {
+				$tool_urls_raw = get_post_meta( $crew_id, 'ys_crew_contact_tool_urls', true );
+				$tool_urls_raw = is_array( $tool_urls_raw ) ? $tool_urls_raw : [];
+			}
+			$hours_range   = $this->get_text_meta( $crew_id, 'ys_crew_online_hours_range' );
+			$hours_data    = $this->parse_online_hours_range( $hours_range );
+
+			$crew_members[] = [
+				'id'             => $crew_id,
+				'name'           => get_the_title( $crew_id ),
+				'is_contact'     => '1' === (string) get_post_meta( $crew_id, 'ys_crew_is_contact', true ),
+				'online_hours'   => $hours_range,
+				'online_start'   => $hours_data['start'],
+				'online_end'     => $hours_data['end'],
+				'utc_offset'     => $this->get_text_meta( $crew_id, 'ys_crew_utc_offset' ),
+				'contact_tools'  => $contact_tools,
+				'tool_urls'      => $this->normalize_contact_tool_urls( $tool_urls_raw, $contact_tools ),
+			];
+		}
+
+		return $crew_members;
+	}
+
+	/**
+	 * Get all registered contact tools.
+	 *
+	 * @return array
+	 */
+	public function get_registered_contact_tools() {
+		$terms = get_terms(
+			[
+				'taxonomy'   => 'ys_contact_tool',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			]
+		);
+
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return [];
+		}
+
+		$tools = [];
+
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof WP_Term ) {
+				continue;
+			}
+
+			$image_id  = absint( get_term_meta( $term->term_id, 'ys_contact_tool_image_id', true ) );
+			$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+
+			$tools[] = [
+				'id'                     => (int) $term->term_id,
+				'slug'                   => (string) $term->slug,
+				'name'                   => (string) $term->name,
+				'description'            => wp_strip_all_tags( (string) $term->description ),
+				'icon_type'              => sanitize_key( (string) get_term_meta( $term->term_id, 'ys_contact_tool_icon_type', true ) ),
+				'icon'                   => sanitize_text_field( (string) get_term_meta( $term->term_id, 'ys_contact_tool_icon', true ) ),
+				'image'                  => $image_url ? (string) $image_url : '',
+				'default_url'            => $this->sanitize_contact_tool_url( (string) get_term_meta( $term->term_id, 'ys_contact_tool_default_url', true ) ),
+				'respects_online_status' => '1' === (string) get_term_meta( $term->term_id, 'ys_contact_tool_respects_online_status', true ),
+			];
+		}
+
+		usort(
+			$tools,
+			static function( $left, $right ) {
+				$compare = (int) $right['respects_online_status'] <=> (int) $left['respects_online_status'];
+
+				if ( 0 !== $compare ) {
+					return $compare;
+				}
+
+				return strcasecmp( $left['name'], $right['name'] );
+			}
+		);
+
+		return $tools;
+	}
+
+	/**
+	 * Get normalized contact tools for a crew member.
+	 *
+	 * @param int $crew_id Crew post ID.
+	 * @return array
+	 */
+	private function get_contact_tools_for_crew( $crew_id ) {
+		$terms = get_the_terms( $crew_id, 'ys_contact_tool' );
+
+		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return [];
+		}
+
+		$tools = [];
+
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof WP_Term ) {
+				continue;
+			}
+
+			$image_id  = absint( get_term_meta( $term->term_id, 'ys_contact_tool_image_id', true ) );
+			$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+
+			$tools[] = [
+				'id'                     => (int) $term->term_id,
+				'slug'                   => (string) $term->slug,
+				'name'                   => (string) $term->name,
+				'description'            => wp_strip_all_tags( (string) $term->description ),
+				'icon_type'              => sanitize_key( (string) get_term_meta( $term->term_id, 'ys_contact_tool_icon_type', true ) ),
+				'icon'                   => sanitize_text_field( (string) get_term_meta( $term->term_id, 'ys_contact_tool_icon', true ) ),
+				'image'                  => $image_url ? (string) $image_url : '',
+				'default_url'            => $this->sanitize_contact_tool_url( (string) get_term_meta( $term->term_id, 'ys_contact_tool_default_url', true ) ),
+				'respects_online_status' => '1' === (string) get_term_meta( $term->term_id, 'ys_contact_tool_respects_online_status', true ),
+			];
+		}
+
+		usort(
+			$tools,
+			static function( $left, $right ) {
+				$compare = (int) $right['respects_online_status'] <=> (int) $left['respects_online_status'];
+
+				if ( 0 !== $compare ) {
+					return $compare;
+				}
+
+				return strcasecmp( $left['name'], $right['name'] );
+			}
+		);
+
+		return $tools;
+	}
+
+	/**
+	 * Parse online hours range into start/end values.
+	 *
+	 * @param string|null $value Raw range.
+	 * @return array
+	 */
+	private function parse_online_hours_range( $value ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+
+		if ( ! preg_match( '/^(2[0-3]|[01]\d)-(2[0-3]|[01]\d)$/', $value, $matches ) ) {
+			return [
+				'start' => '',
+				'end'   => '',
+			];
+		}
+
+		return [
+			'start' => $matches[1] . ':00',
+			'end'   => $matches[2] . ':00',
+		];
+	}
+
+	/**
+	 * Normalize saved crew tool URLs against assigned tools.
+	 *
+	 * @param array $raw_values Raw saved values.
+	 * @param array $contact_tools Normalized assigned tools.
+	 * @return array
+	 */
+	private function normalize_contact_tool_urls( $raw_values, $contact_tools ) {
+		if ( ! is_array( $raw_values ) || ! is_array( $contact_tools ) ) {
+			return [];
+		}
+
+		$allowed_protocols = array_merge( wp_allowed_protocols(), [ 'tel', 'facetime' ] );
+		$normalized = [];
+
+		foreach ( $contact_tools as $tool ) {
+			$tool_key = isset( $tool['slug'] ) ? sanitize_title( (string) $tool['slug'] ) : '';
+			$legacy_tool_id = isset( $tool['id'] ) ? (string) (int) $tool['id'] : '';
+
+			if ( '' === $tool_key ) {
+				continue;
+			}
+
+			$raw_url = '';
+
+			if ( isset( $raw_values[ $tool_key ] ) && is_string( $raw_values[ $tool_key ] ) ) {
+				$raw_url = $raw_values[ $tool_key ];
+			} elseif ( '' !== $legacy_tool_id && isset( $raw_values[ $legacy_tool_id ] ) && is_string( $raw_values[ $legacy_tool_id ] ) ) {
+				$raw_url = $raw_values[ $legacy_tool_id ];
+			}
+
+			if ( '' === $raw_url ) {
+				continue;
+			}
+
+			$url = esc_url_raw( $raw_url, $allowed_protocols );
+
+			if ( '' !== $url ) {
+				$normalized[ $tool_key ] = $url;
+			}
+		}
+
+		return $normalized;
+	}
+
+	/**
+	 * Sanitize a contact tool URL for frontend use.
+	 *
+	 * @param string $value Raw URL.
+	 * @return string
+	 */
+	private function sanitize_contact_tool_url( $value ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		return esc_url_raw( $value, array_merge( wp_allowed_protocols(), [ 'tel', 'facetime' ] ) );
 	}
 
 	/**

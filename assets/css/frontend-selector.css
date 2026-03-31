@@ -162,6 +162,38 @@
   background: #111827;
 }
 
+.ys-tool-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-bottom: 8px;
+}
+
+.ys-tool-card-icon img,
+.ys-tool-card-icon-svg svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.ys-tool-card-icon:not(.ys-tool-card-icon-svg) {
+  object-fit: contain;
+}
+
+.ys-tool-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ys-tool-card.disabled,
+.ys-book-now-button.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .ys-empty-state-container {
   padding: 24px;
   border: 1px dashed #d1d5db;
