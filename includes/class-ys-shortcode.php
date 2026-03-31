@@ -171,6 +171,7 @@ class YS_Shortcode {
 		$contact_tools  = $this->data_provider->get_registered_contact_tools();
 		$container_id   = $this->get_container_id();
 		$watch_text     = isset( $settings['ys_watch_me_text'] ) && '' !== $settings['ys_watch_me_text'] ? $settings['ys_watch_me_text'] : 'Watch Me';
+		$call_text      = isset( $settings['ys_call_crew_text'] ) && '' !== $settings['ys_call_crew_text'] ? $settings['ys_call_crew_text'] : 'Call the Crew';
 		$book_text      = isset( $settings['ys_book_now_text'] ) && '' !== $settings['ys_book_now_text'] ? $settings['ys_book_now_text'] : 'Book Now';
 		$all_label_text = isset( $settings['ys_all_label_text'] ) && '' !== $settings['ys_all_label_text'] ? $settings['ys_all_label_text'] : 'All';
 		$empty_text     = isset( $settings['ys_empty_state_text'] ) && '' !== $settings['ys_empty_state_text'] ? $settings['ys_empty_state_text'] : 'No results found';
@@ -190,6 +191,7 @@ class YS_Shortcode {
 				'contact_tools'  => $contact_tools,
 				'container_id'   => $container_id,
 				'watch_text'     => $watch_text,
+				'call_text'      => $call_text,
 				'book_text'      => $book_text,
 				'all_label_text' => $all_label_text,
 				'empty_text'     => $empty_text,

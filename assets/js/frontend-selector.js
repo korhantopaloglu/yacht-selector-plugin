@@ -149,7 +149,6 @@ function syncCardAvailabilityState(card) {
 
   var hasCrew = card.getAttribute('data-has-crew') === '1';
   var allTools = card.querySelectorAll('.ys-tool-card');
-  var bookButton = card.querySelector('.ys-book-now-button');
   var toolUrls = getActiveCrewToolUrls(card);
   var selectedTools = getActiveCrewSelectedTools(card);
   var crewOnline = hasCrew ? isCrewOnline(card) : false;
@@ -177,11 +176,6 @@ function syncCardAvailabilityState(card) {
     tool.setAttribute('href', resolvedUrl || '#');
     tool.classList.toggle('disabled', shouldDisable);
   });
-
-  if (bookButton) {
-    var bookUrl = bookButton.getAttribute('data-url') || '';
-    bookButton.classList.toggle('disabled', !bookUrl || !hasCrew || !crewOnline);
-  }
 }
 
 document.addEventListener('change', function(event) {
@@ -191,6 +185,74 @@ document.addEventListener('change', function(event) {
 });
 
 document.addEventListener('click', function(event) {
+  var countryLink = event.target.closest('.ys-countries-container a[data-country]');
+  if (countryLink) {
+    var selectedCountry = countryLink.getAttribute('data-country') || 'all';
+    var countryContainer = countryLink.closest('.ys-countries-container');
+
+    if (countryContainer) {
+      countryContainer.querySelectorAll('a[data-country]').forEach(function(link) {
+        var isSelected = link === countryLink;
+        link.classList.toggle('selected', isSelected);
+        link.classList.toggle('active', isSelected);
+      });
+    }
+
+    document.querySelectorAll('.ys-card').forEach(function(card) {
+      var cardCountry = card.getAttribute('data-location') || '';
+      var shouldShow = selectedCountry === 'all' || cardCountry === selectedCountry;
+
+      card.classList.toggle('location-hide', !shouldShow);
+
+      if (!shouldShow) {
+        var crewPanel = card.querySelector('.ys-card-crew-group');
+
+        if (crewPanel) {
+          crewPanel.classList.remove('show');
+        }
+      }
+    });
+
+    event.preventDefault();
+    return;
+  }
+
+  var watchButton = event.target.closest('.ys-watch-button, .ys-watch-video-button');
+  if (watchButton) {
+    var watchUrl = watchButton.getAttribute('data-url') || '';
+
+    if (watchUrl) {
+      window.location.assign(watchUrl);
+    }
+
+    return;
+  }
+
+  var panelTrigger = event.target.closest('.ys-call-crew-button, .ys-book-now-button');
+  if (panelTrigger) {
+    var triggerCard = panelTrigger.closest('.ys-card');
+    var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-crew-group') : null;
+
+    if (triggerPanel) {
+      triggerPanel.classList.toggle('show');
+    }
+
+    event.preventDefault();
+    return;
+  }
+
+  var closeButton = event.target.closest('.ys-card-crew-close');
+  if (closeButton) {
+    var crewPanel = closeButton.closest('.ys-card-crew-group');
+
+    if (crewPanel) {
+      crewPanel.classList.remove('show');
+    }
+
+    event.preventDefault();
+    return;
+  }
+
   var toolCard = event.target.closest('.ys-tool-card');
   if (!toolCard) {
     return;

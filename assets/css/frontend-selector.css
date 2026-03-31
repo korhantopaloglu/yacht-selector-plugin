@@ -24,6 +24,7 @@
 }
 
 .ys-countries-container a.active,
+.ys-countries-container a.selected,
 .ys-months-container .ys-month.active {
   border-color: #0a7a7a;
   background: #0a7a7a;
@@ -102,6 +103,10 @@
   box-shadow: 0 10px 24px rgba(10, 122, 122, 0.12);
 }
 
+.ys-card.location-hide {
+  display: none;
+}
+
 .ys-card-image-container img {
   display: block;
   width: 100%;
@@ -147,6 +152,7 @@
 }
 
 .ys-watch-button,
+.ys-call-button,
 .ys-book-button,
 .ys-prev,
 .ys-next {
@@ -160,6 +166,27 @@
 
 .ys-book-button {
   background: #111827;
+}
+
+.ys-card-crew-group {
+  display: none;
+  position: relative;
+}
+
+.ys-card-crew-group.show {
+  display: block;
+}
+
+.ys-card-crew-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .ys-tool-card-icon {

@@ -284,16 +284,18 @@ class YS_Data_Provider {
 	}
 
 	/**
-	 * Resolve CTA values with override fallback.
+	 * Resolve frontend CTA values without yacht-level overrides.
 	 *
 	 * @param int $post_id Post ID.
 	 * @return array
 	 */
 	public function resolve_cta( $post_id ) {
+		$permalink = get_permalink( $post_id );
+
 		return [
-			'watch_video' => $this->resolve_cta_value( $post_id, 'ys_watch_video_url', 'ys_global_watch_video_url' ),
-			'video_call'  => $this->resolve_cta_value( $post_id, 'ys_video_call_url', 'ys_global_video_call_url' ),
-			'schedule'    => $this->resolve_cta_value( $post_id, 'ys_schedule_url', 'ys_global_schedule_url' ),
+			'watch_video' => is_string( $permalink ) ? $permalink : '',
+			'video_call'  => '',
+			'schedule'    => '',
 		];
 	}
 
@@ -720,23 +722,4 @@ class YS_Data_Provider {
 		return $items;
 	}
 
-	/**
-	 * Resolve a single CTA value with fallback.
-	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $post_meta_key Post-level meta key.
-	 * @param string $setting_key Global setting key.
-	 * @return string|null
-	 */
-	private function resolve_cta_value( $post_id, $post_meta_key, $setting_key ) {
-		$post_value = esc_url_raw( (string) get_post_meta( $post_id, $post_meta_key, true ) );
-
-		if ( '' !== $post_value ) {
-			return $post_value;
-		}
-
-		$global_value = esc_url_raw( (string) $this->settings->get_setting( $setting_key, '' ) );
-
-		return '' !== $global_value ? $global_value : null;
-	}
 }

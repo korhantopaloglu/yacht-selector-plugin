@@ -9,6 +9,7 @@ $months         = is_array( $months ?? null ) ? $months : [];
 $contact_tools  = is_array( $contact_tools ?? null ) ? $contact_tools : [];
 $container_id   = isset( $container_id ) ? (string) $container_id : '';
 $watch_text     = isset( $watch_text ) ? (string) $watch_text : 'Watch Me';
+$call_text      = isset( $call_text ) ? (string) $call_text : 'Call the Crew';
 $book_text      = isset( $book_text ) ? (string) $book_text : 'Book Now';
 $all_label_text = isset( $all_label_text ) ? (string) $all_label_text : 'All';
 $empty_text     = isset( $empty_text ) ? (string) $empty_text : 'No results found';
@@ -114,7 +115,6 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 				$features      = isset( $item['features'] ) && is_array( $item['features'] ) ? array_values( array_filter( $item['features'], 'is_scalar' ) ) : [];
 				$crew_members  = isset( $item['assigned_crew'] ) && is_array( $item['assigned_crew'] ) ? $item['assigned_crew'] : [];
 				$priority      = isset( $item['priority'] ) ? (int) $item['priority'] : 0;
-				$book_url      = isset( $item['cta']['schedule'] ) ? (string) $item['cta']['schedule'] : '';
 				$permalink     = isset( $item['url'] ) ? (string) $item['url'] : '';
 				$card_classes  = 'ys-card' . ( 0 === $index ? ' selected' : '' );
 				$dimensions    = [];
@@ -211,6 +211,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						<?php endif; ?>
 
 						<div class="ys-card-crew-group">
+							<button type="button" class="ys-card-crew-close" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>">&times;</button>
 							<div class="ys-card-crew-top-title"><?php echo esc_html( $crew_top_title ); ?></div>
 							<div class="ys-card-crew-title"><?php echo esc_html( $crew_title ); ?></div>
 							<div class="ys-card-crew-subtitle"><?php echo esc_html( $crew_subtitle ); ?></div>
@@ -274,8 +275,9 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						</div>
 
 						<div class="ys-card-actions-container">
-							<button type="button" class="ys-watch-button" data-url="<?php echo esc_attr( $permalink ); ?>"><?php echo esc_html( $watch_text ); ?></button>
-							<button type="button" class="ys-book-button ys-book-now-button ys-online-sensitive-action" data-url="<?php echo esc_attr( $book_url ); ?>"><?php echo esc_html( $book_text ); ?></button>
+							<button type="button" class="ys-watch-button ys-watch-video-button" data-url="<?php echo esc_attr( $permalink ); ?>"><?php echo esc_html( $watch_text ); ?></button>
+							<button type="button" class="ys-call-button ys-call-crew-button"><?php echo esc_html( $call_text ); ?></button>
+							<button type="button" class="ys-book-button ys-book-now-button"><?php echo esc_html( $book_text ); ?></button>
 						</div>
 					</div>
 				</article>

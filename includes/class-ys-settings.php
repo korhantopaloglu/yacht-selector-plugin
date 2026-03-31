@@ -177,6 +177,14 @@ class YS_Settings {
 		);
 
 		add_settings_field(
+			'ys_call_crew_text',
+			__( 'Call Button Text', 'yacht-selector' ),
+			[ $this, 'render_call_crew_text_field' ],
+			'ys-settings',
+			'ys_frontend_text_settings_section'
+		);
+
+		add_settings_field(
 			'ys_all_label_text',
 			__( 'All Label Text', 'yacht-selector' ),
 			[ $this, 'render_all_label_text_field' ],
@@ -356,6 +364,7 @@ class YS_Settings {
 		$output['ys_global_schedule_url']    = isset( $input['ys_global_schedule_url'] ) ? esc_url_raw( $input['ys_global_schedule_url'] ) : '';
 		$output['ys_watch_me_text']          = isset( $input['ys_watch_me_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_watch_me_text'] ) ) : $defaults['ys_watch_me_text'];
 		$output['ys_book_now_text']          = isset( $input['ys_book_now_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_book_now_text'] ) ) : $defaults['ys_book_now_text'];
+		$output['ys_call_crew_text']         = isset( $input['ys_call_crew_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_call_crew_text'] ) ) : $defaults['ys_call_crew_text'];
 		$output['ys_all_label_text']         = isset( $input['ys_all_label_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_all_label_text'] ) ) : $defaults['ys_all_label_text'];
 		$output['ys_empty_state_text']       = isset( $input['ys_empty_state_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_empty_state_text'] ) ) : $defaults['ys_empty_state_text'];
 		$output['ys_connect_with_top_title'] = isset( $input['ys_connect_with_top_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_connect_with_top_title'] ) ) : $defaults['ys_connect_with_top_title'];
@@ -516,6 +525,7 @@ class YS_Settings {
 		$settings['ys_location_taxonomy_slug'] = sanitize_key( $settings['ys_location_taxonomy_slug'] );
 		$settings['ys_watch_me_text']          = sanitize_text_field( (string) $settings['ys_watch_me_text'] );
 		$settings['ys_book_now_text']          = sanitize_text_field( (string) $settings['ys_book_now_text'] );
+		$settings['ys_call_crew_text']         = sanitize_text_field( (string) $settings['ys_call_crew_text'] );
 		$settings['ys_connect_with_top_title'] = sanitize_text_field( (string) $settings['ys_connect_with_top_title'] );
 		$settings['ys_crew_group_title']       = sanitize_text_field( (string) $settings['ys_crew_group_title'] );
 		$settings['ys_crew_group_subtitle']    = sanitize_text_field( (string) $settings['ys_crew_group_subtitle'] );
@@ -785,6 +795,18 @@ class YS_Settings {
 		$this->render_text_field(
 			'ys_book_now_text',
 			__( 'Text used for the Book Now button.', 'yacht-selector' )
+		);
+	}
+
+	/**
+	 * Render call crew text field.
+	 *
+	 * @return void
+	 */
+	public function render_call_crew_text_field() {
+		$this->render_text_field(
+			'ys_call_crew_text',
+			__( 'Text used for the Call button.', 'yacht-selector' )
 		);
 	}
 
@@ -1399,11 +1421,6 @@ class YS_Settings {
 				continue;
 			}
 
-			if ( is_array( $meta_key ) ) {
-				$this->save_import_nested_meta( $post_id, $item[ $json_key ], $meta_key );
-				continue;
-			}
-
 			$value = $this->normalize_import_meta_value( $json_key, $item[ $json_key ], $model_options, $extra_feature_options );
 
 			if ( null === $value ) {
@@ -1434,28 +1451,6 @@ class YS_Settings {
 	}
 
 	/**
-	 * Save nested imported meta values such as CTA fields.
-	 *
-	 * @param int   $post_id Post ID.
-	 * @param mixed $value Raw nested value.
-	 * @param array $meta_map Nested meta map.
-	 * @return void
-	 */
-	private function save_import_nested_meta( $post_id, $value, $meta_map ) {
-		$value = is_array( $value ) ? $value : [];
-
-		foreach ( $meta_map as $nested_key => $meta_key ) {
-			$nested_value = isset( $value[ $nested_key ] ) && is_scalar( $value[ $nested_key ] ) ? esc_url_raw( (string) $value[ $nested_key ] ) : '';
-
-			if ( '' === $nested_value ) {
-				delete_post_meta( $post_id, $meta_key );
-			} else {
-				update_post_meta( $post_id, $meta_key, $nested_value );
-			}
-		}
-	}
-
-	/**
 	 * Get the JSON key to post meta key mapping.
 	 *
 	 * @return array
@@ -1476,11 +1471,6 @@ class YS_Settings {
 			'booked'     => 'ys_booked',
 			'model'      => 'ys_model',
 			'features'   => 'ys_extra_features',
-			'cta'        => [
-				'watch_video' => 'ys_watch_video_url',
-				'video_call'  => 'ys_video_call_url',
-				'schedule'    => 'ys_schedule_url',
-			],
 		];
 	}
 
@@ -1729,13 +1719,7 @@ class YS_Settings {
     "crew": 4,
     "priority": 90,
 
-    "features": ["Internet", "TV", "Jetski"],
-
-    "cta": {
-      "watch_video": "https://example.com/watch",
-      "video_call": "https://example.com/call",
-      "schedule": "https://example.com/schedule"
-    }
+    "features": ["Internet", "TV", "Jetski"]
   }
 ]
 JSON;
@@ -1817,6 +1801,7 @@ JSON;
 			'ys_global_schedule_url'     => '',
 			'ys_watch_me_text'           => 'Watch Me',
 			'ys_book_now_text'           => 'Book Now',
+			'ys_call_crew_text'          => 'Call the Crew',
 			'ys_all_label_text'          => 'All',
 			'ys_empty_state_text'        => 'No results found',
 			'ys_connect_with_top_title'  => 'Connect with',

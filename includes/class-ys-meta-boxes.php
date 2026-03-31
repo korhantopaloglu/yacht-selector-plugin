@@ -280,9 +280,6 @@ class YS_Meta_Boxes {
 		$this->save_array_meta( $post_id, 'ys_extra_features', $this->sanitize_extra_features_values( isset( $_POST['ys_extra_features'] ) ? wp_unslash( $_POST['ys_extra_features'] ) : [] ) );
 		$this->save_array_meta( $post_id, 'ys_assigned_crew', $this->sanitize_crew_ids( isset( $_POST['ys_assigned_crew'] ) ? wp_unslash( $_POST['ys_assigned_crew'] ) : [] ) );
 		$this->save_scalar_meta( $post_id, 'ys_card_image_id', $this->sanitize_attachment_id( isset( $_POST['ys_card_image_id'] ) ? wp_unslash( $_POST['ys_card_image_id'] ) : '' ) );
-		$this->save_scalar_meta( $post_id, 'ys_watch_video_url', $this->sanitize_url_value( isset( $_POST['ys_watch_video_url'] ) ? wp_unslash( $_POST['ys_watch_video_url'] ) : '' ) );
-		$this->save_scalar_meta( $post_id, 'ys_video_call_url', $this->sanitize_url_value( isset( $_POST['ys_video_call_url'] ) ? wp_unslash( $_POST['ys_video_call_url'] ) : '' ) );
-		$this->save_scalar_meta( $post_id, 'ys_schedule_url', $this->sanitize_url_value( isset( $_POST['ys_schedule_url'] ) ? wp_unslash( $_POST['ys_schedule_url'] ) : '' ) );
 	}
 
 	/**
@@ -636,26 +633,6 @@ class YS_Meta_Boxes {
 				</div>
 			</section>
 
-			<section class="ys-admin-card ys-admin-card-full">
-				<div class="ys-admin-card-header">
-					<h3><?php esc_html_e( 'CTA Overrides', 'yacht-selector' ); ?></h3>
-					<p><?php esc_html_e( 'These values override the global settings only when filled.', 'yacht-selector' ); ?></p>
-				</div>
-				<div class="ys-meta-grid ys-meta-grid-2">
-					<div class="ys-field">
-						<label for="ys_watch_video_url"><strong><?php esc_html_e( 'Watch Video URL', 'yacht-selector' ); ?></strong></label>
-						<input type="url" id="ys_watch_video_url" name="ys_watch_video_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_watch_video_url', true ) ); ?>" class="regular-text code" placeholder="https://" />
-					</div>
-					<div class="ys-field">
-						<label for="ys_video_call_url"><strong><?php esc_html_e( 'Video Call URL', 'yacht-selector' ); ?></strong></label>
-						<input type="url" id="ys_video_call_url" name="ys_video_call_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_video_call_url', true ) ); ?>" class="regular-text code" placeholder="https://" />
-					</div>
-					<div class="ys-field ys-field-full">
-						<label for="ys_schedule_url"><strong><?php esc_html_e( 'Schedule URL', 'yacht-selector' ); ?></strong></label>
-						<input type="url" id="ys_schedule_url" name="ys_schedule_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_schedule_url', true ) ); ?>" class="regular-text code" placeholder="https://" />
-					</div>
-				</div>
-			</section>
 		</div>
 		<?php
 	}
@@ -794,24 +771,6 @@ class YS_Meta_Boxes {
 					<?php esc_html_e( 'Remove', 'yacht-selector' ); ?>
 				</button>
 			</div>
-		</div>
-
-		<div class="ys-field">
-			<label for="ys_watch_video_url"><strong><?php esc_html_e( 'Watch Video URL', 'yacht-selector' ); ?></strong></label>
-			<input type="url" id="ys_watch_video_url" name="ys_watch_video_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_watch_video_url', true ) ); ?>" class="widefat code" placeholder="https://" />
-			<p class="description"><?php esc_html_e( 'Optional. Overrides the global Watch Video URL for this yacht.', 'yacht-selector' ); ?></p>
-		</div>
-
-		<div class="ys-field">
-			<label for="ys_video_call_url"><strong><?php esc_html_e( 'Video Call URL', 'yacht-selector' ); ?></strong></label>
-			<input type="url" id="ys_video_call_url" name="ys_video_call_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_video_call_url', true ) ); ?>" class="widefat code" placeholder="https://" />
-			<p class="description"><?php esc_html_e( 'Optional. Overrides the global Video Call URL for this yacht.', 'yacht-selector' ); ?></p>
-		</div>
-
-		<div class="ys-field">
-			<label for="ys_schedule_url"><strong><?php esc_html_e( 'Schedule URL', 'yacht-selector' ); ?></strong></label>
-			<input type="url" id="ys_schedule_url" name="ys_schedule_url" value="<?php echo esc_attr( get_post_meta( $post->ID, 'ys_schedule_url', true ) ); ?>" class="widefat code" placeholder="https://" />
-			<p class="description"><?php esc_html_e( 'Optional. Overrides the global Schedule URL for this yacht.', 'yacht-selector' ); ?></p>
 		</div>
 		<?php
 	}
