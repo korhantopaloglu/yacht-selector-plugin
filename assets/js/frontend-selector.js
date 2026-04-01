@@ -178,30 +178,106 @@ function syncCardAvailabilityState(card) {
   });
 }
 
-function centerSelectedMonth(selectedMonthLink) {
-  if (!selectedMonthLink) {
+// Month Overlay Controller
+function getMonthItems() {
+  return Array.prototype.slice.call(document.querySelectorAll('.ys-months-track .ys-month'));
+}
+
+function getSelectedMonthItem() {
+  return document.querySelector('.ys-months-track .ys-month.active, .ys-months-track .ys-month.selected');
+}
+
+function updateMonthOverlayFromItem(monthItem) {
+  if (!monthItem) {
     return;
   }
 
-  var monthContainer = selectedMonthLink.closest('.ys-months-container');
-  if (!monthContainer) {
+  var overlay = document.querySelector('.ys-month-overlay');
+  if (!overlay) {
     return;
   }
 
-  if (monthContainer.scrollWidth <= monthContainer.clientWidth) {
-    monthContainer.scrollLeft = 0;
+  var fullLabel = monthItem.getAttribute('data-month-full') || monthItem.querySelector('.ys-month-label').textContent;
+  var density = monthItem.getAttribute('data-density') || monthItem.querySelector('.ys-month-density').textContent.replace('%', '');
+  var barFill = monthItem.querySelector('.ys-month-bar-fill').style.width;
+
+  overlay.querySelector('.ys-month-overlay-label').textContent = fullLabel;
+  overlay.querySelector('.ys-month-overlay-density').textContent = density + '%';
+  overlay.querySelector('.ys-month-overlay-bar-fill').style.width = barFill;
+}
+
+function getMonthItemCenter(monthItem) {
+  if (!monthItem) {
+    return 0;
+  }
+
+  var track = monthItem.closest('.ys-months-track');
+  var trackRect = track.getBoundingClientRect();
+  var itemRect = monthItem.getBoundingClientRect();
+
+  return itemRect.left + (itemRect.width / 2) - trackRect.left;
+}
+
+function getOverlayCenter() {
+  var overlay = document.querySelector('.ys-month-overlay');
+  if (!overlay) {
+    return 0;
+  }
+
+  var wrapper = overlay.closest('.ys-months-header-wrapper');
+  var wrapperRect = wrapper.getBoundingClientRect();
+  var overlayRect = overlay.getBoundingClientRect();
+
+  return overlayRect.left + (overlayRect.width / 2) - wrapperRect.left;
+}
+
+function centerMonthItemUnderOverlay(monthItem) {
+  if (!monthItem) {
     return;
   }
 
-  var targetScrollLeft = selectedMonthLink.offsetLeft - (monthContainer.clientWidth / 2) + (selectedMonthLink.offsetWidth / 2);
-  var maxScrollLeft = monthContainer.scrollWidth - monthContainer.clientWidth;
+  var track = monthItem.closest('.ys-months-track');
+  if (!track) {
+    return;
+  }
 
-  targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+  var itemCenter = getMonthItemCenter(monthItem);
+  var overlayCenter = getOverlayCenter();
+  var currentTransform = track.style.transform ? parseFloat(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
+  
+  // Determine direction based on item position relative to overlay
+  var distance = itemCenter - overlayCenter;
+  var targetTransform;
+  
+  if (distance < 0) {
+    // Item is on the LEFT side of overlay - move track RIGHT (left-to-right)
+    targetTransform = currentTransform + Math.abs(distance);
+  } else if (distance > 0) {
+    // Item is on the RIGHT side of overlay - move track LEFT (right-to-left)  
+    targetTransform = currentTransform - Math.abs(distance);
+  } else {
+    // Item is already centered
+    targetTransform = currentTransform;
+  }
 
-  monthContainer.scrollTo({
-    left: targetScrollLeft,
-    behavior: 'smooth'
+  track.style.transform = 'translateX(' + targetTransform + 'px)';
+  
+  // Mark the item as under overlay
+  getMonthItems().forEach(function(item) {
+    item.classList.remove('is-under-overlay');
   });
+  monthItem.classList.add('is-under-overlay');
+}
+
+function setUnderlyingMonthState(monthItem) {
+  if (!monthItem) {
+    return;
+  }
+
+  getMonthItems().forEach(function(item) {
+    item.classList.remove('is-under-overlay');
+  });
+  monthItem.classList.add('is-under-overlay');
 }
 
 function updateMonthState(selectedMonthLink) {
@@ -227,7 +303,11 @@ function updateMonthState(selectedMonthLink) {
     card.classList.toggle('booked', isBooked);
   });
 
-  centerSelectedMonth(selectedMonthLink);
+  // Update overlay immediately
+  updateMonthOverlayFromItem(selectedMonthLink);
+  
+  // Then animate track to center the month
+  centerMonthItemUnderOverlay(selectedMonthLink);
 }
 
 function getVisibleCards() {
@@ -453,9 +533,24 @@ document.addEventListener('DOMContentLoaded', function() {
     syncCardAvailabilityState(card);
   });
 
+  // Initialize month overlay
   var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
   if (activeMonthLink) {
     updateMonthState(activeMonthLink);
+  } else {
+    // If no active month, find current month and set it
+    var currentMonth = new Date().getMonth() + 1; // 1-12
+    var monthItems = getMonthItems();
+    var currentMonthItem = monthItems.find(function(item) {
+      var itemMonth = parseInt(item.getAttribute('data-month'));
+      return itemMonth === currentMonth;
+    });
+    
+    if (currentMonthItem) {
+      updateMonthState(currentMonthItem);
+    } else if (monthItems.length > 0) {
+      updateMonthState(monthItems[0]);
+    }
   }
 
   applySliderWindowState();
@@ -465,6 +560,6 @@ window.addEventListener('resize', function() {
   var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
 
   if (activeMonthLink) {
-    centerSelectedMonth(activeMonthLink);
+    centerMonthItemUnderOverlay(activeMonthLink);
   }
 });

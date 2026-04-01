@@ -69,16 +69,25 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 		</div>
 
 		<div class="ys-months-container">
-			<div class="ys-months-track">
-				<?php foreach ( $months as $month ) : ?>
-					<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>">
-						<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
-						<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
-						<span class="ys-month-bar">
-							<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
-						</span>
-					</a>
-				<?php endforeach; ?>
+			<div class="ys-months-header-wrapper">
+				<div class="ys-months-track">
+					<?php foreach ( $months as $month ) : ?>
+						<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>" data-month-full="<?php echo esc_attr( $month['full'] ?? '' ); ?>" data-density="<?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>">
+							<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
+							<span class="ys-month-bar">
+								<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
+							</span>
+							<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
+						</a>
+					<?php endforeach; ?>
+				</div>
+				<div class="ys-month-overlay">
+					<span class="ys-month-overlay-label"></span>
+					<span class="ys-month-overlay-density"></span>
+					<span class="ys-month-overlay-bar">
+						<span class="ys-month-overlay-bar-fill"></span>
+					</span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -169,6 +178,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					<div class="ys-card-content-container">
 						<h3><?php echo esc_html( $title ); ?></h3>
 						<span class="booked-text"><?php echo esc_html( $booked_text ); ?></span>
+					<div class="ys-card-details-container">
 						<div class="ys-card-specifications-group">
 							<div class="ys-card-group-title"><?php esc_html_e( 'Specifications', 'yacht-selector' ); ?></div>
 							<div class="ys-card-specifications-items">
@@ -194,27 +204,53 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 							<div class="ys-card-group-title"><?php esc_html_e( 'Capacity', 'yacht-selector' ); ?></div>
 							<div class="ys-card-capacity-items">
 								<?php if ( isset( $item['cabins'] ) && null !== $item['cabins'] ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-label"><?php esc_html_e( 'Kabin', 'yacht-selector' ); ?></span><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['cabins'] ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['cabins'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Kabin', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( isset( $item['guests'] ) && null !== $item['guests'] ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-label"><?php esc_html_e( 'Misafir', 'yacht-selector' ); ?></span><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['guests'] ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['guests'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Misafir', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( '' !== $crew ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-label"><?php esc_html_e( 'Murettebat', 'yacht-selector' ); ?></span><span class="ys-card-capacity-value"><?php echo esc_html( $crew ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( $crew ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Murettebat', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 							</div>
 						</div>
 
-						<?php if ( ! empty( $features ) ) : ?>
-							<div class="ys-card-features-group">
+						<div class="ys-card-features-group">
 								<div class="ys-card-group-title"><?php esc_html_e( 'Extra Features', 'yacht-selector' ); ?></div>
 								<div class="ys-card-features-list">
-									<?php foreach ( $features as $feature ) : ?>
-										<div class="ys-card-feature-item"><?php echo esc_html( (string) $feature ); ?></div>
-									<?php endforeach; ?>
+									<?php 
+									if ( ! empty( $features ) ) :
+										$total_chars = 0;
+										$visible_features = [];
+										$hidden_features = [];
+										
+										foreach ( $features as $feature ) :
+											$feature_text = (string) $feature;
+											$feature_chars = strlen( $feature_text );
+											
+											if ( $total_chars + $feature_chars <= 70 ) {
+												$visible_features[] = $feature_text;
+												$total_chars += $feature_chars;
+											} else {
+												$hidden_features[] = $feature_text;
+											}
+										endforeach;
+										
+										// Display visible features
+										foreach ( $visible_features as $feature ) : ?>
+										<div class="ys-card-feature-item"><?php echo esc_html( $feature ); ?></div>
+									<?php endforeach; 
+									endif; ?>
 								</div>
+								
+								<?php // Display overflow indicator if there are hidden features ?>
+								<?php if ( ! empty( $hidden_features ) ) : ?>
+									<span class="ys-card-feature-overflow" data-features="<?php echo esc_attr( implode( ', ', $hidden_features ) ); ?>">
+										+<?php echo count( $hidden_features ); ?> <?php esc_html_e( 'Fazlasi', 'yacht-selector' ); ?>
+									</span>
+								<?php endif; ?>
 							</div>
-						<?php endif; ?>
+									</div>
 
 						<div class="ys-card-crew-group">
 							<button type="button" class="ys-card-crew-close" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>">&times;</button>
@@ -290,8 +326,8 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 			<?php endforeach; ?>
 
 			<div class="ys-card-nav-container">
-				<button type="button" class="ys-prev"><?php esc_html_e( 'Previous', 'yacht-selector' ); ?></button>
-				<button type="button" class="ys-next"><?php esc_html_e( 'Next', 'yacht-selector' ); ?></button>
+				<button type="button" class="ys-prev"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+				<button type="button" class="ys-next"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
 			</div>
 		</div>
 	<?php else : ?>

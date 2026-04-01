@@ -439,6 +439,7 @@ class YS_Shortcode {
 			$months[] = [
 				'month'   => $month,
 				'label'   => wp_date( 'M', mktime( 0, 0, 0, $month, 1, (int) wp_date( 'Y' ) ) ),
+				'full'    => wp_date( 'F', mktime( 0, 0, 0, $month, 1, (int) wp_date( 'Y' ) ) ),
 				'density' => $density,
 				'active'  => $month === $current_month,
 			];
