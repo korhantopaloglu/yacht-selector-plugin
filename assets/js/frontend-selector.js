@@ -178,6 +178,32 @@ function syncCardAvailabilityState(card) {
   });
 }
 
+function centerSelectedMonth(selectedMonthLink) {
+  if (!selectedMonthLink) {
+    return;
+  }
+
+  var monthContainer = selectedMonthLink.closest('.ys-months-container');
+  if (!monthContainer) {
+    return;
+  }
+
+  if (monthContainer.scrollWidth <= monthContainer.clientWidth) {
+    monthContainer.scrollLeft = 0;
+    return;
+  }
+
+  var targetScrollLeft = selectedMonthLink.offsetLeft - (monthContainer.clientWidth / 2) + (selectedMonthLink.offsetWidth / 2);
+  var maxScrollLeft = monthContainer.scrollWidth - monthContainer.clientWidth;
+
+  targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
+  monthContainer.scrollTo({
+    left: targetScrollLeft,
+    behavior: 'smooth'
+  });
+}
+
 function updateMonthState(selectedMonthLink) {
   if (!selectedMonthLink) {
     return;
@@ -200,6 +226,8 @@ function updateMonthState(selectedMonthLink) {
 
     card.classList.toggle('booked', isBooked);
   });
+
+  centerSelectedMonth(selectedMonthLink);
 }
 
 function getVisibleCards() {
@@ -431,4 +459,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   applySliderWindowState();
+});
+
+window.addEventListener('resize', function() {
+  var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
+
+  if (activeMonthLink) {
+    centerSelectedMonth(activeMonthLink);
+  }
 });

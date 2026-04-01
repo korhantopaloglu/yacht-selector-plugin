@@ -69,15 +69,17 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 		</div>
 
 		<div class="ys-months-container">
-			<?php foreach ( $months as $month ) : ?>
-				<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>">
-					<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
-					<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
-					<span class="ys-month-bar">
-						<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
-					</span>
-				</a>
-			<?php endforeach; ?>
+			<div class="ys-months-track">
+				<?php foreach ( $months as $month ) : ?>
+					<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>">
+						<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
+						<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
+						<span class="ys-month-bar">
+							<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
+						</span>
+					</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</div>
 
