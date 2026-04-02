@@ -407,6 +407,26 @@ function goToRelativeCard(step) {
   applySliderWindowState();
 }
 
+function syncCrewPanelOpenState() {
+  document.querySelectorAll('.ys-card').forEach(function(card) {
+    var panel = card.querySelector('.ys-card-crew-group');
+    var isOpen = panel ? panel.classList.contains('show') : false;
+    card.classList.toggle('has-open-crew', isOpen);
+  });
+}
+
+function closeAllCrewPanels(exceptPanel) {
+  document.querySelectorAll('.ys-card-crew-group.show').forEach(function(panel) {
+    if (exceptPanel && panel === exceptPanel) {
+      return;
+    }
+
+    panel.classList.remove('show');
+  });
+
+  syncCrewPanelOpenState();
+}
+
 document.addEventListener('change', function(event) {
   if (event.target.matches('.ys-card-crew-member-select')) {
     syncCardAvailabilityState(event.target.closest('.ys-card'));
@@ -442,6 +462,7 @@ document.addEventListener('click', function(event) {
       }
     });
 
+    syncCrewPanelOpenState();
     applySliderWindowState();
 
     event.preventDefault();
@@ -478,7 +499,10 @@ document.addEventListener('click', function(event) {
     }
 
     if (triggerPanel) {
-      triggerPanel.classList.toggle('show');
+      var shouldOpenPanel = !triggerPanel.classList.contains('show');
+      closeAllCrewPanels(triggerPanel);
+      triggerPanel.classList.toggle('show', shouldOpenPanel);
+      syncCrewPanelOpenState();
     }
 
     event.preventDefault();
@@ -493,6 +517,7 @@ document.addEventListener('click', function(event) {
       crewPanel.classList.remove('show');
     }
 
+    syncCrewPanelOpenState();
     event.preventDefault();
     return;
   }
@@ -529,6 +554,8 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+  closeAllCrewPanels();
+
   document.querySelectorAll('.ys-card').forEach(function(card) {
     syncCardAvailabilityState(card);
   });
