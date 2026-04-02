@@ -172,7 +172,7 @@
   position: relative;
   width: 100%;
   padding: 1.825rem 0;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .ys-months-track {

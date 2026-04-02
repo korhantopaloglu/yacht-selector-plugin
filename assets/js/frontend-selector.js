@@ -307,7 +307,7 @@ function updateMonthState(selectedMonthLink) {
   updateMonthOverlayFromItem(selectedMonthLink);
   
   // Then animate track to center the month
-  centerMonthItemUnderOverlay(selectedMonthLink);
+  // DISABLED: centerMonthItemUnderOverlay(selectedMonthLink);
 }
 
 function getVisibleCards() {
@@ -560,6 +560,6 @@ window.addEventListener('resize', function() {
   var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
 
   if (activeMonthLink) {
-    centerMonthItemUnderOverlay(activeMonthLink);
+    // DISABLED: centerMonthItemUnderOverlay(activeMonthLink);
   }
 });

@@ -81,13 +81,13 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						</a>
 					<?php endforeach; ?>
 				</div>
-				<div class="ys-month-overlay">
-					<span class="ys-month-overlay-label"></span>
-					<span class="ys-month-overlay-density"></span>
-					<span class="ys-month-overlay-bar">
-						<span class="ys-month-overlay-bar-fill"></span>
-					</span>
-				</div>
+			</div>
+			<div class="ys-month-overlay">
+				<span class="ys-month-overlay-label"></span>
+				<span class="ys-month-overlay-density"></span>
+				<span class="ys-month-overlay-bar">
+					<span class="ys-month-overlay-bar-fill"></span>
+				</span>
 			</div>
 		</div>
 	</div>
