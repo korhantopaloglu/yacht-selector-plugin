@@ -99,30 +99,6 @@ class YS_Settings {
 			'ys_general_section'
 		);
 
-		add_settings_field(
-			'ys_global_watch_video_url',
-			__( 'Watch Video URL', 'yacht-selector' ),
-			[ $this, 'render_watch_video_url_field' ],
-			'ys-settings',
-			'ys_general_section'
-		);
-
-		add_settings_field(
-			'ys_global_video_call_url',
-			__( 'Video Call URL', 'yacht-selector' ),
-			[ $this, 'render_video_call_url_field' ],
-			'ys-settings',
-			'ys_general_section'
-		);
-
-		add_settings_field(
-			'ys_global_schedule_url',
-			__( 'Schedule URL', 'yacht-selector' ),
-			[ $this, 'render_schedule_url_field' ],
-			'ys-settings',
-			'ys_general_section'
-		);
-
 		add_settings_section(
 			'ys_model_options_section',
 			__( 'Model Options', 'yacht-selector' ),
@@ -322,7 +298,7 @@ class YS_Settings {
 		<div class="wrap ys-settings-page">
 			<h1><?php esc_html_e( 'Yacht Selector', 'yacht-selector' ); ?></h1>
 			<p class="ys-settings-intro">
-				<?php esc_html_e( 'Configure the post type, plugin-managed location taxonomy slug, global CTA URLs, and reusable option lists for yacht data management.', 'yacht-selector' ); ?>
+				<?php esc_html_e( 'Configure the post type, plugin-managed location taxonomy slug, and reusable option lists for yacht data management.', 'yacht-selector' ); ?>
 			</p>
 
 			<?php settings_errors( self::OPTION_KEY ); ?>
@@ -367,9 +343,6 @@ class YS_Settings {
 		}
 		$output['ys_location_taxonomy_slug'] = $taxonomy_slug;
 
-		$output['ys_global_watch_video_url'] = isset( $input['ys_global_watch_video_url'] ) ? esc_url_raw( $input['ys_global_watch_video_url'] ) : '';
-		$output['ys_global_video_call_url']  = isset( $input['ys_global_video_call_url'] ) ? esc_url_raw( $input['ys_global_video_call_url'] ) : '';
-		$output['ys_global_schedule_url']    = isset( $input['ys_global_schedule_url'] ) ? esc_url_raw( $input['ys_global_schedule_url'] ) : '';
 		$output['ys_watch_me_text']          = isset( $input['ys_watch_me_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_watch_me_text'] ) ) : $defaults['ys_watch_me_text'];
 		$output['ys_book_now_text']          = isset( $input['ys_book_now_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_book_now_text'] ) ) : $defaults['ys_book_now_text'];
 		$output['ys_call_crew_text']         = isset( $input['ys_call_crew_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_call_crew_text'] ) ) : $defaults['ys_call_crew_text'];
@@ -616,7 +589,7 @@ class YS_Settings {
 	 * @return void
 	 */
 	public function render_general_section() {
-		echo '<p>' . esc_html__( 'Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type, then set the global CTA destinations used across yacht records.', 'yacht-selector' ) . '</p>';
+		echo '<p>' . esc_html__( 'Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type.', 'yacht-selector' ) . '</p>';
 	}
 
 	/**
@@ -724,41 +697,6 @@ class YS_Settings {
 		<?php
 	}
 
-	/**
-	 * Render watch video URL field.
-	 *
-	 * @return void
-	 */
-	public function render_watch_video_url_field() {
-		$this->render_url_field(
-			'ys_global_watch_video_url',
-			__( 'Optional global URL used for the Watch Video CTA.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render video call URL field.
-	 *
-	 * @return void
-	 */
-	public function render_video_call_url_field() {
-		$this->render_url_field(
-			'ys_global_video_call_url',
-			__( 'Optional global URL used for the Video Call CTA.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render schedule URL field.
-	 *
-	 * @return void
-	 */
-	public function render_schedule_url_field() {
-		$this->render_url_field(
-			'ys_global_schedule_url',
-			__( 'Optional global URL used for the Schedule CTA.', 'yacht-selector' )
-		);
-	}
 
 	/**
 	 * Render model options repeatable field.
@@ -997,27 +935,6 @@ class YS_Settings {
 			}());
 		</script>
 		<p class="description"><?php esc_html_e( 'Upload a .json file to replace the saved JSON data, or use the textarea above and click the import button to validate and save it.', 'yacht-selector' ); ?></p>
-		<?php
-	}
-
-	/**
-	 * Render a URL field.
-	 *
-	 * @param string $key Field key.
-	 * @param string $description Field description.
-	 * @return void
-	 */
-	private function render_url_field( $key, $description ) {
-		$value = $this->get_setting( $key, '' );
-		?>
-		<input
-			type="url"
-			name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]"
-			value="<?php echo esc_attr( $value ); ?>"
-			class="regular-text code"
-			placeholder="https://"
-		/>
-		<p class="description"><?php echo esc_html( $description ); ?></p>
 		<?php
 	}
 
@@ -1818,9 +1735,6 @@ JSON;
 			'ys_use_existing_post_type' => '0',
 			'ys_selected_post_type'      => '',
 			'ys_location_taxonomy_slug'  => 'ys_location',
-			'ys_global_watch_video_url'  => '',
-			'ys_global_video_call_url'   => '',
-			'ys_global_schedule_url'     => '',
 			'ys_watch_me_text'           => 'Watch Me',
 			'ys_book_now_text'           => 'Book Now',
 			'ys_call_crew_text'          => 'Call the Crew',

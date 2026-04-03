@@ -78,20 +78,62 @@ function syncBulkBookedGrid(scope) {
       return;
     }
 
-    var grid = fieldset.querySelector('[data-ys-bulk-booked-grid]');
-    if (!grid) {
+    var inputWrap = fieldset.querySelector('[data-ys-bulk-booked-input]');
+    if (!inputWrap) {
       return;
     }
 
-    var showGrid = select.value === 'replace';
-    grid.hidden = !showGrid;
+    var input = inputWrap.querySelector('textarea[name="ys_bulk_booked_months"]');
+    var showInput = select.value === 'replace' || select.value === 'add' || select.value === 'remove';
+    inputWrap.hidden = !showInput;
 
-    if (select.value === 'clear') {
-      grid.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
-        checkbox.checked = false;
-      });
+    if (!showInput && input) {
+      input.value = '';
     }
   });
+}
+
+function initializeQuickEditBookedMonths() {
+  if (typeof inlineEditPost === 'undefined' || typeof inlineEditPost.edit !== 'function') {
+    return;
+  }
+
+  if (inlineEditPost._ysBookedPatched) {
+    return;
+  }
+
+  inlineEditPost._ysBookedPatched = true;
+
+  var originalInlineEdit = inlineEditPost.edit;
+
+  inlineEditPost.edit = function(id) {
+    originalInlineEdit.apply(this, arguments);
+
+    var postId = 0;
+    if (typeof id === 'object') {
+      postId = parseInt(this.getId(id), 10);
+    } else {
+      postId = parseInt(id, 10);
+    }
+
+    if (!postId) {
+      return;
+    }
+
+    var postRow = document.getElementById('post-' + postId);
+    var editRow = document.getElementById('edit-' + postId);
+    if (!postRow || !editRow) {
+      return;
+    }
+
+    var valueNode = postRow.querySelector('[data-ys-booked-values]');
+    var input = editRow.querySelector('textarea[name="ys_quick_booked_months"]');
+    if (!input) {
+      return;
+    }
+
+    input.value = valueNode ? valueNode.getAttribute('data-ys-booked-values') || '' : '';
+  };
 }
 
 document.addEventListener('change', function(event) {
@@ -102,6 +144,7 @@ document.addEventListener('change', function(event) {
 
 document.addEventListener('DOMContentLoaded', function() {
   syncBulkBookedGrid(document);
+  initializeQuickEditBookedMonths();
 });
 
 function syncExistingPostTypeField() {

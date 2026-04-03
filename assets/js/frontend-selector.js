@@ -179,12 +179,23 @@ function syncCardAvailabilityState(card) {
 }
 
 // Month Overlay Controller
+var ENABLE_MONTH_TRACK_MOTION = false;
+
 function getMonthItems() {
   return Array.prototype.slice.call(document.querySelectorAll('.ys-months-track .ys-month'));
 }
 
 function getSelectedMonthItem() {
   return document.querySelector('.ys-months-track .ys-month.active, .ys-months-track .ys-month.selected');
+}
+
+function resetMonthTrackTransform() {
+  var track = document.querySelector('.ys-months-track');
+  if (!track) {
+    return;
+  }
+
+  track.style.transform = '';
 }
 
 function updateMonthOverlayFromItem(monthItem) {
@@ -232,6 +243,10 @@ function getOverlayCenter() {
 }
 
 function centerMonthItemUnderOverlay(monthItem) {
+  if (!ENABLE_MONTH_TRACK_MOTION) {
+    return;
+  }
+
   if (!monthItem) {
     return;
   }
@@ -305,9 +320,15 @@ function updateMonthState(selectedMonthLink) {
 
   // Update overlay immediately
   updateMonthOverlayFromItem(selectedMonthLink);
+
+  // Keep visual marker state without moving the month track.
+  setUnderlyingMonthState(selectedMonthLink);
+  resetMonthTrackTransform();
   
   // Then animate track to center the month
-  // DISABLED: centerMonthItemUnderOverlay(selectedMonthLink);
+  if (ENABLE_MONTH_TRACK_MOTION) {
+    centerMonthItemUnderOverlay(selectedMonthLink);
+  }
 }
 
 function getVisibleCards() {
@@ -355,7 +376,7 @@ function getActiveCardIndex(cards) {
 
 function applySliderWindowState() {
   var cards = getVisibleCards();
-  var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'slider-outside-window'];
+  var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'is-bg-card', 'slider-outside-window'];
 
   document.querySelectorAll('.ys-card').forEach(function(card) {
     sliderStateClasses.forEach(function(className) {
@@ -381,11 +402,13 @@ function applySliderWindowState() {
 
     if (forwardDistance <= 3 && (forwardDistance < backwardDistance || backwardDistance > 3)) {
       card.classList.add('is-pos-' + forwardDistance);
+      card.classList.add('is-bg-card');
       return;
     }
 
     if (backwardDistance <= 3) {
       card.classList.add('is-neg-' + backwardDistance);
+      card.classList.add('is-bg-card');
       return;
     }
 
@@ -408,15 +431,30 @@ function goToRelativeCard(step) {
 }
 
 function syncCrewPanelOpenState() {
+  var hasOpenCrewPanel = false;
+
   document.querySelectorAll('.ys-card').forEach(function(card) {
-    var panel = card.querySelector('.ys-card-crew-group');
+    var panel = card.querySelector('.ys-card-contact-tools-group');
     var isOpen = panel ? panel.classList.contains('show') : false;
+    var isSelectedCard = card.classList.contains('selected');
     card.classList.toggle('has-open-crew', isOpen);
+
+    if (isSelectedCard && isOpen) {
+      card.style.height = card.offsetHeight + 'px';
+    } else {
+      card.style.height = 'auto';
+    }
+
+    if (isOpen) {
+      hasOpenCrewPanel = true;
+    }
   });
+
+  document.body.classList.toggle('crew-card-open', hasOpenCrewPanel);
 }
 
 function closeAllCrewPanels(exceptPanel) {
-  document.querySelectorAll('.ys-card-crew-group.show').forEach(function(panel) {
+  document.querySelectorAll('.ys-card-contact-tools-group.show').forEach(function(panel) {
     if (exceptPanel && panel === exceptPanel) {
       return;
     }
@@ -454,7 +492,7 @@ document.addEventListener('click', function(event) {
       card.classList.toggle('location-hide', !shouldShow);
 
       if (!shouldShow) {
-        var crewPanel = card.querySelector('.ys-card-crew-group');
+        var crewPanel = card.querySelector('.ys-card-contact-tools-group');
 
         if (crewPanel) {
           crewPanel.classList.remove('show');
@@ -491,7 +529,7 @@ document.addEventListener('click', function(event) {
   var panelTrigger = event.target.closest('.ys-call-crew-button, .ys-book-now-button');
   if (panelTrigger) {
     var triggerCard = panelTrigger.closest('.ys-card');
-    var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-crew-group') : null;
+    var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-contact-tools-group') : null;
 
     if (triggerCard) {
       setSelectedCard(triggerCard);
@@ -511,10 +549,23 @@ document.addEventListener('click', function(event) {
 
   var closeButton = event.target.closest('.ys-card-crew-close');
   if (closeButton) {
-    var crewPanel = closeButton.closest('.ys-card-crew-group');
+    var crewPanel = closeButton.closest('.ys-card-contact-tools-group');
 
     if (crewPanel) {
       crewPanel.classList.remove('show');
+    }
+
+    syncCrewPanelOpenState();
+    event.preventDefault();
+    return;
+  }
+
+  var crewCloseButton = event.target.closest('.ys-card-crew-close-button');
+  if (crewCloseButton) {
+    var crewPanel = crewCloseButton.closest('.ys-card-contact-tools-group');
+
+    if (crewPanel) {
+      crewPanel.classList.toggle('show');
     }
 
     syncCrewPanelOpenState();
@@ -554,6 +605,7 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+  resetMonthTrackTransform();
   closeAllCrewPanels();
 
   document.querySelectorAll('.ys-card').forEach(function(card) {
@@ -584,9 +636,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.addEventListener('resize', function() {
-  var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
+  resetMonthTrackTransform();
 
-  if (activeMonthLink) {
-    // DISABLED: centerMonthItemUnderOverlay(activeMonthLink);
+  if (ENABLE_MONTH_TRACK_MOTION) {
+    var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
+    if (activeMonthLink) {
+      centerMonthItemUnderOverlay(activeMonthLink);
+    }
   }
 });

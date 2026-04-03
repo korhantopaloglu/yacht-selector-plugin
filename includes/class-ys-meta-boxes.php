@@ -49,8 +49,9 @@ class YS_Meta_Boxes {
 	public function register() {
 		add_action( 'add_meta_boxes', [ $this, 'add_meta_boxes' ] );
 		add_action( 'save_post', [ $this, 'save_meta_boxes' ], 10, 2 );
-		add_action( 'save_post', [ $this, 'save_bulk_edit_booked_months' ], 20, 2 );
+		add_action( 'save_post', [ $this, 'save_inline_edit_booked_months' ], 20, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		add_action( 'quick_edit_custom_box', [ $this, 'render_quick_edit_booked_field' ], 10, 2 );
 		add_action( 'bulk_edit_custom_box', [ $this, 'render_bulk_edit_booked_field' ], 10, 2 );
 
 		$post_type = $this->get_selected_post_type();
@@ -151,6 +152,9 @@ class YS_Meta_Boxes {
 		}
 
 		$values = $this->get_stored_booked_values( $post_id );
+		$raw    = implode( ', ', $values );
+
+		echo '<span class="hidden" data-ys-booked-values="' . esc_attr( $raw ) . '"></span>';
 
 		if ( empty( $values ) ) {
 			echo '&mdash;';
@@ -158,6 +162,31 @@ class YS_Meta_Boxes {
 		}
 
 		echo esc_html( implode( ', ', $this->format_booked_month_labels( $values ) ) );
+	}
+
+	/**
+	 * Render booked quick edit controls.
+	 *
+	 * @param string $column_name Column key.
+	 * @param string $post_type Post type key.
+	 * @return void
+	 */
+	public function render_quick_edit_booked_field( $column_name, $post_type ) {
+		if ( 'ys_booked_months' !== $column_name || $post_type !== $this->get_selected_post_type() ) {
+			return;
+		}
+		?>
+		<fieldset class="inline-edit-col-right ys-quick-edit-fieldset">
+			<div class="inline-edit-col">
+				<label>
+					<span class="title"><?php esc_html_e( 'Booked Months', 'yacht-selector' ); ?></span>
+					<textarea name="ys_quick_booked_months" class="ys-quick-booked-months" rows="2" placeholder="2026-06, 2026-07"></textarea>
+				</label>
+				<p class="description"><?php esc_html_e( 'Comma-separated YYYY-MM values. Example: 2026-06, 2026-07', 'yacht-selector' ); ?></p>
+				<input type="hidden" name="ys_quick_booked_present" value="1" />
+			</div>
+		</fieldset>
+		<?php
 	}
 
 	/**
@@ -179,17 +208,13 @@ class YS_Meta_Boxes {
 					<select name="ys_bulk_booked_action" class="ys-bulk-booked-action" data-ys-bulk-booked-action>
 						<option value=""><?php esc_html_e( 'No Change', 'yacht-selector' ); ?></option>
 						<option value="replace"><?php esc_html_e( 'Replace Booked Months', 'yacht-selector' ); ?></option>
-						<option value="clear"><?php esc_html_e( 'Clear Booked Months', 'yacht-selector' ); ?></option>
+						<option value="add"><?php esc_html_e( 'Add Booked Months', 'yacht-selector' ); ?></option>
+						<option value="remove"><?php esc_html_e( 'Remove Booked Months', 'yacht-selector' ); ?></option>
 					</select>
 				</label>
-				<p class="description"><?php esc_html_e( 'Leave untouched to keep current values. Replace applies the selected months to all chosen posts.', 'yacht-selector' ); ?></p>
-				<div class="ys-booked-grid ys-bulk-booked-grid" data-ys-bulk-booked-grid hidden>
-					<?php foreach ( $this->get_month_options() as $month ) : ?>
-						<label class="ys-booked-item">
-							<input type="checkbox" name="ys_bulk_booked[]" value="<?php echo esc_attr( $month['value'] ); ?>" />
-							<span><?php echo esc_html( $month['label'] ); ?></span>
-						</label>
-					<?php endforeach; ?>
+				<p class="description"><?php esc_html_e( 'Enter comma-separated YYYY-MM values. Replace overwrites all values, Add merges into existing values, Remove deletes matching values.', 'yacht-selector' ); ?></p>
+				<div class="ys-bulk-booked-input" data-ys-bulk-booked-input hidden>
+					<textarea name="ys_bulk_booked_months" class="ys-bulk-booked-months" rows="2" placeholder="2026-06, 2026-07"></textarea>
 				</div>
 			</div>
 		</fieldset>
@@ -283,13 +308,13 @@ class YS_Meta_Boxes {
 	}
 
 	/**
-	 * Save booked months from the bulk edit form.
+	 * Save booked months from inline edit forms.
 	 *
 	 * @param int     $post_id Post ID.
 	 * @param WP_Post $post Post object.
 	 * @return void
 	 */
-	public function save_bulk_edit_booked_months( $post_id, $post ) {
+	public function save_inline_edit_booked_months( $post_id, $post ) {
 		$post_type = $this->get_selected_post_type();
 
 		if ( ! $post instanceof WP_Post || ! $this->is_valid_post_type( $post_type ) || $post->post_type !== $post_type ) {
@@ -313,23 +338,62 @@ class YS_Meta_Boxes {
 			return;
 		}
 
-		$action = isset( $_REQUEST['ys_bulk_booked_action'] ) ? sanitize_key( wp_unslash( $_REQUEST['ys_bulk_booked_action'] ) ) : '';
+		$has_quick_input = isset( $_REQUEST['ys_quick_booked_present'] );
+		$bulk_action     = isset( $_REQUEST['ys_bulk_booked_action'] ) ? sanitize_key( wp_unslash( $_REQUEST['ys_bulk_booked_action'] ) ) : '';
 
-		if ( '' === $action ) {
+		if ( ! $has_quick_input && '' === $bulk_action ) {
 			return;
 		}
 
-		if ( 'clear' === $action ) {
-			$this->save_booked_meta( $post_id, [] );
+		if ( $has_quick_input ) {
+			$values = $this->sanitize_booked_text_input( isset( $_REQUEST['ys_quick_booked_months'] ) ? wp_unslash( $_REQUEST['ys_quick_booked_months'] ) : '' );
+			$this->save_booked_meta( $post_id, $values );
+
 			return;
 		}
 
-		if ( 'replace' !== $action ) {
+		if ( ! in_array( $bulk_action, [ 'replace', 'add', 'remove' ], true ) ) {
 			return;
 		}
 
-		$values = $this->sanitize_booked_values( isset( $_REQUEST['ys_bulk_booked'] ) ? wp_unslash( $_REQUEST['ys_bulk_booked'] ) : [] );
-		$this->save_booked_meta( $post_id, $values );
+		$input_values = $this->sanitize_booked_text_input( isset( $_REQUEST['ys_bulk_booked_months'] ) ? wp_unslash( $_REQUEST['ys_bulk_booked_months'] ) : '' );
+		$stored       = $this->get_stored_booked_values( $post_id );
+
+		if ( 'replace' === $bulk_action ) {
+			$this->save_booked_meta( $post_id, $input_values );
+			return;
+		}
+
+		if ( empty( $input_values ) ) {
+			return;
+		}
+
+		if ( 'add' === $bulk_action ) {
+			$this->save_booked_meta( $post_id, $this->normalize_booked_values( array_merge( $stored, $input_values ) ) );
+			return;
+		}
+
+		$this->save_booked_meta( $post_id, $this->normalize_booked_values( array_diff( $stored, $input_values ) ) );
+	}
+
+	/**
+	 * Sanitize booked month values from comma/newline-separated text.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return array
+	 */
+	private function sanitize_booked_text_input( $value ) {
+		if ( ! is_string( $value ) ) {
+			return [];
+		}
+
+		$chunks = preg_split( '/[\r\n,]+/', $value );
+
+		if ( ! is_array( $chunks ) ) {
+			return [];
+		}
+
+		return $this->normalize_booked_values( $chunks );
 	}
 
 	/**

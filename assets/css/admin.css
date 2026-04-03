@@ -385,10 +385,11 @@
   margin-top: 4px;
 }
 
-.ys-bulk-booked-grid {
+.ys-bulk-booked-input,
+.ys-quick-edit-fieldset textarea,
+.ys-bulk-booked-input textarea {
   margin-top: 10px;
-  max-height: 220px;
-  overflow-y: auto;
+  width: 100%;
 }
 
 .ys-crew-meta-box .ys-checkbox-list {

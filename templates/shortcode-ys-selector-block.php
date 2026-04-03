@@ -126,7 +126,31 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 				$build_year    = isset( $item['build_year'] ) && null !== $item['build_year'] ? (string) $item['build_year'] : '';
 				$refit_year    = isset( $item['refit_year'] ) && null !== $item['refit_year'] ? (string) $item['refit_year'] : '';
 				$crew          = isset( $item['crew'] ) && null !== $item['crew'] ? (string) $item['crew'] : '';
-				$features      = isset( $item['features'] ) && is_array( $item['features'] ) ? array_values( array_filter( $item['features'], 'is_scalar' ) ) : [];
+				$raw_features  = isset( $item['features'] ) && is_array( $item['features'] ) ? $item['features'] : [];
+				$features      = [];
+				$junk_features = [ '-', '--', 'n/a', 'na', 'none', 'null', 'false' ];
+
+				foreach ( $raw_features as $raw_feature ) {
+					if ( ! is_scalar( $raw_feature ) ) {
+						continue;
+					}
+
+					$feature_text = trim( sanitize_text_field( (string) $raw_feature ) );
+
+					if ( '' === $feature_text ) {
+						continue;
+					}
+
+					if ( in_array( strtolower( $feature_text ), $junk_features, true ) ) {
+						continue;
+					}
+
+					if ( in_array( $feature_text, $features, true ) ) {
+						continue;
+					}
+
+					$features[] = $feature_text;
+				}
 				$crew_members  = isset( $item['assigned_crew'] ) && is_array( $item['assigned_crew'] ) ? $item['assigned_crew'] : [];
 				$priority      = isset( $item['priority'] ) ? (int) $item['priority'] : 0;
 				$permalink     = isset( $item['url'] ) ? (string) $item['url'] : '';
@@ -159,6 +183,29 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					}
 				}
 				?>
+				<?php 
+				// Check if any crew member is online
+				$any_crew_online = false;
+				if ( ! empty( $crew_members ) ) {
+					foreach ( $crew_members as $crew_member ) {
+						$online_start = isset( $crew_member['online_start'] ) ? (string) $crew_member['online_start'] : '';
+						$online_end = isset( $crew_member['online_end'] ) ? (string) $crew_member['online_end'] : '';
+						
+						if ( '' !== $online_start && '' !== $online_end ) {
+							$any_crew_online = true;
+							break;
+						}
+					}
+				}
+				
+				$card_classes = 'ys-card';
+				if ( $priority === 0 ) {
+					$card_classes .= ' is-active';
+				}
+				if ( $any_crew_online ) {
+					$card_classes .= ' crew-online';
+				}
+				?>
 				<article
 					class="<?php echo esc_attr( $card_classes ); ?>"
 					data-card-id="<?php echo esc_attr( (string) ( $item['id'] ?? 0 ) ); ?>"
@@ -169,6 +216,8 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					data-months="<?php echo esc_attr( implode( ',', $month_numbers ) ); ?>"
 					data-card-index="<?php echo esc_attr( (string) ( $index + 1 ) ); ?>"
 				>
+
+					<div class="ys-card-content-group">
 					<div class="ys-card-image-container">
 						<?php if ( '' !== $image_url ) : ?>
 							<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>">
@@ -178,8 +227,8 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					<div class="ys-card-content-container">
 						<h3><?php echo esc_html( $title ); ?></h3>
 						<span class="booked-text"><?php echo esc_html( $booked_text ); ?></span>
-					<div class="ys-card-details-container">
-						<div class="ys-card-specifications-group">
+						<div class="ys-card-details-container">
+							<div class="ys-card-specifications-group">
 							<div class="ys-card-group-title"><?php esc_html_e( 'Specifications', 'yacht-selector' ); ?></div>
 							<div class="ys-card-specifications-items">
 								<?php if ( '' !== $model ) : ?>
@@ -219,13 +268,14 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 								<div class="ys-card-group-title"><?php esc_html_e( 'Extra Features', 'yacht-selector' ); ?></div>
 								<div class="ys-card-features-list">
 									<?php 
+									$visible_features = [];
+									$hidden_features  = [];
+									$total_chars      = 0;
+
 									if ( ! empty( $features ) ) :
-										$total_chars = 0;
-										$visible_features = [];
-										$hidden_features = [];
 										
 										foreach ( $features as $feature ) :
-											$feature_text = (string) $feature;
+											$feature_text  = (string) $feature;
 											$feature_chars = strlen( $feature_text );
 											
 											if ( $total_chars + $feature_chars <= 70 ) {
@@ -252,31 +302,29 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 							</div>
 									</div>
 
-						<div class="ys-card-crew-group">
+						
+					</div>
+											<div class="ys-card-actions-container">
+							<button type="button" class="ys-watch-button ys-watch-video-button" data-url="<?php echo esc_attr( $permalink ); ?>"><?php echo esc_html( $watch_text ); ?></button>
+							<button type="button" class="ys-call-button ys-call-crew-button"><?php echo esc_html( $call_text ); ?></button>
+							<button type="button" class="ys-book-button ys-book-now-button"><?php echo esc_html( $book_text ); ?></button>
+						</div>
+						</div>
+						<div class="ys-card-contact-tools-group">
+							<div class="ys-card-contact-tools-group-container">
 							<button type="button" class="ys-card-crew-close" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>">&times;</button>
-							<div class="ys-card-crew-top-title"><?php echo esc_html( $crew_top_title ); ?></div>
-							<div class="ys-card-crew-title"><?php echo esc_html( $crew_title ); ?></div>
-							<div class="ys-card-crew-subtitle"><?php echo esc_html( $crew_subtitle ); ?></div>
-
-							<?php if ( ! empty( $crew_members ) ) : ?>
-								<div class="ys-card-crew-status-group" data-crew-online="0" data-online-text-template="<?php echo esc_attr( $on_board_text ); ?>" data-offline-text-template="<?php echo esc_attr( $offline_text ); ?>">
-									<?php if ( '' !== $online_icon ) : ?>
-										<img class="ys-card-crew-status-icon" src="<?php echo esc_url( $online_icon ); ?>" alt="">
-									<?php endif; ?>
-									<span class="ys-card-crew-status-text"></span>
-									<?php if ( count( $crew_members ) === 1 ) : ?>
-										<span class="ys-card-crew-member-single" data-crew-id="<?php echo esc_attr( (string) ( $crew_members[0]['id'] ?? 0 ) ); ?>" data-crew-name="<?php echo esc_attr( $primary_name ); ?>" data-online-start="<?php echo esc_attr( (string) ( $crew_members[0]['online_start'] ?? '' ) ); ?>" data-online-end="<?php echo esc_attr( (string) ( $crew_members[0]['online_end'] ?? '' ) ); ?>" data-tool-urls="<?php echo esc_attr( wp_json_encode( $primary_tool_urls ) ); ?>" data-selected-tools="<?php echo esc_attr( wp_json_encode( $primary_selected_tool_keys ) ); ?>"><?php echo esc_html( $primary_name ); ?></span>
-									<?php else : ?>
-										<select class="ys-card-crew-member-select">
-											<?php foreach ( $crew_members as $crew_member ) : ?>
-												<option value="<?php echo esc_attr( (string) ( $crew_member['id'] ?? 0 ) ); ?>" data-crew-id="<?php echo esc_attr( (string) ( $crew_member['id'] ?? 0 ) ); ?>" data-crew-name="<?php echo esc_attr( (string) ( $crew_member['name'] ?? '' ) ); ?>" data-online-start="<?php echo esc_attr( (string) ( $crew_member['online_start'] ?? '' ) ); ?>" data-online-end="<?php echo esc_attr( (string) ( $crew_member['online_end'] ?? '' ) ); ?>" data-tool-urls="<?php echo esc_attr( wp_json_encode( isset( $crew_member['tool_urls'] ) && is_array( $crew_member['tool_urls'] ) ? $crew_member['tool_urls'] : [] ) ); ?>" data-selected-tools="<?php echo esc_attr( wp_json_encode( ! empty( $crew_member['contact_tools'] ) && is_array( $crew_member['contact_tools'] ) ? array_values( array_filter( array_map( static function( $tool ) {
-													return isset( $tool['slug'] ) ? (string) $tool['slug'] : '';
-												}, $crew_member['contact_tools'] ) ) ) : [] ) ); ?>"><?php echo esc_html( (string) ( $crew_member['name'] ?? '' ) ); ?></option>
-											<?php endforeach; ?>
-										</select>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+							<div class="ys-card-image-container">
+								<?php if ( '' !== $image_url ) : ?>
+									<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>">
+								<?php endif; ?>
+							</div>
+							<h3><?php echo esc_html( $title ); ?></h3>
+							<div class="ys-card-crew-content-group">
+							<div class="ys-card-crew-content-header">
+								<div class="ys-card-crew-top-title"><?php echo esc_html( $crew_top_title ); ?></div>
+								<div class="ys-card-crew-title"><?php echo esc_html( $crew_title ); ?></div>
+								<div class="ys-card-crew-subtitle"><?php echo esc_html( $crew_subtitle ); ?></div>
+							</div>
 
 							<?php if ( ! empty( $column_one ) || ! empty( $column_two ) ) : ?>
 								<div class="ys-card-contact-tools-container">
@@ -291,8 +339,10 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 														<span class="ys-tool-card-icon ys-tool-card-icon-svg" aria-hidden="true"><?php echo $tool_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 													<?php endif; ?>
 												<?php endif; ?>
-												<div class="ys-tool-card-title"><?php echo esc_html( (string) ( $tool['name'] ?? '' ) ); ?></div>
-												<?php if ( ! empty( $tool['description'] ) ) : ?><div class="ys-tool-card-description"><?php echo esc_html( (string) $tool['description'] ); ?></div><?php endif; ?>
+												<div class="ys-tool-card-text-wrapper">
+													<div class="ys-tool-card-title"><?php echo esc_html( (string) ( $tool['name'] ?? '' ) ); ?></div>
+													<?php if ( ! empty( $tool['description'] ) ) : ?><div class="ys-tool-card-description"><?php echo esc_html( (string) $tool['description'] ); ?></div><?php endif; ?>
+												</div>
 											</a>
 										<?php endforeach; ?>
 									</div>
@@ -315,13 +365,32 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 								</div>
 							<?php endif; ?>
 						</div>
-
-						<div class="ys-card-actions-container">
-							<button type="button" class="ys-watch-button ys-watch-video-button" data-url="<?php echo esc_attr( $permalink ); ?>"><?php echo esc_html( $watch_text ); ?></button>
-							<button type="button" class="ys-call-button ys-call-crew-button"><?php echo esc_html( $call_text ); ?></button>
-							<button type="button" class="ys-book-button ys-book-now-button"><?php echo esc_html( $book_text ); ?></button>
-						</div>
 					</div>
+					<div class="ys-card-contact-tools-action-group">
+								<button type="button" class="ys-card-crew-close-button" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>"><?php esc_attr_e( 'Go to back', 'yacht-selector' ); ?></button>
+							
+								<?php if ( ! empty( $crew_members ) ) : ?>
+									<div class="ys-card-crew-status-group" data-crew-online="0" data-online-text-template="<?php echo esc_attr( $on_board_text ); ?>" data-offline-text-template="<?php echo esc_attr( $offline_text ); ?>">
+										<?php if ( '' !== $online_icon ) : ?>
+											<img class="ys-card-crew-status-icon" src="<?php echo esc_url( $online_icon ); ?>" alt="">
+										<?php endif; ?>
+										<span class="ys-card-crew-status-text"></span>
+										<?php if ( count( $crew_members ) === 1 ) : ?>
+											<span class="ys-card-crew-member-single" data-crew-id="<?php echo esc_attr( (string) ( $crew_members[0]['id'] ?? 0 ) ); ?>" data-crew-name="<?php echo esc_attr( $primary_name ); ?>" data-online-start="<?php echo esc_attr( (string) ( $crew_members[0]['online_start'] ?? '' ) ); ?>" data-online-end="<?php echo esc_attr( (string) ( $crew_members[0]['online_end'] ?? '' ) ); ?>" data-tool-urls="<?php echo esc_attr( wp_json_encode( $primary_tool_urls ) ); ?>" data-selected-tools="<?php echo esc_attr( wp_json_encode( $primary_selected_tool_keys ) ); ?>"><?php echo esc_html( $primary_name ); ?></span>
+										<?php else : ?>
+											<select class="ys-card-crew-member-select">
+												<?php foreach ( $crew_members as $crew_member ) : ?>
+													<option value="<?php echo esc_attr( (string) ( $crew_member['id'] ?? 0 ) ); ?>" data-crew-id="<?php echo esc_attr( (string) ( $crew_member['id'] ?? 0 ) ); ?>" data-crew-name="<?php echo esc_attr( (string) ( $crew_member['name'] ?? '' ) ); ?>" data-online-start="<?php echo esc_attr( (string) ( $crew_member['online_start'] ?? '' ) ); ?>" data-online-end="<?php echo esc_attr( (string) ( $crew_member['online_end'] ?? '' ) ); ?>" data-tool-urls="<?php echo esc_attr( wp_json_encode( isset( $crew_member['tool_urls'] ) && is_array( $crew_member['tool_urls'] ) ? $crew_member['tool_urls'] : [] ) ); ?>" data-selected-tools="<?php echo esc_attr( wp_json_encode( ! empty( $crew_member['contact_tools'] ) && is_array( $crew_member['contact_tools'] ) ? array_values( array_filter( array_map( static function( $tool ) {
+														return isset( $tool['slug'] ) ? (string) $tool['slug'] : '';
+													}, $crew_member['contact_tools'] ) ) ) : [] ) ); ?>"><?php echo esc_html( (string) ( $crew_member['name'] ?? '' ) ); ?></option>
+												<?php endforeach; ?>
+											</select>
+										<?php endif; ?>
+									</div>
+								<?php endif; ?>
+
+					</div>
+
 				</article>
 			<?php endforeach; ?>
 
