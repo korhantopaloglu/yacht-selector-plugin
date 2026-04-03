@@ -16,8 +16,8 @@
   position: relative;
   width: min(100%, var(--ys-shell-max-width));
   margin-inline: auto;
-  display: grid;
-  gap: 22px;
+  display: flex;
+  flex-direction: column;
   isolation: isolate;
   max-width: none !important;
 }
@@ -68,7 +68,7 @@
 .ys-countries-container {
   flex-wrap: wrap;
   gap: 12px;
-  padding: 30px 24px 15px;
+  padding: var(--ys-padding-around-2) var(--ys-padding-around-2) 0;
 }
 
 .ys-country {
@@ -145,8 +145,10 @@
 .ys-months-header-wrapper {
   position: relative;
   width: 100%;
-  padding: var(--ys-padding-around-1) 0;
+  padding: var(--ys-padding-around-2) 0;
   overflow: hidden;
+  display: flex;
+  gap: 10px;
 }
 
 .ys-months-track {
@@ -190,6 +192,10 @@
   width: 100%;
 }
 
+.ys-months-track::after {
+  content: "";
+  width: calc((100% - (10 * var(--ys-month-gap))) / 11);
+}
 .ys-month {
   flex: 0 0 calc((100% - (10 * var(--ys-month-gap))) / 11);
   /* 11 item görünür, 12. item dışarı taşar */
@@ -198,13 +204,15 @@
 
 @media (max-width: 1024px) {
   .ys-month {
-    flex: 0 0 calc((100% - (8 * var(--ys-month-gap))) / 9);
+    flex: 0 0 calc((100% - (8 * var(--ys-month-gap))) / 9);  
+    margin-right: calc((100% - (10 * var(--ys-month-gap))) * 3 / 11);
   }
 }
 
 @media (max-width: 767px) {
   .ys-month {
-    flex: 0 0 calc((100% - (4 * var(--ys-month-gap))) / 5);
+    flex: 0 0 calc((100% - (4 * var(--ys-month-gap))) / 5);  
+    margin-right: calc((100% - (10 * var(--ys-month-gap))) * 7 / 11);
   }
 }
 
@@ -369,27 +377,33 @@
 }
 
 .ys-card.is-pos-1 {
+  top: 132px;
   transform: translateX(calc(var(--ys-slider-step) * 0.5)) scale(0.97);
 }
 
 .ys-card.is-pos-2 {
+  top: 152px;
   transform: translateX(calc(var(--ys-slider-step) * 0.86)) scale(0.94);
 }
 
 .ys-card.is-pos-3 {
-  transform: translateX(calc(var(--ys-slider-step) * 1.12)) scale(0.91);
+  transform: translateX(calc(var(--ys-slider-step) * 1.22)) scale(0.88);
+  top: 162px;
 }
 
 .ys-card.is-neg-1 {
+  top: 132px;
   transform: translateX(calc(var(--ys-slider-step) * -0.5)) scale(0.97);
 }
 
 .ys-card.is-neg-2 {
+  top: 152px;
   transform: translateX(calc(var(--ys-slider-step) * -0.86)) scale(0.94);
 }
 
 .ys-card.is-neg-3 {
-  transform: translateX(calc(var(--ys-slider-step) * -1.12)) scale(0.91);
+  transform: translateX(calc(var(--ys-slider-step) * -1.22)) scale(0.88);
+  top: 162px;
 }
 
 .ys-card.is-bg-card {
@@ -496,7 +510,7 @@
 
 .booked-text {
   position: absolute;
-  top: 320px;
+  top: 332px;
   left: 50%;
   display: none;
   align-items: center;
@@ -510,7 +524,7 @@
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
 
 .ys-card.booked .booked-text {
@@ -975,7 +989,7 @@
 
 .ys-card-nav-container {
   position: absolute;
-  top: 320px;
+  top: 332px;
   left: 0;
   right: 0;
   z-index: 20;
@@ -1113,7 +1127,6 @@
   .ys-card-nav-container {
     width: calc(100% - 1.4rem);
     padding: 0.4rem;
-    height: clamp(250px, 36vh, 320px);
   }
 
   .ys-prev,
@@ -1127,8 +1140,11 @@
 }
 
 @media (max-width: 782px) {
+  .ys-header-wrapper {
+    position: static;
+    width: 100vw;
+  }
   .ys-selector-block-container {
-    gap: 12px;
   }
 
   .ys-country {

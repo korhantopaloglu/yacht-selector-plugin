@@ -7,6 +7,53 @@
   margin: 0 0 20px;
 }
 
+.ys-settings-tabs {
+  border: 1px solid #dcdcde;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.ys-settings-tabs .ys-admin-tabs-nav {
+  padding: 14px 14px 0;
+  background: linear-gradient(180deg, #f8fafc 0%, #f6f7f7 100%);
+}
+
+.ys-settings-tabs-panels {
+  padding: 14px;
+  background: #f6f7f7;
+}
+
+.ys-settings-section-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  padding: 16px;
+}
+
+.ys-settings-section-card + .ys-settings-section-card {
+  margin-top: 14px;
+}
+
+.ys-settings-section-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.ys-settings-section-card .form-table {
+  margin-top: 8px;
+}
+
+.ys-settings-section-card .form-table th {
+  width: 240px;
+}
+
+.ys-settings-page form > .submit {
+  margin-top: 16px;
+}
+
 .ys-repeatable {
   max-width: 640px;
 }

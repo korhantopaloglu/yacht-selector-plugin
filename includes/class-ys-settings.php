@@ -306,12 +306,87 @@ class YS_Settings {
 			<form action="options.php" method="post" enctype="multipart/form-data">
 				<?php
 				settings_fields( 'ys_settings_group' );
-				do_settings_sections( 'ys-settings' );
+				?>
+				<div class="ys-settings-tabs" data-ys-admin-panel>
+					<div class="ys-admin-tabs-nav" role="tablist" aria-label="<?php esc_attr_e( 'Yacht Selector Settings Sections', 'yacht-selector' ); ?>">
+						<button type="button" class="ys-tab-button is-active" data-ys-tab="general" aria-selected="true"><?php esc_html_e( 'General', 'yacht-selector' ); ?></button>
+						<button type="button" class="ys-tab-button" data-ys-tab="lists" aria-selected="false"><?php esc_html_e( 'Lists', 'yacht-selector' ); ?></button>
+						<button type="button" class="ys-tab-button" data-ys-tab="texts" aria-selected="false"><?php esc_html_e( 'Frontend Texts', 'yacht-selector' ); ?></button>
+						<button type="button" class="ys-tab-button" data-ys-tab="import" aria-selected="false"><?php esc_html_e( 'JSON Import', 'yacht-selector' ); ?></button>
+					</div>
+
+					<div class="ys-admin-tabs-panels ys-settings-tabs-panels">
+						<div class="ys-tab-panel is-active" data-ys-panel="general">
+							<?php $this->render_settings_tab_sections( [ 'ys_general_section' ] ); ?>
+						</div>
+						<div class="ys-tab-panel" data-ys-panel="lists" hidden>
+							<?php $this->render_settings_tab_sections( [ 'ys_model_options_section', 'ys_extra_feature_options_section' ] ); ?>
+						</div>
+						<div class="ys-tab-panel" data-ys-panel="texts" hidden>
+							<?php $this->render_settings_tab_sections( [ 'ys_frontend_text_settings_section' ] ); ?>
+						</div>
+						<div class="ys-tab-panel" data-ys-panel="import" hidden>
+							<?php $this->render_settings_tab_sections( [ 'ys_json_data_import_section' ] ); ?>
+						</div>
+					</div>
+				</div>
+				<?php
 				submit_button();
 				?>
 			</form>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Render one tab content with one or more settings sections.
+	 *
+	 * @param array $section_ids Section identifiers.
+	 * @return void
+	 */
+	private function render_settings_tab_sections( $section_ids ) {
+		if ( ! is_array( $section_ids ) ) {
+			return;
+		}
+
+		foreach ( $section_ids as $section_id ) {
+			$this->render_settings_section( 'ys-settings', $section_id );
+		}
+	}
+
+	/**
+	 * Render a single settings section using WordPress settings globals.
+	 *
+	 * @param string $page Page slug.
+	 * @param string $section_id Section identifier.
+	 * @return void
+	 */
+	private function render_settings_section( $page, $section_id ) {
+		global $wp_settings_sections, $wp_settings_fields;
+
+		if ( ! isset( $wp_settings_sections[ $page ][ $section_id ] ) ) {
+			return;
+		}
+
+		$section = $wp_settings_sections[ $page ][ $section_id ];
+
+		echo '<section class="ys-settings-section-card">';
+
+		if ( ! empty( $section['title'] ) ) {
+			echo '<h2 class="ys-settings-section-title">' . esc_html( $section['title'] ) . '</h2>';
+		}
+
+		if ( ! empty( $section['callback'] ) && is_callable( $section['callback'] ) ) {
+			call_user_func( $section['callback'] );
+		}
+
+		if ( isset( $wp_settings_fields[ $page ][ $section_id ] ) ) {
+			echo '<table class="form-table" role="presentation">';
+			do_settings_fields( $page, $section_id );
+			echo '</table>';
+		}
+
+		echo '</section>';
 	}
 
 	/**
