@@ -22,6 +22,7 @@ $offline_text   = isset( $offline_text ) ? (string) $offline_text : 'Currently o
 $online_icon    = isset( $online_icon ) ? (string) $online_icon : '';
 $ui_class       = isset( $ui_class ) ? sanitize_html_class( (string) $ui_class ) : '';
 $root_classes   = 'ys-selector-block-container' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
+$thumbnail_placeholder = 'data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%2290%22 viewBox=%220 0 160 90%22%3E%3Crect width=%22160%22 height=%2290%22 fill=%22%23e2e8f0%22/%3E%3C/svg%3E';
 
 if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 	/**
@@ -50,6 +51,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 	<div class="ys-header-wrapper">
 		<div class="ys-countries-container">
 			<div class="ys-countries-mask">
+				<div class="ys-countries-track">
 				<a href="#" class="ys-country active" data-country="all">
 					<span class="ys-country-option__flag-wrap">
 						<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
@@ -69,15 +71,17 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
 					</a>
 				<?php endforeach; ?>
+				</div>
 			</div>
 		</div>
 
 		<div class="ys-months-container">
-			<div class="ys-months-header-wrapper">
+			<div class="ys-months-mask">
 				<div class="ys-months-track">
 					<?php foreach ( $months as $month ) : ?>
 						<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>" data-month-full="<?php echo esc_attr( $month['full'] ?? '' ); ?>" data-density="<?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>">
 							<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
+							<span class="ys-month-label-full"><?php echo esc_html( $month['full'] ?? '' ); ?></span>
 							<span class="ys-month-bar">
 								<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
 							</span>
@@ -92,6 +96,33 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 				<span class="ys-month-overlay-bar">
 					<span class="ys-month-overlay-bar-fill"></span>
 				</span>
+			</div>
+		</div>
+
+		<div class="ys-card-thumbnail-container" aria-label="<?php esc_attr_e( 'Yacht thumbnails', 'yacht-selector' ); ?>">
+			<div class="ys-card-thumbnail-mask">
+				<div class="ys-card-thumbnail-track">
+					<?php foreach ( $items as $thumbnail_index => $thumbnail_item ) : ?>
+						<?php
+						$thumbnail_card_id = isset( $thumbnail_item['id'] ) ? (string) $thumbnail_item['id'] : '';
+						$thumbnail_title   = isset( $thumbnail_item['title'] ) ? (string) $thumbnail_item['title'] : '';
+						$thumbnail_image   = isset( $thumbnail_item['image'] ) && '' !== (string) $thumbnail_item['image'] ? (string) $thumbnail_item['image'] : $thumbnail_placeholder;
+						?>
+						<button
+							type="button"
+							class="ys-card-thumbnail<?php echo 0 === $thumbnail_index ? ' active is-selected' : ''; ?>"
+							data-card-id="<?php echo esc_attr( $thumbnail_card_id ); ?>"
+							aria-label="<?php echo esc_attr( '' !== $thumbnail_title ? sprintf( __( 'Select %s', 'yacht-selector' ), $thumbnail_title ) : sprintf( __( 'Select yacht %d', 'yacht-selector' ), (int) ( $thumbnail_index + 1 ) ) ); ?>"
+							aria-current="<?php echo esc_attr( 0 === $thumbnail_index ? 'true' : 'false' ); ?>"
+						>
+							<img
+								class="ys-card-thumbnail-image"
+								src="<?php echo esc_url( $thumbnail_image ); ?>"
+								alt="<?php echo esc_attr( '' !== $thumbnail_title ? $thumbnail_title : sprintf( __( 'Yacht %d', 'yacht-selector' ), (int) ( $thumbnail_index + 1 ) ) ); ?>"
+							>
+						</button>
+					<?php endforeach; ?>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -397,13 +428,10 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 
 				</article>
 			<?php endforeach; ?>
-
+			
 			<div class="ys-card-nav-container">
 				<button type="button" class="ys-prev"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
 				<button type="button" class="ys-next"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-				<nav class="ys-card-thumbnail-nav" aria-label="<?php esc_attr_e( 'Yacht thumbnails', 'yacht-selector' ); ?>">
-					<div class="ys-card-thumbnail-track"></div>
-				</nav>
 			</div>
 		</div>
 	<?php else : ?>

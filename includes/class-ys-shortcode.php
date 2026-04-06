@@ -82,14 +82,14 @@ class YS_Shortcode {
 	private function enqueue_selector_assets() {
 		wp_enqueue_style(
 			'ys-frontend-selector',
-			YS_PLUGIN_URL . 'assets/css/frontend-selector.css',
+			YS_PLUGIN_URL . 'assets/css/frontend.css',
 			[],
 			YS_PLUGIN_VERSION
 		);
 
 		wp_enqueue_script(
 			'ys-frontend-selector',
-			YS_PLUGIN_URL . 'assets/js/frontend-selector.js',
+			YS_PLUGIN_URL . 'assets/js/frontend.js',
 			[],
 			YS_PLUGIN_VERSION,
 			true
@@ -295,7 +295,23 @@ class YS_Shortcode {
 			];
 		}
 
-		return $months;
+		$current_index = -1;
+
+		foreach ( $months as $index => $month_item ) {
+			if ( (int) ( $month_item['month'] ?? 0 ) === $current_month ) {
+				$current_index = (int) $index;
+				break;
+			}
+		}
+
+		if ( $current_index > 0 ) {
+			$months = array_merge(
+				array_slice( $months, $current_index ),
+				array_slice( $months, 0, $current_index )
+			);
+		}
+
+		return array_values( $months );
 	}
 
 	/**

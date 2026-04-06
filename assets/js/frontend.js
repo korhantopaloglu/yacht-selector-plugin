@@ -190,7 +190,7 @@ function getMonthTrack(scope) {
     return scope;
   }
 
-  if (scope.classList && scope.classList.contains('ys-months-header-wrapper')) {
+  if (scope.classList && scope.classList.contains('ys-months-mask')) {
     return scope.querySelector('.ys-months-track');
   }
 
@@ -292,7 +292,7 @@ function getOverlayCenter(monthContainer) {
   }
 
   var overlay = monthContainer.querySelector('.ys-month-overlay');
-  var wrapper = monthContainer.querySelector('.ys-months-header-wrapper');
+  var wrapper = monthContainer.querySelector('.ys-months-mask');
   if (!overlay || !wrapper) {
     return 0;
   }
@@ -409,6 +409,22 @@ function getScopeRoot(scope) {
   return scope && scope.querySelectorAll ? scope : document;
 }
 
+function getBlockScope(node) {
+  if (node && node.closest) {
+    var localScope = node.closest('.ys-selector-block-container');
+    if (localScope) {
+      return localScope;
+    }
+  }
+
+  var allScopes = document.querySelectorAll('.ys-selector-block-container');
+  if (allScopes.length === 1) {
+    return allScopes[0];
+  }
+
+  return document;
+}
+
 function getCards(scope) {
   return Array.prototype.slice.call(getScopeRoot(scope).querySelectorAll('.ys-card'));
 }
@@ -440,50 +456,6 @@ function findCardByIdentifier(scope, cardId) {
   }
 
   return null;
-}
-
-function getCardThumbnailImageSource(card) {
-  if (!card) {
-    return '';
-  }
-
-  var image = card.querySelector('.ys-card-image-container img');
-  if (image && image.getAttribute('src')) {
-    return image.getAttribute('src');
-  }
-
-  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="90" viewBox="0 0 160 90"><rect width="160" height="90" fill="%23e2e8f0"/></svg>';
-}
-
-function buildThumbnailRail(scope) {
-  var root = getScopeRoot(scope);
-  var track = root.querySelector('.ys-card-thumbnail-track');
-
-  if (!track) {
-    return;
-  }
-
-  track.innerHTML = '';
-
-  getCards(root).forEach(function(card, index) {
-    var cardId = getCardIdentifier(card);
-    var titleNode = card.querySelector('.ys-card-content-container h3');
-    var title = titleNode ? titleNode.textContent.trim() : '';
-    var thumbnail = document.createElement('button');
-    var image = document.createElement('img');
-
-    thumbnail.type = 'button';
-    thumbnail.className = 'ys-card-thumbnail';
-    thumbnail.setAttribute('data-card-id', cardId);
-    thumbnail.setAttribute('aria-label', title ? 'Select ' + title : 'Select yacht ' + (index + 1));
-
-    image.className = 'ys-card-thumbnail-image';
-    image.src = getCardThumbnailImageSource(card);
-    image.alt = title || ('Yacht ' + (index + 1));
-
-    thumbnail.appendChild(image);
-    track.appendChild(thumbnail);
-  });
 }
 
 function syncThumbnailRailState(scope) {
@@ -632,6 +604,114 @@ function goToRelativeCard(step, scope) {
   }
 }
 
+function initCardSliderGestures(scope) {
+  var root = getScopeRoot(scope);
+  var cardsContainer = root.querySelector('.ys-cards-container');
+  var dragThreshold = 42;
+  var wheelThreshold = 18;
+  var wheelCooldownMs = 260;
+  var pointerState = null;
+  var wheelLockedUntil = 0;
+
+  if (!cardsContainer || cardsContainer.getAttribute('data-swipe-ready') === '1') {
+    return;
+  }
+
+  cardsContainer.setAttribute('data-swipe-ready', '1');
+
+  function shouldIgnorePointerStart(target) {
+    if (!target || !target.closest) {
+      return false;
+    }
+
+    return !!target.closest('a, button, input, select, textarea, .ys-tool-card');
+  }
+
+  function applySwipe(deltaX, deltaY) {
+    if (Math.abs(deltaX) < dragThreshold || Math.abs(deltaX) <= Math.abs(deltaY)) {
+      return;
+    }
+
+    if (deltaX < 0) {
+      goToRelativeCard(1, root);
+      return;
+    }
+
+    goToRelativeCard(-1, root);
+  }
+
+  cardsContainer.addEventListener('touchstart', function(event) {
+    if (!event.touches || event.touches.length !== 1) {
+      pointerState = null;
+      return;
+    }
+
+    pointerState = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    };
+  }, { passive: true });
+
+  cardsContainer.addEventListener('touchend', function(event) {
+    if (!pointerState || !event.changedTouches || !event.changedTouches.length) {
+      pointerState = null;
+      return;
+    }
+
+    var endX = event.changedTouches[0].clientX;
+    var endY = event.changedTouches[0].clientY;
+    applySwipe(endX - pointerState.x, endY - pointerState.y);
+    pointerState = null;
+  }, { passive: true });
+
+  cardsContainer.addEventListener('pointerdown', function(event) {
+    if (event.pointerType !== 'mouse') {
+      return;
+    }
+
+    if (shouldIgnorePointerStart(event.target)) {
+      pointerState = null;
+      return;
+    }
+
+    pointerState = {
+      x: event.clientX,
+      y: event.clientY
+    };
+  });
+
+  cardsContainer.addEventListener('pointerup', function(event) {
+    if (!pointerState || event.pointerType !== 'mouse') {
+      pointerState = null;
+      return;
+    }
+
+    applySwipe(event.clientX - pointerState.x, event.clientY - pointerState.y);
+    pointerState = null;
+  });
+
+  cardsContainer.addEventListener('pointercancel', function() {
+    pointerState = null;
+  });
+
+  cardsContainer.addEventListener('wheel', function(event) {
+    var now = Date.now();
+    var deltaX = event.deltaX;
+
+    if (Math.abs(deltaX) < wheelThreshold && event.shiftKey) {
+      deltaX = event.deltaY;
+    }
+
+    if (Math.abs(deltaX) < wheelThreshold || now < wheelLockedUntil) {
+      return;
+    }
+
+    wheelLockedUntil = now + wheelCooldownMs;
+    event.preventDefault();
+    goToRelativeCard(deltaX > 0 ? 1 : -1, root);
+  }, { passive: false });
+}
+
 function syncCrewPanelOpenState(scope) {
   var root = getScopeRoot(scope);
 
@@ -677,7 +757,7 @@ document.addEventListener('click', function(event) {
   if (countryLink) {
     var selectedCountry = countryLink.getAttribute('data-country') || 'all';
     var countryContainer = countryLink.closest('.ys-countries-container');
-    var blockContainer = countryLink.closest('.ys-selector-block-container') || document;
+    var blockContainer = getBlockScope(countryLink);
 
     if (countryContainer) {
       countryContainer.querySelectorAll('a[data-country]').forEach(function(link) {
@@ -711,7 +791,7 @@ document.addEventListener('click', function(event) {
 
   var monthLink = event.target.closest('.ys-months-container a[data-month]');
   if (monthLink) {
-    var monthScope = monthLink.closest('.ys-selector-block-container') || document;
+    var monthScope = getBlockScope(monthLink);
     updateMonthState(monthLink);
     applySliderWindowState(monthScope);
     event.preventDefault();
@@ -732,7 +812,7 @@ document.addEventListener('click', function(event) {
   var panelTrigger = event.target.closest('.ys-call-crew-button, .ys-book-now-button');
   if (panelTrigger) {
     var triggerCard = panelTrigger.closest('.ys-card');
-    var triggerScope = panelTrigger.closest('.ys-selector-block-container') || document;
+    var triggerScope = getBlockScope(panelTrigger);
     var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-contact-tools-group') : null;
 
     if (triggerCard) {
@@ -754,7 +834,7 @@ document.addEventListener('click', function(event) {
   var closeButton = event.target.closest('.ys-card-crew-close');
   if (closeButton) {
     var crewPanel = closeButton.closest('.ys-card-contact-tools-group');
-    var closeScope = closeButton.closest('.ys-selector-block-container') || document;
+    var closeScope = getBlockScope(closeButton);
 
     if (crewPanel) {
       crewPanel.classList.remove('show');
@@ -768,7 +848,7 @@ document.addEventListener('click', function(event) {
   var crewCloseButton = event.target.closest('.ys-card-crew-close-button');
   if (crewCloseButton) {
     var crewPanel = crewCloseButton.closest('.ys-card-contact-tools-group');
-    var crewCloseScope = crewCloseButton.closest('.ys-selector-block-container') || document;
+    var crewCloseScope = getBlockScope(crewCloseButton);
 
     if (crewPanel) {
       crewPanel.classList.toggle('show');
@@ -781,7 +861,7 @@ document.addEventListener('click', function(event) {
 
   var prevButton = event.target.closest('.ys-card-nav-container .ys-prev');
   if (prevButton) {
-    var prevScope = prevButton.closest('.ys-selector-block-container') || document;
+    var prevScope = getBlockScope(prevButton);
     goToRelativeCard(-1, prevScope);
     event.preventDefault();
     return;
@@ -789,7 +869,7 @@ document.addEventListener('click', function(event) {
 
   var nextButton = event.target.closest('.ys-card-nav-container .ys-next');
   if (nextButton) {
-    var nextScope = nextButton.closest('.ys-selector-block-container') || document;
+    var nextScope = getBlockScope(nextButton);
     goToRelativeCard(1, nextScope);
     event.preventDefault();
     return;
@@ -797,7 +877,7 @@ document.addEventListener('click', function(event) {
 
   var thumbnailButton = event.target.closest('.ys-card-thumbnail');
   if (thumbnailButton) {
-    var thumbnailScope = thumbnailButton.closest('.ys-selector-block-container') || document;
+    var thumbnailScope = getBlockScope(thumbnailButton);
     var targetCardId = thumbnailButton.getAttribute('data-card-id') || '';
     var targetCard = findCardByIdentifier(thumbnailScope, targetCardId);
 
@@ -812,7 +892,7 @@ document.addEventListener('click', function(event) {
 
   var selectedCard = event.target.closest('.ys-card');
   if (selectedCard && !selectedCard.classList.contains('location-hide')) {
-    var selectedScope = selectedCard.closest('.ys-selector-block-container') || document;
+    var selectedScope = getBlockScope(selectedCard);
     setSelectedCard(selectedCard, selectedScope);
     applySliderWindowState(selectedScope);
     return;
@@ -833,12 +913,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.querySelectorAll('.ys-selector-block-container').forEach(function(blockContainer) {
     closeAllCrewPanels(null, blockContainer);
+    initCardSliderGestures(blockContainer);
 
     blockContainer.querySelectorAll('.ys-card').forEach(function(card) {
       syncCardAvailabilityState(card);
     });
-
-    buildThumbnailRail(blockContainer);
 
     // Initialize month overlay per instance.
     blockContainer.querySelectorAll('.ys-months-container').forEach(function(monthContainer) {
