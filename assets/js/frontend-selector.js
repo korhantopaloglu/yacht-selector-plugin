@@ -181,36 +181,93 @@ function syncCardAvailabilityState(card) {
 // Month Overlay Controller
 var ENABLE_MONTH_TRACK_MOTION = false;
 
-function getMonthItems() {
-  return Array.prototype.slice.call(document.querySelectorAll('.ys-months-track .ys-month'));
+function getMonthTrack(scope) {
+  if (!scope) {
+    return document.querySelector('.ys-months-track');
+  }
+
+  if (scope.classList && scope.classList.contains('ys-months-track')) {
+    return scope;
+  }
+
+  if (scope.classList && scope.classList.contains('ys-months-header-wrapper')) {
+    return scope.querySelector('.ys-months-track');
+  }
+
+  if (scope.classList && scope.classList.contains('ys-months-container')) {
+    return scope.querySelector('.ys-months-track');
+  }
+
+  return scope.querySelector ? scope.querySelector('.ys-months-track') : document.querySelector('.ys-months-track');
 }
 
-function getSelectedMonthItem() {
-  return document.querySelector('.ys-months-track .ys-month.active, .ys-months-track .ys-month.selected');
+function getMonthContainer(scope) {
+  if (!scope) {
+    return null;
+  }
+
+  if (scope.classList && scope.classList.contains('ys-months-container')) {
+    return scope;
+  }
+
+  return scope.closest ? scope.closest('.ys-months-container') : null;
 }
 
-function resetMonthTrackTransform() {
-  var track = document.querySelector('.ys-months-track');
+function getMonthItems(scope) {
+  var track = getMonthTrack(scope || document);
+
   if (!track) {
+    return [];
+  }
+
+  return Array.prototype.slice.call(track.querySelectorAll('.ys-month'));
+}
+
+function getSelectedMonthItem(scope) {
+  var track = getMonthTrack(scope || document);
+
+  if (!track) {
+    return null;
+  }
+
+  return track.querySelector('.ys-month.active, .ys-month.selected');
+}
+
+function resetMonthTrackTransform(scope) {
+  if (scope) {
+    var scopedTrack = getMonthTrack(scope);
+    if (scopedTrack) {
+      scopedTrack.style.transform = '';
+    }
     return;
   }
 
-  track.style.transform = '';
+  document.querySelectorAll('.ys-months-track').forEach(function(track) {
+    track.style.transform = '';
+  });
 }
 
-function updateMonthOverlayFromItem(monthItem) {
+function updateMonthOverlayFromItem(monthItem, monthContainer) {
   if (!monthItem) {
     return;
   }
 
-  var overlay = document.querySelector('.ys-month-overlay');
+  var resolvedContainer = monthContainer || getMonthContainer(monthItem);
+  if (!resolvedContainer) {
+    return;
+  }
+
+  var overlay = resolvedContainer.querySelector('.ys-month-overlay');
   if (!overlay) {
     return;
   }
 
-  var fullLabel = monthItem.getAttribute('data-month-full') || monthItem.querySelector('.ys-month-label').textContent;
-  var density = monthItem.getAttribute('data-density') || monthItem.querySelector('.ys-month-density').textContent.replace('%', '');
-  var barFill = monthItem.querySelector('.ys-month-bar-fill').style.width;
+  var labelNode = monthItem.querySelector('.ys-month-label');
+  var densityNode = monthItem.querySelector('.ys-month-density');
+  var barNode = monthItem.querySelector('.ys-month-bar-fill');
+  var fullLabel = monthItem.getAttribute('data-month-full') || (labelNode ? labelNode.textContent : '');
+  var density = monthItem.getAttribute('data-density') || (densityNode ? densityNode.textContent.replace('%', '') : '0');
+  var barFill = barNode ? barNode.style.width : '0%';
 
   overlay.querySelector('.ys-month-overlay-label').textContent = fullLabel;
   overlay.querySelector('.ys-month-overlay-density').textContent = density + '%';
@@ -229,20 +286,24 @@ function getMonthItemCenter(monthItem) {
   return itemRect.left + (itemRect.width / 2) - trackRect.left;
 }
 
-function getOverlayCenter() {
-  var overlay = document.querySelector('.ys-month-overlay');
-  if (!overlay) {
+function getOverlayCenter(monthContainer) {
+  if (!monthContainer) {
     return 0;
   }
 
-  var wrapper = overlay.closest('.ys-months-header-wrapper');
+  var overlay = monthContainer.querySelector('.ys-month-overlay');
+  var wrapper = monthContainer.querySelector('.ys-months-header-wrapper');
+  if (!overlay || !wrapper) {
+    return 0;
+  }
+
   var wrapperRect = wrapper.getBoundingClientRect();
   var overlayRect = overlay.getBoundingClientRect();
 
   return overlayRect.left + (overlayRect.width / 2) - wrapperRect.left;
 }
 
-function centerMonthItemUnderOverlay(monthItem) {
+function centerMonthItemUnderOverlay(monthItem, monthContainer) {
   if (!ENABLE_MONTH_TRACK_MOTION) {
     return;
   }
@@ -251,13 +312,18 @@ function centerMonthItemUnderOverlay(monthItem) {
     return;
   }
 
-  var track = monthItem.closest('.ys-months-track');
+  var resolvedContainer = monthContainer || getMonthContainer(monthItem);
+  if (!resolvedContainer) {
+    return;
+  }
+
+  var track = resolvedContainer.querySelector('.ys-months-track');
   if (!track) {
     return;
   }
 
   var itemCenter = getMonthItemCenter(monthItem);
-  var overlayCenter = getOverlayCenter();
+  var overlayCenter = getOverlayCenter(resolvedContainer);
   var currentTransform = track.style.transform ? parseFloat(track.style.transform.replace('translateX(', '').replace('px)', '')) : 0;
   
   // Determine direction based on item position relative to overlay
@@ -278,18 +344,23 @@ function centerMonthItemUnderOverlay(monthItem) {
   track.style.transform = 'translateX(' + targetTransform + 'px)';
   
   // Mark the item as under overlay
-  getMonthItems().forEach(function(item) {
+  getMonthItems(resolvedContainer).forEach(function(item) {
     item.classList.remove('is-under-overlay');
   });
   monthItem.classList.add('is-under-overlay');
 }
 
-function setUnderlyingMonthState(monthItem) {
+function setUnderlyingMonthState(monthItem, monthContainer) {
   if (!monthItem) {
     return;
   }
 
-  getMonthItems().forEach(function(item) {
+  var resolvedContainer = monthContainer || getMonthContainer(monthItem);
+  if (!resolvedContainer) {
+    return;
+  }
+
+  getMonthItems(resolvedContainer).forEach(function(item) {
     item.classList.remove('is-under-overlay');
   });
   monthItem.classList.add('is-under-overlay');
@@ -302,6 +373,8 @@ function updateMonthState(selectedMonthLink) {
 
   var selectedMonth = selectedMonthLink.getAttribute('data-month') || '';
   var monthContainer = selectedMonthLink.closest('.ys-months-container');
+  var blockContainer = monthContainer ? monthContainer.closest('.ys-selector-block-container') : null;
+  var cardScope = blockContainer || document;
 
   if (monthContainer) {
     monthContainer.querySelectorAll('.ys-month').forEach(function(link) {
@@ -311,7 +384,7 @@ function updateMonthState(selectedMonthLink) {
     });
   }
 
-  document.querySelectorAll('.ys-card').forEach(function(card) {
+  cardScope.querySelectorAll('.ys-card').forEach(function(card) {
     var monthValues = (card.getAttribute('data-months') || '').split(',');
     var isBooked = monthValues.indexOf(selectedMonth) !== -1;
 
@@ -319,22 +392,130 @@ function updateMonthState(selectedMonthLink) {
   });
 
   // Update overlay immediately
-  updateMonthOverlayFromItem(selectedMonthLink);
+  updateMonthOverlayFromItem(selectedMonthLink, monthContainer);
 
   // Keep visual marker state without moving the month track.
-  setUnderlyingMonthState(selectedMonthLink);
-  resetMonthTrackTransform();
+  setUnderlyingMonthState(selectedMonthLink, monthContainer);
+  resetMonthTrackTransform(monthContainer);
   
   // Then animate track to center the month
   if (ENABLE_MONTH_TRACK_MOTION) {
-    centerMonthItemUnderOverlay(selectedMonthLink);
+    centerMonthItemUnderOverlay(selectedMonthLink, monthContainer);
   }
 }
 
-function getVisibleCards() {
-  return Array.prototype.slice.call(document.querySelectorAll('.ys-card')).filter(function(card) {
+
+function getScopeRoot(scope) {
+  return scope && scope.querySelectorAll ? scope : document;
+}
+
+function getCards(scope) {
+  return Array.prototype.slice.call(getScopeRoot(scope).querySelectorAll('.ys-card'));
+}
+
+function getVisibleCards(scope) {
+  return getCards(scope).filter(function(card) {
     return !card.classList.contains('location-hide');
   });
+}
+
+function getCardIdentifier(card) {
+  if (!card) {
+    return '';
+  }
+
+  return (card.getAttribute('data-card-id') || card.getAttribute('data-id') || card.getAttribute('data-card-index') || '').toString();
+}
+
+function findCardByIdentifier(scope, cardId) {
+  if (!cardId) {
+    return null;
+  }
+
+  var cards = getCards(scope);
+  for (var i = 0; i < cards.length; i += 1) {
+    if (getCardIdentifier(cards[i]) === cardId) {
+      return cards[i];
+    }
+  }
+
+  return null;
+}
+
+function getCardThumbnailImageSource(card) {
+  if (!card) {
+    return '';
+  }
+
+  var image = card.querySelector('.ys-card-image-container img');
+  if (image && image.getAttribute('src')) {
+    return image.getAttribute('src');
+  }
+
+  return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="90" viewBox="0 0 160 90"><rect width="160" height="90" fill="%23e2e8f0"/></svg>';
+}
+
+function buildThumbnailRail(scope) {
+  var root = getScopeRoot(scope);
+  var track = root.querySelector('.ys-card-thumbnail-track');
+
+  if (!track) {
+    return;
+  }
+
+  track.innerHTML = '';
+
+  getCards(root).forEach(function(card, index) {
+    var cardId = getCardIdentifier(card);
+    var titleNode = card.querySelector('.ys-card-content-container h3');
+    var title = titleNode ? titleNode.textContent.trim() : '';
+    var thumbnail = document.createElement('button');
+    var image = document.createElement('img');
+
+    thumbnail.type = 'button';
+    thumbnail.className = 'ys-card-thumbnail';
+    thumbnail.setAttribute('data-card-id', cardId);
+    thumbnail.setAttribute('aria-label', title ? 'Select ' + title : 'Select yacht ' + (index + 1));
+
+    image.className = 'ys-card-thumbnail-image';
+    image.src = getCardThumbnailImageSource(card);
+    image.alt = title || ('Yacht ' + (index + 1));
+
+    thumbnail.appendChild(image);
+    track.appendChild(thumbnail);
+  });
+}
+
+function syncThumbnailRailState(scope) {
+  var root = getScopeRoot(scope);
+  var track = root.querySelector('.ys-card-thumbnail-track');
+
+  if (!track) {
+    return;
+  }
+
+  var visibleIds = getVisibleCards(root).map(function(card) {
+    return getCardIdentifier(card);
+  });
+  var selectedCard = root.querySelector('.ys-card.selected');
+  var selectedId = selectedCard ? getCardIdentifier(selectedCard) : '';
+
+  track.querySelectorAll('.ys-card-thumbnail').forEach(function(thumbnail) {
+    var thumbnailId = thumbnail.getAttribute('data-card-id') || '';
+    var isVisible = visibleIds.indexOf(thumbnailId) !== -1;
+    var isActive = !!selectedId && selectedId === thumbnailId;
+
+    thumbnail.classList.toggle('is-hidden', !isVisible);
+    thumbnail.classList.toggle('active', isActive);
+    thumbnail.classList.toggle('is-selected', isActive);
+    thumbnail.hidden = !isVisible;
+    thumbnail.setAttribute('aria-current', isActive ? 'true' : 'false');
+  });
+
+  var activeThumbnail = track.querySelector('.ys-card-thumbnail.active');
+  if (activeThumbnail && activeThumbnail.scrollIntoView) {
+    activeThumbnail.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }
 }
 
 function getWrappedIndex(index, length) {
@@ -345,16 +526,19 @@ function getWrappedIndex(index, length) {
   return ((index % length) + length) % length;
 }
 
-function setSelectedCard(card) {
+function setSelectedCard(card, scope) {
   if (!card) {
     return;
   }
 
-  document.querySelectorAll('.ys-card.selected').forEach(function(selectedCard) {
+  var root = getScopeRoot(scope || card.closest('.ys-selector-block-container'));
+
+  root.querySelectorAll('.ys-card.selected').forEach(function(selectedCard) {
     selectedCard.classList.remove('selected');
   });
 
   card.classList.add('selected');
+  syncThumbnailRailState(root);
 }
 
 function getActiveCardIndex(cards) {
@@ -374,17 +558,19 @@ function getActiveCardIndex(cards) {
   return activeIndex;
 }
 
-function applySliderWindowState() {
-  var cards = getVisibleCards();
+function applySliderWindowState(scope) {
+  var root = getScopeRoot(scope);
+  var cards = getVisibleCards(root);
   var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'is-bg-card', 'slider-outside-window'];
 
-  document.querySelectorAll('.ys-card').forEach(function(card) {
+  root.querySelectorAll('.ys-card').forEach(function(card) {
     sliderStateClasses.forEach(function(className) {
       card.classList.remove(className);
     });
   });
 
   if (!cards.length) {
+    syncThumbnailRailState(root);
     return;
   }
 
@@ -414,26 +600,42 @@ function applySliderWindowState() {
 
     card.classList.add('slider-outside-window');
   });
+
+  syncThumbnailRailState(root);
 }
 
-function goToRelativeCard(step) {
-  var cards = getVisibleCards();
+function goToRelativeCard(step, scope) {
+  var root = getScopeRoot(scope);
+  var cards = getVisibleCards(root);
+  var cardsContainer = root.querySelector('.ys-cards-container');
 
   if (!cards.length) {
     return;
   }
 
+  if (cardsContainer) {
+    cardsContainer.classList.add('ys-no-active-slide');
+  }
+
   var activeIndex = getActiveCardIndex(cards);
   var nextIndex = getWrappedIndex(activeIndex + step, cards.length);
 
-  setSelectedCard(cards[nextIndex]);
-  applySliderWindowState();
+  setSelectedCard(cards[nextIndex], root);
+  applySliderWindowState(root);
+
+  if (cardsContainer) {
+    window.requestAnimationFrame(function() {
+      window.requestAnimationFrame(function() {
+        cardsContainer.classList.remove('ys-no-active-slide');
+      });
+    });
+  }
 }
 
-function syncCrewPanelOpenState() {
-  var hasOpenCrewPanel = false;
+function syncCrewPanelOpenState(scope) {
+  var root = getScopeRoot(scope);
 
-  document.querySelectorAll('.ys-card').forEach(function(card) {
+  root.querySelectorAll('.ys-card').forEach(function(card) {
     var panel = card.querySelector('.ys-card-contact-tools-group');
     var isOpen = panel ? panel.classList.contains('show') : false;
     var isSelectedCard = card.classList.contains('selected');
@@ -445,16 +647,15 @@ function syncCrewPanelOpenState() {
       card.style.height = 'auto';
     }
 
-    if (isOpen) {
-      hasOpenCrewPanel = true;
-    }
   });
 
-  document.body.classList.toggle('crew-card-open', hasOpenCrewPanel);
+  document.body.classList.toggle('crew-card-open', !!document.querySelector('.ys-card-contact-tools-group.show'));
 }
 
-function closeAllCrewPanels(exceptPanel) {
-  document.querySelectorAll('.ys-card-contact-tools-group.show').forEach(function(panel) {
+function closeAllCrewPanels(exceptPanel, scope) {
+  var root = getScopeRoot(scope);
+
+  root.querySelectorAll('.ys-card-contact-tools-group.show').forEach(function(panel) {
     if (exceptPanel && panel === exceptPanel) {
       return;
     }
@@ -462,7 +663,7 @@ function closeAllCrewPanels(exceptPanel) {
     panel.classList.remove('show');
   });
 
-  syncCrewPanelOpenState();
+  syncCrewPanelOpenState(root);
 }
 
 document.addEventListener('change', function(event) {
@@ -476,6 +677,7 @@ document.addEventListener('click', function(event) {
   if (countryLink) {
     var selectedCountry = countryLink.getAttribute('data-country') || 'all';
     var countryContainer = countryLink.closest('.ys-countries-container');
+    var blockContainer = countryLink.closest('.ys-selector-block-container') || document;
 
     if (countryContainer) {
       countryContainer.querySelectorAll('a[data-country]').forEach(function(link) {
@@ -485,7 +687,7 @@ document.addEventListener('click', function(event) {
       });
     }
 
-    document.querySelectorAll('.ys-card').forEach(function(card) {
+    blockContainer.querySelectorAll('.ys-card').forEach(function(card) {
       var cardCountry = card.getAttribute('data-location') || '';
       var shouldShow = selectedCountry === 'all' || cardCountry === selectedCountry;
 
@@ -500,8 +702,8 @@ document.addEventListener('click', function(event) {
       }
     });
 
-    syncCrewPanelOpenState();
-    applySliderWindowState();
+    syncCrewPanelOpenState(blockContainer);
+    applySliderWindowState(blockContainer);
 
     event.preventDefault();
     return;
@@ -509,8 +711,9 @@ document.addEventListener('click', function(event) {
 
   var monthLink = event.target.closest('.ys-months-container a[data-month]');
   if (monthLink) {
+    var monthScope = monthLink.closest('.ys-selector-block-container') || document;
     updateMonthState(monthLink);
-    applySliderWindowState();
+    applySliderWindowState(monthScope);
     event.preventDefault();
     return;
   }
@@ -529,18 +732,19 @@ document.addEventListener('click', function(event) {
   var panelTrigger = event.target.closest('.ys-call-crew-button, .ys-book-now-button');
   if (panelTrigger) {
     var triggerCard = panelTrigger.closest('.ys-card');
+    var triggerScope = panelTrigger.closest('.ys-selector-block-container') || document;
     var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-contact-tools-group') : null;
 
     if (triggerCard) {
-      setSelectedCard(triggerCard);
-      applySliderWindowState();
+      setSelectedCard(triggerCard, triggerScope);
+      applySliderWindowState(triggerScope);
     }
 
     if (triggerPanel) {
       var shouldOpenPanel = !triggerPanel.classList.contains('show');
-      closeAllCrewPanels(triggerPanel);
+      closeAllCrewPanels(triggerPanel, triggerScope);
       triggerPanel.classList.toggle('show', shouldOpenPanel);
-      syncCrewPanelOpenState();
+      syncCrewPanelOpenState(triggerScope);
     }
 
     event.preventDefault();
@@ -550,12 +754,13 @@ document.addEventListener('click', function(event) {
   var closeButton = event.target.closest('.ys-card-crew-close');
   if (closeButton) {
     var crewPanel = closeButton.closest('.ys-card-contact-tools-group');
+    var closeScope = closeButton.closest('.ys-selector-block-container') || document;
 
     if (crewPanel) {
       crewPanel.classList.remove('show');
     }
 
-    syncCrewPanelOpenState();
+    syncCrewPanelOpenState(closeScope);
     event.preventDefault();
     return;
   }
@@ -563,34 +768,53 @@ document.addEventListener('click', function(event) {
   var crewCloseButton = event.target.closest('.ys-card-crew-close-button');
   if (crewCloseButton) {
     var crewPanel = crewCloseButton.closest('.ys-card-contact-tools-group');
+    var crewCloseScope = crewCloseButton.closest('.ys-selector-block-container') || document;
 
     if (crewPanel) {
       crewPanel.classList.toggle('show');
     }
 
-    syncCrewPanelOpenState();
+    syncCrewPanelOpenState(crewCloseScope);
     event.preventDefault();
     return;
   }
 
   var prevButton = event.target.closest('.ys-card-nav-container .ys-prev');
   if (prevButton) {
-    goToRelativeCard(-1);
+    var prevScope = prevButton.closest('.ys-selector-block-container') || document;
+    goToRelativeCard(-1, prevScope);
     event.preventDefault();
     return;
   }
 
   var nextButton = event.target.closest('.ys-card-nav-container .ys-next');
   if (nextButton) {
-    goToRelativeCard(1);
+    var nextScope = nextButton.closest('.ys-selector-block-container') || document;
+    goToRelativeCard(1, nextScope);
+    event.preventDefault();
+    return;
+  }
+
+  var thumbnailButton = event.target.closest('.ys-card-thumbnail');
+  if (thumbnailButton) {
+    var thumbnailScope = thumbnailButton.closest('.ys-selector-block-container') || document;
+    var targetCardId = thumbnailButton.getAttribute('data-card-id') || '';
+    var targetCard = findCardByIdentifier(thumbnailScope, targetCardId);
+
+    if (targetCard && !targetCard.classList.contains('location-hide')) {
+      setSelectedCard(targetCard, thumbnailScope);
+      applySliderWindowState(thumbnailScope);
+    }
+
     event.preventDefault();
     return;
   }
 
   var selectedCard = event.target.closest('.ys-card');
   if (selectedCard && !selectedCard.classList.contains('location-hide')) {
-    setSelectedCard(selectedCard);
-    applySliderWindowState();
+    var selectedScope = selectedCard.closest('.ys-selector-block-container') || document;
+    setSelectedCard(selectedCard, selectedScope);
+    applySliderWindowState(selectedScope);
     return;
   }
 
@@ -606,42 +830,51 @@ document.addEventListener('click', function(event) {
 
 document.addEventListener('DOMContentLoaded', function() {
   resetMonthTrackTransform();
-  closeAllCrewPanels();
 
-  document.querySelectorAll('.ys-card').forEach(function(card) {
-    syncCardAvailabilityState(card);
-  });
+  document.querySelectorAll('.ys-selector-block-container').forEach(function(blockContainer) {
+    closeAllCrewPanels(null, blockContainer);
 
-  // Initialize month overlay
-  var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
-  if (activeMonthLink) {
-    updateMonthState(activeMonthLink);
-  } else {
-    // If no active month, find current month and set it
-    var currentMonth = new Date().getMonth() + 1; // 1-12
-    var monthItems = getMonthItems();
-    var currentMonthItem = monthItems.find(function(item) {
-      var itemMonth = parseInt(item.getAttribute('data-month'));
-      return itemMonth === currentMonth;
+    blockContainer.querySelectorAll('.ys-card').forEach(function(card) {
+      syncCardAvailabilityState(card);
     });
-    
-    if (currentMonthItem) {
-      updateMonthState(currentMonthItem);
-    } else if (monthItems.length > 0) {
-      updateMonthState(monthItems[0]);
-    }
-  }
 
-  applySliderWindowState();
+    buildThumbnailRail(blockContainer);
+
+    // Initialize month overlay per instance.
+    blockContainer.querySelectorAll('.ys-months-container').forEach(function(monthContainer) {
+      var activeMonthLink = getSelectedMonthItem(monthContainer);
+
+      if (activeMonthLink) {
+        updateMonthState(activeMonthLink);
+        return;
+      }
+
+      var currentMonth = new Date().getMonth() + 1;
+      var monthItems = getMonthItems(monthContainer);
+      var currentMonthItem = monthItems.find(function(item) {
+        return parseInt(item.getAttribute('data-month'), 10) === currentMonth;
+      });
+
+      if (currentMonthItem) {
+        updateMonthState(currentMonthItem);
+      } else if (monthItems.length > 0) {
+        updateMonthState(monthItems[0]);
+      }
+    });
+
+    applySliderWindowState(blockContainer);
+  });
 });
 
 window.addEventListener('resize', function() {
   resetMonthTrackTransform();
 
   if (ENABLE_MONTH_TRACK_MOTION) {
-    var activeMonthLink = document.querySelector('.ys-months-container .ys-month.active, .ys-months-container .ys-month.selected');
-    if (activeMonthLink) {
-      centerMonthItemUnderOverlay(activeMonthLink);
-    }
+    document.querySelectorAll('.ys-months-container').forEach(function(monthContainer) {
+      var activeMonthLink = getSelectedMonthItem(monthContainer);
+      if (activeMonthLink) {
+        centerMonthItemUnderOverlay(activeMonthLink, monthContainer);
+      }
+    });
   }
 });

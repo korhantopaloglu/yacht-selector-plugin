@@ -63,14 +63,16 @@ class YS_Shortcode {
 		$atts = shortcode_atts(
 			[
 				'block' => '',
+				'ui'    => '',
 			],
 			is_array( $atts ) ? $atts : [],
 			'ys_yacht_selector'
 		);
+		$ui_class = $this->build_ui_class( isset( $atts['ui'] ) ? (string) $atts['ui'] : '' );
 
 		if ( 'selector' === sanitize_key( $atts['block'] ) ) {
 			$this->enqueue_selector_assets();
-			return $this->render_selector_shortcode();
+			return $this->render_selector_shortcode( $ui_class );
 		}
 
 		$this->enqueue_default_assets();
@@ -103,6 +105,7 @@ class YS_Shortcode {
 				'container_id'     => $container_id,
 				'initial_items'    => $initial_items,
 				'active_item'      => $active_item,
+				'ui_class'         => $ui_class,
 			]
 		);
 	}
@@ -163,7 +166,7 @@ class YS_Shortcode {
 	 *
 	 * @return string
 	 */
-	private function render_selector_shortcode() {
+	private function render_selector_shortcode( $ui_class = '' ) {
 		$settings       = $this->get_selector_settings();
 		$items          = $this->get_selector_items( $settings );
 		$countries      = $this->get_selector_country_terms();
@@ -203,9 +206,26 @@ class YS_Shortcode {
 				'on_board_text'  => $on_board_text,
 				'offline_text'   => $offline_text,
 				'online_icon'    => $online_icon,
+				'ui_class'       => is_string( $ui_class ) ? $ui_class : '',
 			],
 			YS_PLUGIN_PATH . 'templates/shortcode-ys-selector-block.php'
 		);
+	}
+
+	/**
+	 * Build an optional ui-* modifier class from shortcode ui attribute.
+	 *
+	 * @param string $ui_value Raw shortcode ui attribute.
+	 * @return string
+	 */
+	private function build_ui_class( $ui_value ) {
+		$normalized = sanitize_title( $ui_value );
+
+		if ( '' === $normalized ) {
+			return '';
+		}
+
+		return sanitize_html_class( 'ui-' . $normalized );
 	}
 
 	/**

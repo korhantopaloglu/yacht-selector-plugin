@@ -20,6 +20,8 @@ $crew_subtitle  = isset( $crew_subtitle ) ? (string) $crew_subtitle : 'See the y
 $on_board_text  = isset( $on_board_text ) ? (string) $on_board_text : 'Currently on board: {crew_member}';
 $offline_text   = isset( $offline_text ) ? (string) $offline_text : 'Currently offline: {crew_member}';
 $online_icon    = isset( $online_icon ) ? (string) $online_icon : '';
+$ui_class       = isset( $ui_class ) ? sanitize_html_class( (string) $ui_class ) : '';
+$root_classes   = 'ys-selector-block-container' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
 
 if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 	/**
@@ -44,28 +46,30 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 	}
 }
 ?>
-<div id="<?php echo esc_attr( $container_id ); ?>" class="ys-selector-block-container">
+<div id="<?php echo esc_attr( $container_id ); ?>" class="<?php echo esc_attr( $root_classes ); ?>">
 	<div class="ys-header-wrapper">
 		<div class="ys-countries-container">
-			<a href="#" class="ys-country active" data-country="all">
-				<span class="ys-country-option__flag-wrap">
-					<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
-				</span>
-				<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
-			</a>
-			<?php foreach ( $countries as $country ) : ?>
-				<?php $flag_url = isset( $country['flag'] ) ? (string) $country['flag'] : ''; ?>
-				<a href="#" class="ys-country" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>">
+			<div class="ys-countries-mask">
+				<a href="#" class="ys-country active" data-country="all">
 					<span class="ys-country-option__flag-wrap">
-						<?php if ( '' !== $flag_url ) : ?>
-							<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
-						<?php else : ?>
-							<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
-						<?php endif; ?>
+						<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
 					</span>
-					<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
+					<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
 				</a>
-			<?php endforeach; ?>
+				<?php foreach ( $countries as $country ) : ?>
+					<?php $flag_url = isset( $country['flag'] ) ? (string) $country['flag'] : ''; ?>
+					<a href="#" class="ys-country" data-country="<?php echo esc_attr( $country['slug'] ?? '' ); ?>">
+						<span class="ys-country-option__flag-wrap">
+							<?php if ( '' !== $flag_url ) : ?>
+								<img class="ys-country-option__flag" src="<?php echo esc_url( $flag_url ); ?>" alt="<?php echo esc_attr( sprintf( __( '%s flag', 'yacht-selector' ), $country['name'] ?? '' ) ); ?>">
+							<?php else : ?>
+								<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
+							<?php endif; ?>
+						</span>
+						<span class="ys-country-option__label"><?php echo esc_html( $country['name'] ?? '' ); ?></span>
+					</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
 
 		<div class="ys-months-container">
@@ -397,6 +401,9 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 			<div class="ys-card-nav-container">
 				<button type="button" class="ys-prev"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
 				<button type="button" class="ys-next"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+				<nav class="ys-card-thumbnail-nav" aria-label="<?php esc_attr_e( 'Yacht thumbnails', 'yacht-selector' ); ?>">
+					<div class="ys-card-thumbnail-track"></div>
+				</nav>
 			</div>
 		</div>
 	<?php else : ?>

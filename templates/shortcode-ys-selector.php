@@ -10,6 +10,8 @@ $countries           = is_array( $countries ) ? $countries : [];
 $months              = is_array( $months ) ? $months : [];
 $selected_country    = is_string( $selected_country ) ? $selected_country : '';
 $selected_month      = is_string( $selected_month ) ? $selected_month : '';
+$ui_class            = isset( $ui_class ) ? sanitize_html_class( (string) $ui_class ) : '';
+$root_classes        = 'ys-yacht-selector' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
 $country_label       = '';
 $month_label         = '';
 $month_stats         = [
@@ -42,7 +44,7 @@ if ( $month_stats['total'] > 0 ) {
 	$month_stats['percentage'] = (int) round( ( $month_stats['booked'] / $month_stats['total'] ) * 100 );
 }
 ?>
-<div id="<?php echo esc_attr( $container_id ); ?>" class="ys-yacht-selector">
+<div id="<?php echo esc_attr( $container_id ); ?>" class="<?php echo esc_attr( $root_classes ); ?>">
 	<script type="application/json" class="ys-selector-data"><?php echo wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>
 
 	<div class="page">
