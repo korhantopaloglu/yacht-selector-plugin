@@ -62,7 +62,6 @@ class YS_Shortcode {
 
 		$atts = shortcode_atts(
 			[
-				'block' => '',
 				'ui'    => '',
 			],
 			is_array( $atts ) ? $atts : [],
@@ -70,73 +69,9 @@ class YS_Shortcode {
 		);
 		$ui_class = $this->build_ui_class( isset( $atts['ui'] ) ? (string) $atts['ui'] : '' );
 
-		if ( 'selector' === sanitize_key( $atts['block'] ) ) {
-			$this->enqueue_selector_assets();
-			return $this->render_selector_shortcode( $ui_class );
-		}
+		$this->enqueue_selector_assets();
 
-		$this->enqueue_default_assets();
-
-		$payload          = $this->get_payload();
-		$items            = isset( $payload['items'] ) && is_array( $payload['items'] ) ? $payload['items'] : [];
-		$months           = isset( $payload['months'] ) && is_array( $payload['months'] ) ? $payload['months'] : [];
-		$countries        = isset( $payload['countries'] ) && is_array( $payload['countries'] ) ? $payload['countries'] : [];
-		$selected_country = isset( $payload['selectedCountry'] ) ? (string) $payload['selectedCountry'] : '';
-		$selected_month   = isset( $payload['selectedMonth'] ) ? (string) $payload['selectedMonth'] : '';
-		$container_id     = $this->get_container_id();
-		$initial_items    = array_values(
-			array_filter(
-				$items,
-				static function( $item ) use ( $selected_country ) {
-					return isset( $item['country']['slug'] ) && $item['country']['slug'] === $selected_country;
-				}
-			)
-		);
-		$active_item      = ! empty( $initial_items ) ? $initial_items[0] : null;
-
-		return $this->render_template(
-			[
-				'payload'          => $payload,
-				'items'            => $items,
-				'months'           => $months,
-				'countries'        => $countries,
-				'selected_country' => $selected_country,
-				'selected_month'   => $selected_month,
-				'container_id'     => $container_id,
-				'initial_items'    => $initial_items,
-				'active_item'      => $active_item,
-				'ui_class'         => $ui_class,
-			]
-		);
-	}
-
-	/**
-	 * Enqueue assets for the default shortcode view.
-	 *
-	 * @return void
-	 */
-	private function enqueue_default_assets() {
-		wp_enqueue_style(
-			'ys-shortcode-default-prototype',
-			YS_PLUGIN_URL . 'templates/yacht-selector/assets/css/shortcode.css',
-			[],
-			YS_PLUGIN_VERSION
-		);
-
-		wp_enqueue_style(
-			'ys-frontend-default',
-			YS_PLUGIN_URL . 'assets/css/frontend-default.css',
-			[ 'ys-shortcode-default-prototype' ],
-			YS_PLUGIN_VERSION
-		);
-
-		wp_enqueue_script(
-			'ys-frontend-default',
-			YS_PLUGIN_URL . 'assets/js/frontend-default.js',
-			[],
-			YS_PLUGIN_VERSION,
-			true
-		);
+		return $this->render_selector_shortcode( $ui_class );
 	}
 
 	/**
@@ -226,111 +161,6 @@ class YS_Shortcode {
 		}
 
 		return sanitize_html_class( 'ui-' . $normalized );
-	}
-
-	/**
-	 * Build the frontend payload.
-	 *
-	 * @return array
-	 */
-	public function get_payload() {
-		$items            = $this->data_provider->get_items();
-		$months           = $this->get_month_options();
-		$countries        = $this->get_country_options( $items );
-		$selected_country = $this->get_default_country( $countries );
-		$selected_month   = $this->get_default_month( $months );
-
-		return [
-			'items'           => $items,
-			'months'          => $months,
-			'countries'       => $countries,
-			'selectedCountry' => $selected_country,
-			'selectedMonth'   => $selected_month,
-		];
-	}
-
-	/**
-	 * Generate current month + next 11 months.
-	 *
-	 * @return array
-	 */
-	public function get_month_options() {
-		$options   = [];
-		$timestamp = current_time( 'timestamp' );
-		$timezone  = wp_timezone();
-		$current   = new DateTimeImmutable( gmdate( 'Y-m-01 H:i:s', $timestamp ), new DateTimeZone( 'UTC' ) );
-		$current   = $current->setTimezone( $timezone );
-
-		for ( $i = 0; $i < 12; $i++ ) {
-			$month = $current->modify( '+' . $i . ' months' );
-
-			$options[] = [
-				'value' => $month->format( 'Y-m' ),
-				'label' => wp_date( 'F Y', $month->getTimestamp(), $timezone ),
-			];
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Get unique country options from items.
-	 *
-	 * @param array $items Normalized items.
-	 * @return array
-	 */
-	public function get_country_options( $items ) {
-		$countries = [];
-
-		foreach ( $items as $item ) {
-			if ( empty( $item['country']['slug'] ) || empty( $item['country']['name'] ) || empty( $item['country']['id'] ) ) {
-				continue;
-			}
-
-			$slug = (string) $item['country']['slug'];
-
-			if ( isset( $countries[ $slug ] ) ) {
-				continue;
-			}
-
-			$countries[ $slug ] = [
-				'id'   => (int) $item['country']['id'],
-				'name' => (string) $item['country']['name'],
-				'slug' => $slug,
-				'flag' => isset( $item['country']['flag'] ) ? (string) $item['country']['flag'] : '',
-			];
-		}
-
-		$countries = array_values( $countries );
-
-		usort(
-			$countries,
-			static function( $left, $right ) {
-				return strcasecmp( $left['name'], $right['name'] );
-			}
-		);
-
-		return $countries;
-	}
-
-	/**
-	 * Get default country slug.
-	 *
-	 * @param array $countries Country options.
-	 * @return string
-	 */
-	public function get_default_country( $countries ) {
-		return ! empty( $countries[0]['slug'] ) ? (string) $countries[0]['slug'] : '';
-	}
-
-	/**
-	 * Get default month value.
-	 *
-	 * @param array $months Month options.
-	 * @return string
-	 */
-	public function get_default_month( $months ) {
-		return ! empty( $months[0]['value'] ) ? (string) $months[0]['value'] : '';
 	}
 
 	/**
@@ -499,12 +329,12 @@ class YS_Shortcode {
 	}
 
 	/**
-	 * Get template path.
+	 * Get default shortcode template path.
 	 *
 	 * @return string
 	 */
 	public function get_template_path() {
-		return YS_PLUGIN_PATH . 'templates/shortcode-ys-selector.php';
+		return YS_PLUGIN_PATH . 'templates/shortcode-ys-selector-block.php';
 	}
 
 	/**
