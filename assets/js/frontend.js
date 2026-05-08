@@ -933,6 +933,30 @@ function getActiveCardIndex(cards) {
   return activeIndex;
 }
 
+function updateSliderCounter(scope) {
+  var root    = getScopeRoot(scope);
+  var counter = root.querySelector ? root.querySelector('.ys-slider-counter') : null;
+  if (!counter) { return; }
+
+  var cards = getVisibleCards(root);
+  var total = cards.length;
+  var currentIndex = 1;
+
+  for (var i = 0; i < cards.length; i++) {
+    if (cards[i].classList.contains('selected') || cards[i].classList.contains('is-active')) {
+      currentIndex = i + 1;
+      break;
+    }
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  var currentEl = counter.querySelector('.ys-slider-counter-current');
+  var totalEl   = counter.querySelector('.ys-slider-counter-total');
+  if (currentEl) { currentEl.textContent = pad(currentIndex); }
+  if (totalEl)   { totalEl.textContent   = pad(total); }
+}
+
 function applySliderWindowState(scope) {
   var root = getScopeRoot(scope);
   var cards = getVisibleCards(root);
@@ -983,6 +1007,7 @@ function applySliderWindowState(scope) {
   });
 
   syncThumbnailRailState(root);
+  updateSliderCounter(root);
 }
 
 function goToRelativeCard(step, scope) {

@@ -461,6 +461,11 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 			
 			<div class="ys-card-nav-container">
 				<button type="button" class="ys-prev"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+				<div class="ys-slider-counter" aria-live="polite" aria-atomic="true">
+					<span class="ys-slider-counter-current">01</span>
+					<span class="ys-slider-counter-separator" aria-hidden="true">/</span>
+					<span class="ys-slider-counter-total">01</span>
+				</div>
 				<button type="button" class="ys-next"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
 			</div>
 		</div>
