@@ -76,26 +76,56 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 		</div>
 
 		<div class="ys-months-container">
-			<div class="ys-months-mask">
-				<div class="ys-months-track">
-					<?php foreach ( $months as $month ) : ?>
-						<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) ? ' active' : ''; ?>" data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>" data-month-full="<?php echo esc_attr( $month['full'] ?? '' ); ?>" data-density="<?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>">
-							<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
-							<span class="ys-month-label-full"><?php echo esc_html( $month['full'] ?? '' ); ?></span>
-							<span class="ys-month-bar">
-								<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
-							</span>
-							<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
-						</a>
-					<?php endforeach; ?>
+			<div class="ys-months-header-wrapper">
+				<div class="ys-months-mask">
+					<div class="ys-months-mask-inner">
+						<?php 
+						if (!function_exists('render_month_items')) {
+							// Helper function to render month items
+							function render_month_items($months, $track_role, $track_index) {
+								foreach ( $months as $month_index => $month ) : ?>
+									<a href="#" class="ys-month<?php echo ! empty( $month['active'] ) && $track_role === 'original' ? ' active' : ''; ?>" 
+									data-month="<?php echo esc_attr( $month['month'] ?? '' ); ?>" 
+									data-month-full="<?php echo esc_attr( $month['full'] ?? '' ); ?>" 
+									data-density="<?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>"
+									data-month-key="<?php echo esc_attr( (string) ( $month['month'] ?? '' ) ); ?>"
+									data-track-role="<?php echo esc_attr( $track_role ); ?>"
+									data-track-index="<?php echo esc_attr( (string) $track_index ); ?>"
+									data-month-index="<?php echo esc_attr( (string) $month_index ); ?>">
+										<span class="ys-month-label"><?php echo esc_html( $month['label'] ?? '' ); ?></span>
+										<span class="ys-month-bar">
+											<span class="ys-month-bar-fill" style="width: <?php echo esc_attr( (string) ( $month['density'] ?? 0 ) ); ?>%;"></span>
+										</span>
+										<span class="ys-month-density"><?php echo esc_html( (string) ( $month['density'] ?? 0 ) ); ?>%</span>
+									</a>
+								<?php endforeach;
+							}
+						}
+						?>
+						
+						<!-- Pre Clone Track -->
+						<div class="ys-months-track ys-months-track-1" data-track-role="pre">
+							<?php render_month_items($months, 'pre', 0); ?>
+						</div>
+						
+						<!-- Original Track -->
+						<div class="ys-months-track ys-months-track-2" data-track-role="original">
+							<?php render_month_items($months, 'original', 1); ?>
+						</div>
+						
+						<!-- Post Clone Track -->
+						<div class="ys-months-track ys-months-track-3" data-track-role="post">
+							<?php render_month_items($months, 'post', 2); ?>
+						</div>
+					</div>
 				</div>
-			</div>
-			<div class="ys-month-overlay">
-				<span class="ys-month-overlay-label"></span>
-				<span class="ys-month-overlay-density"></span>
-				<span class="ys-month-overlay-bar">
-					<span class="ys-month-overlay-bar-fill"></span>
-				</span>
+				<div class="ys-month-overlay">
+					<span class="ys-month-overlay-label"></span>
+					<span class="ys-month-overlay-density"></span>
+					<span class="ys-month-overlay-bar">
+						<span class="ys-month-overlay-bar-fill"></span>
+					</span>
+				</div>
 			</div>
 		</div>
 

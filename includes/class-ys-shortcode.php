@@ -295,23 +295,7 @@ class YS_Shortcode {
 			];
 		}
 
-		$current_index = -1;
-
-		foreach ( $months as $index => $month_item ) {
-			if ( (int) ( $month_item['month'] ?? 0 ) === $current_month ) {
-				$current_index = (int) $index;
-				break;
-			}
-		}
-
-		if ( $current_index > 0 ) {
-			$months = array_merge(
-				array_slice( $months, $current_index ),
-				array_slice( $months, 0, $current_index )
-			);
-		}
-
-		return array_values( $months );
+		return $months;
 	}
 
 	/**

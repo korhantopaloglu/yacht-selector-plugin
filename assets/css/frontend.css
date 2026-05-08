@@ -192,7 +192,54 @@
   top: 440px; */
 }
 
-.ys-months-track,
+.ys-months-header-wrapper {
+  position: relative;
+}
+
+.ys-months-mask {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.ys-months-mask.is-drag-scroll-ready {
+  cursor: grab;
+}
+
+.ys-months-mask.is-month-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.ys-months-mask::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.ys-months-mask-inner {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: var(--ys-month-gap);
+}
+
+.ys-months-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--ys-month-gap);
+  align-items: center;
+  width: max-content;
+  flex-shrink: 0;
+}
+
+/* Remove transform transition from months tracks only */
+.ys-months-track {
+  transition: none;
+  will-change: auto;
+}
+
+/* Keep transform for countries and thumbnail tracks */
 .ys-countries-track,
 .ys-card-thumbnail-track {
   display: flex;
@@ -206,7 +253,8 @@
 
 
 .ys-month {
-  flex: 0 0 calc((100% + var(--ys-month-gap)) / 11 - var(--ys-month-gap));
+  /* flex: 0 0 calc((100% + var(--ys-month-gap)) / 11 - var(--ys-month-gap)); */
+  width: 70px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,7 +264,7 @@
   opacity: 0.9;
   transition: opacity 240ms ease, transform 240ms ease;
 }
-
+/* 
 @media (max-width: 1024px) {
   .ys-month {
     flex: 0 0 calc((100% + var(--ys-month-gap)) / 9 - var(--ys-month-gap));
@@ -227,7 +275,7 @@
   .ys-month {
     flex: 0 0 calc((100% + var(--ys-month-gap)) / 5 - var(--ys-month-gap));
   }
-}
+} */
 
 .ys-month-label {
   font-size: 14px;
@@ -408,6 +456,7 @@
 }
 
 .ys-card.location-hide,
+.ys-card.booked-hide,
 .ys-card.slider-outside-window {
   display: none;
 }
@@ -492,7 +541,7 @@
   display: block;
   width: 100%;
   height: clamp(360px, 65vh, 720px);
-  min-height: 360px;
+  min-height: 240px;
   object-fit: cover;
   object-position: center top ;
 }
@@ -582,7 +631,9 @@
   text-transform: uppercase;
   transform: translate(-50%, -50%);
 }
-
+.ys-card.booked {
+  display: none;
+}
 .ys-card.booked .booked-text {
   display: inline-flex;
 }
