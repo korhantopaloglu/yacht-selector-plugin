@@ -195,7 +195,56 @@ function syncCardAvailabilityState(card) {
 var ENABLE_MONTH_TRACK_MOTION = false;
 var MONTH_SCROLL_THRESHOLD = 60;
 var MONTH_DRAG_THRESHOLD = 6;
+var MONTH_SNAP_DURATION_MS = 260;
 var suppressMonthClickOnce = false;
+
+// Shared smooth-center animation — used by drag-snap and direct click.
+// Eases the mask scroll so targetItem's centre aligns with the mask centre.
+// Returns a cancel function (or null if no animation was needed).
+// Calls onComplete (if provided) once the animation finishes.
+function animateScrollToCenter(mask, targetItem, onComplete) {
+  if (!mask || !targetItem) {
+    if (onComplete) { onComplete(); }
+    return null;
+  }
+
+  var maskRect   = mask.getBoundingClientRect();
+  var itemRect   = targetItem.getBoundingClientRect();
+  var offset     = (itemRect.left + itemRect.width / 2) - (maskRect.left + maskRect.width / 2);
+  var fromScroll = mask.scrollLeft;
+  var toScroll   = fromScroll + offset;
+  var maxScroll  = Math.max(0, mask.scrollWidth - mask.clientWidth);
+  toScroll       = Math.max(0, Math.min(toScroll, maxScroll));
+
+  if (Math.abs(toScroll - fromScroll) < 1) {
+    if (onComplete) { onComplete(); }
+    return null;
+  }
+
+  var dist    = toScroll - fromScroll;
+  var startTs = null;
+  var rafId   = null;
+
+  function step(ts) {
+    if (startTs === null) { startTs = ts; }
+    var t = Math.min((ts - startTs) / MONTH_SNAP_DURATION_MS, 1);
+    mask.scrollLeft = fromScroll + dist * (1 - Math.pow(1 - t, 3)); // easeOutCubic
+
+    if (t < 1) {
+      rafId = requestAnimationFrame(step);
+    } else {
+      rafId = null;
+      mask.scrollLeft = toScroll;
+      if (onComplete) { onComplete(); }
+    }
+  }
+
+  rafId = requestAnimationFrame(step);
+
+  return function cancel() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  };
+}
 
 function getMonthTrack(scope) {
   if (!scope) {
@@ -385,11 +434,10 @@ function bindMonthDragScroll(monthContainer) {
   mask.setAttribute('data-month-drag-ready', '1');
   mask.classList.add('is-drag-scroll-ready');
 
-  // Momentum / snap tuning constants
+  // Momentum tuning constants
   var FRICTION         = 0.94;   // velocity multiplier per 60 fps frame (time-normalised below)
   var MIN_VELOCITY     = 0.25;   // px/ms — stop momentum below this
   var SAMPLE_WINDOW_MS = 100;    // rolling window used to compute release velocity
-  var SNAP_DURATION_MS = 260;    // duration of the final snap-easing animation
 
   var isPointerDown    = false;
   var isDragging       = false;
@@ -400,11 +448,11 @@ function bindMonthDragScroll(monthContainer) {
   var dragCaptureActive = false;
   var velSamples       = [];     // { t, x } recent pointer positions
   var momentumRafId    = null;
-  var snapRafId        = null;
+  var cancelSnapFn     = null;   // cancel handle returned by animateScrollToCenter
 
   function cancelAnimations() {
     if (momentumRafId !== null) { cancelAnimationFrame(momentumRafId); momentumRafId = null; }
-    if (snapRafId    !== null) { cancelAnimationFrame(snapRafId);    snapRafId    = null; }
+    if (cancelSnapFn  !== null) { cancelSnapFn(); cancelSnapFn = null; }
   }
 
   // Find the a.ys-month whose visual centre is closest to the mask centre.
@@ -432,43 +480,13 @@ function bindMonthDragScroll(monthContainer) {
     applySliderWindowState(scope);
   }
 
-  // Animate scroll so targetItem sits exactly at the mask centre, then select it.
+  // Snap to a month item using the shared animation, then select it.
   function snapToItem(targetItem) {
     if (!targetItem) { return; }
-
-    var maskRect   = mask.getBoundingClientRect();
-    var itemRect   = targetItem.getBoundingClientRect();
-    var offset     = (itemRect.left + itemRect.width / 2) - (maskRect.left + maskRect.width / 2);
-    var fromScroll = mask.scrollLeft;
-    var toScroll   = fromScroll + offset;
-    var maxScroll  = Math.max(0, mask.scrollWidth - mask.clientWidth);
-    toScroll       = Math.max(0, Math.min(toScroll, maxScroll));
-
-    if (Math.abs(toScroll - fromScroll) < 1) {
+    cancelSnapFn = animateScrollToCenter(mask, targetItem, function() {
+      cancelSnapFn = null;
       selectSnappedMonth(targetItem);
-      return;
-    }
-
-    var dist    = toScroll - fromScroll;
-    var startTs = null;
-
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-
-    function snapStep(ts) {
-      if (startTs === null) { startTs = ts; }
-      var t = Math.min((ts - startTs) / SNAP_DURATION_MS, 1);
-      mask.scrollLeft = fromScroll + dist * easeOutCubic(t);
-
-      if (t < 1) {
-        snapRafId = requestAnimationFrame(snapStep);
-      } else {
-        snapRafId = null;
-        mask.scrollLeft = toScroll;
-        selectSnappedMonth(targetItem);
-      }
-    }
-
-    snapRafId = requestAnimationFrame(snapStep);
+    });
   }
 
   // Derive release velocity (px/ms) from recent pointer samples.
@@ -1182,9 +1200,18 @@ document.addEventListener('click', function(event) {
       return;
     }
 
-    var monthScope = getBlockScope(monthLink);
+    var monthScope     = getBlockScope(monthLink);
+    var clickContainer = monthLink.closest('.ys-months-container');
+    var clickMask      = getMonthMask(clickContainer);
+
     updateMonthState(monthLink);
     applySliderWindowState(monthScope);
+
+    // Smoothly center the clicked month under the overlay using the shared helper.
+    if (clickMask) {
+      animateScrollToCenter(clickMask, monthLink, null);
+    }
+
     event.preventDefault();
     return;
   }
