@@ -469,28 +469,68 @@ function bindMonthDragScroll(monthContainer) {
     if (cancelSnapFn  !== null) { cancelSnapFn(); cancelSnapFn = null; }
   }
 
-  // Find the visually nearest a.ys-month, then resolve it to the canonical track-2 copy.
-  // This guarantees snap targets are always within the track-2 safe zone.
-  function findNearestTrack2Item() {
+  // Find the best snap target in the given scroll direction, using only track-2
+  // (canonical) items so the snap animation never ventures into clone territory.
+  //
+  // direction > 0 : scrollLeft was increasing (content moved left).
+  //   The "next" uncentered month is to the RIGHT of mask centre (diff >= 0).
+  //   Pick the track-2 item with the smallest non-negative diff.
+  //
+  // direction < 0 : scrollLeft was decreasing (content moved right).
+  //   The "next" uncentered month is to the LEFT of mask centre (diff <= 0).
+  //   Pick the track-2 item with the smallest non-positive diff (abs).
+  //
+  // direction === 0 : no clear direction — fall back to nearest item.
+  //
+  // A ±1 px slack around mask centre lets items that land virtually on-centre
+  // qualify for either direction, avoiding a "wrong side" snap for tiny offsets.
+  //
+  // If no directional candidate exists (clone boundary edge case after
+  // normalisation), falls back to the nearest track-2 item.
+  function findSnapTarget(direction) {
     var maskRect    = mask.getBoundingClientRect();
     var maskCenterX = maskRect.left + maskRect.width / 2;
-    var items       = maskInner.querySelectorAll('a.ys-month[data-month]');
-    var closest     = null;
-    var closestDist = Infinity;
+    var items       = monthContainer.querySelectorAll(
+      '.ys-months-track[data-track-role="original"] a.ys-month[data-month]'
+    );
+
+    var best     = null;
+    var bestDist = Infinity;
 
     for (var i = 0; i < items.length; i++) {
       var r    = items[i].getBoundingClientRect();
       var cx   = r.left + r.width / 2;
-      var dist = Math.abs(cx - maskCenterX);
-      if (dist < closestDist) { closestDist = dist; closest = items[i]; }
-    }
-    if (!closest) { return null; }
+      var diff = cx - maskCenterX; // positive = item is right of mask centre
 
-    var monthKey   = closest.getAttribute('data-month-key') || closest.getAttribute('data-month') || '';
-    var track2Copy = monthKey
-      ? monthContainer.querySelector('.ys-months-track[data-track-role="original"] .ys-month[data-month-key="' + monthKey + '"]')
-      : null;
-    return track2Copy || closest;
+      var isCandidate, dist;
+      if (direction > 0) {
+        // Snap continues rightward in content: pick first item at/right-of centre.
+        isCandidate = diff >= -1;
+        dist        = Math.max(0, diff);   // items within 1 px of centre treated as AT centre
+      } else if (direction < 0) {
+        // Snap continues leftward in content: pick first item at/left-of centre.
+        isCandidate = diff <= 1;
+        dist        = Math.max(0, -diff);
+      } else {
+        isCandidate = true;
+        dist        = Math.abs(diff);
+      }
+
+      if (isCandidate && dist < bestDist) { bestDist = dist; best = items[i]; }
+    }
+
+    // Fallback: no directional candidate — nearest track-2 item.
+    if (!best) {
+      bestDist = Infinity;
+      for (var j = 0; j < items.length; j++) {
+        var rj  = items[j].getBoundingClientRect();
+        var cxj = rj.left + rj.width / 2;
+        var dj  = Math.abs(cxj - maskCenterX);
+        if (dj < bestDist) { bestDist = dj; best = items[j]; }
+      }
+    }
+
+    return best || null; // already a track-2 item — no clone resolution needed
   }
 
   function selectSnappedMonth(monthItem) {
@@ -535,11 +575,11 @@ function bindMonthDragScroll(monthContainer) {
       var maxScroll = Math.max(0, mask.scrollWidth - mask.clientWidth);
 
       if (nextLeft <= 0 || nextLeft >= maxScroll) {
-        // Hard boundary — clamp, normalise, snap.
+        // Hard boundary — clamp, normalise, snap (direction from final velocity).
         mask.scrollLeft = Math.max(0, Math.min(nextLeft, maxScroll));
         momentumRafId   = null;
         normalizeMonthRailScroll(mask, monthContainer);
-        snapToItem(findNearestTrack2Item());
+        snapToItem(findSnapTarget(velocity));
         return;
       }
 
@@ -551,7 +591,7 @@ function bindMonthDragScroll(monthContainer) {
       } else {
         momentumRafId = null;
         normalizeMonthRailScroll(mask, monthContainer);
-        snapToItem(findNearestTrack2Item());
+        snapToItem(findSnapTarget(velocity)); // velocity still carries its sign
       }
     }
 
@@ -580,7 +620,7 @@ function bindMonthDragScroll(monthContainer) {
       startMomentum(velocity);
     } else {
       normalizeMonthRailScroll(mask, monthContainer);
-      snapToItem(findNearestTrack2Item());
+      snapToItem(findSnapTarget(velocity)); // velocity carries drag-release direction
     }
   }
 
