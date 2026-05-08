@@ -26,6 +26,55 @@
   box-sizing: border-box;
 }
 
+.ys-selector-inner {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ys-selector.is-loading .ys-selector-inner {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ys-selector-loader {
+  display: none;
+}
+
+.ys-selector.is-loading .ys-selector-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 420px;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.ys-selector-loader-text {
+  font-size: 1rem;
+  line-height: 1.45;
+  color: rgba(51, 65, 85, 0.88);
+}
+
+.ys-selector.is-ready .ys-selector-inner {
+  opacity: 1;
+  transition: opacity 240ms ease;
+}
+
+.ys-card .ys-card-image {
+  transition: filter 240ms ease, opacity 240ms ease;
+}
+
+.ys-card:not(.is-active) .ys-card-image {
+  filter: blur(3px);
+}
+
+.ys-card.is-active .ys-card-image {
+  filter: none;
+}
+
 .ys-card-group-title {
   display: none;
 }

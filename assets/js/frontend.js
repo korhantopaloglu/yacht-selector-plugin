@@ -898,17 +898,6 @@ function initializeMonthInfiniteScroll(monthContainer) {
   }
 }
 
-// Event Handlers
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize month infinite scroll for each selector block
-  document.querySelectorAll('.ys-selector-block-container').forEach(function(blockContainer) {
-    var monthContainer = blockContainer.querySelector('.ys-months-container');
-    if (monthContainer) {
-      initializeMonthInfiniteScroll(monthContainer);
-    }
-  });
-});
-
 window.addEventListener('resize', function() {
   // Re-initialize month scroll for each container
   document.querySelectorAll('.ys-months-container').forEach(function(monthContainer) {
@@ -954,6 +943,170 @@ function getBlockScope(node) {
 function getCards(scope) {
   return Array.prototype.slice.call(getScopeRoot(scope).querySelectorAll('.ys-card'));
 }
+
+/**
+ * Compare resolved img[src] with a target URL (handles absolute vs relative).
+ *
+ * @param {HTMLImageElement} img Image element.
+ * @param {string} url Target URL.
+ * @returns {boolean}
+ */
+function imageSrcMatches(img, url) {
+  if (!img || !url) {
+    return false;
+  }
+
+  var current = img.getAttribute('src') || '';
+
+  if (current === url) {
+    return true;
+  }
+
+  try {
+    var absCurrent = new URL(current, window.location.href).href;
+    var absTarget = new URL(url, window.location.href).href;
+    return absCurrent === absTarget;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Active cards load full-size images asynchronously; side cards use thumbnails (with blur via CSS).
+ *
+ * @param {ParentNode|Document|null} scope Scope root or document.
+ * @returns {void}
+ */
+function updateCardImages(scope) {
+  getCards(scope).forEach(function(card) {
+    var images = card.querySelectorAll('.ys-card-image');
+
+    if (!images.length) {
+      return;
+    }
+
+    images.forEach(function(image) {
+      var fullSrc = image.getAttribute('data-full-src') || '';
+      var thumbSrc = image.getAttribute('data-thumb-src') || '';
+
+      if (!thumbSrc && fullSrc) {
+        thumbSrc = fullSrc;
+      }
+
+      if (!fullSrc) {
+        fullSrc = thumbSrc;
+      }
+
+      if (card.classList.contains('is-active')) {
+        if (!fullSrc) {
+          return;
+        }
+
+        if (imageSrcMatches(image, fullSrc)) {
+          card.classList.add('is-full-image-loaded');
+          return;
+        }
+
+        if (!thumbSrc || thumbSrc === fullSrc) {
+          image.src = fullSrc;
+          card.classList.add('is-full-image-loaded');
+          return;
+        }
+
+        var gen = String(parseInt(image.getAttribute('data-ys-img-gen') || '0', 10) + 1);
+        image.setAttribute('data-ys-img-gen', gen);
+
+        var preload = new Image();
+        preload.decoding = 'async';
+
+        preload.onload = function() {
+          if (image.getAttribute('data-ys-img-gen') !== gen || !card.classList.contains('is-active')) {
+            return;
+          }
+
+          image.src = fullSrc;
+          card.classList.add('is-full-image-loaded');
+        };
+
+        preload.onerror = function() {
+          if (image.getAttribute('data-ys-img-gen') !== gen || !card.classList.contains('is-active')) {
+            return;
+          }
+
+          image.src = fullSrc;
+          card.classList.remove('is-full-image-loaded');
+        };
+
+        preload.src = fullSrc;
+      } else if (thumbSrc && !imageSrcMatches(image, thumbSrc)) {
+        image.src = thumbSrc;
+        card.classList.remove('is-full-image-loaded');
+      }
+    });
+  });
+}
+
+/**
+ * Reveal the selector after initial JS layout (slider, months, images).
+ *
+ * @param {Element|null} scope Block container.
+ * @returns {void}
+ */
+function markSelectorReady(scope) {
+  var root = scope && scope.classList && scope.classList.contains('ys-selector-block-container')
+    ? scope
+    : null;
+
+  if (!root) {
+    return;
+  }
+
+  root.classList.remove('is-loading');
+  root.classList.add('is-ready');
+
+  var loader = root.querySelector('.ys-selector-loader');
+
+  if (loader) {
+    loader.setAttribute('aria-hidden', 'true');
+    loader.removeAttribute('aria-busy');
+  }
+}
+
+/**
+ * Initialise one selector block (cards, months, images, ready state).
+ *
+ * @param {Element} blockContainer Root `.ys-selector-block-container`.
+ * @returns {void}
+ */
+function initSelectorBlock(blockContainer) {
+  if (!blockContainer) {
+    return;
+  }
+
+  var monthContainer = blockContainer.querySelector('.ys-months-container');
+
+  if (monthContainer) {
+    initializeMonthInfiniteScroll(monthContainer);
+  }
+
+  closeAllCrewPanels(null, blockContainer);
+  initCardSliderGestures(blockContainer);
+
+  blockContainer.querySelectorAll('.ys-card').forEach(function(card) {
+    syncCardAvailabilityState(card);
+  });
+
+  applySliderWindowState(blockContainer);
+  updateCardImages(blockContainer);
+
+  window.requestAnimationFrame(function() {
+    window.requestAnimationFrame(function() {
+      markSelectorReady(blockContainer);
+    });
+  });
+}
+
+window.ysYachtSelectorInitBlock = initSelectorBlock;
 
 function getVisibleCards(scope) {
   return getCards(scope).filter(function(card) {
@@ -1093,6 +1246,8 @@ function applySliderWindowState(scope) {
 
   if (!cards.length) {
     syncThumbnailRailState(root);
+    updateSliderCounter(root);
+    updateCardImages(root);
     return;
   }
 
@@ -1131,6 +1286,7 @@ function applySliderWindowState(scope) {
 
   syncThumbnailRailState(root);
   updateSliderCounter(root);
+  updateCardImages(root);
 }
 
 function goToRelativeCard(step, scope) {
@@ -1510,14 +1666,5 @@ document.addEventListener('click', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.ys-selector-block-container').forEach(function(blockContainer) {
-    closeAllCrewPanels(null, blockContainer);
-    initCardSliderGestures(blockContainer);
-
-    blockContainer.querySelectorAll('.ys-card').forEach(function(card) {
-      syncCardAvailabilityState(card);
-    });
-  });
-  
-  applySliderWindowState();
+  document.querySelectorAll('.ys-selector-block-container').forEach(initSelectorBlock);
 });

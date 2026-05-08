@@ -21,7 +21,7 @@ $on_board_text  = isset( $on_board_text ) ? (string) $on_board_text : 'Currently
 $offline_text   = isset( $offline_text ) ? (string) $offline_text : 'Currently offline: {crew_member}';
 $online_icon    = isset( $online_icon ) ? (string) $online_icon : '';
 $ui_class       = isset( $ui_class ) ? sanitize_html_class( (string) $ui_class ) : '';
-$root_classes   = 'ys-selector-block-container' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
+$root_classes   = 'ys-selector ys-selector-block-container is-loading' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
 $thumbnail_placeholder = 'data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%2290%22 viewBox=%220 0 160 90%22%3E%3Crect width=%22160%22 height=%2290%22 fill=%22%23e2e8f0%22/%3E%3C/svg%3E';
 
 if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
@@ -48,6 +48,10 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 }
 ?>
 <div id="<?php echo esc_attr( $container_id ); ?>" class="<?php echo esc_attr( $root_classes ); ?>">
+	<div class="ys-selector-loader" role="status" aria-live="polite" aria-busy="true">
+		<span class="ys-selector-loader-text"><?php esc_html_e( 'Preparing your yacht selection...', 'yacht-selector' ); ?></span>
+	</div>
+	<div class="ys-selector-inner">
 	<div class="ys-header-wrapper">
 		<div class="ys-countries-container">
 			<div class="ys-countries-mask">
@@ -136,7 +140,9 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						<?php
 						$thumbnail_card_id = isset( $thumbnail_item['id'] ) ? (string) $thumbnail_item['id'] : '';
 						$thumbnail_title   = isset( $thumbnail_item['title'] ) ? (string) $thumbnail_item['title'] : '';
-						$thumbnail_image   = isset( $thumbnail_item['image'] ) && '' !== (string) $thumbnail_item['image'] ? (string) $thumbnail_item['image'] : $thumbnail_placeholder;
+						$thumbnail_full    = isset( $thumbnail_item['image'] ) && '' !== (string) $thumbnail_item['image'] ? (string) $thumbnail_item['image'] : '';
+						$thumbnail_thumb   = isset( $thumbnail_item['image_thumb'] ) && '' !== (string) $thumbnail_item['image_thumb'] ? (string) $thumbnail_item['image_thumb'] : $thumbnail_full;
+						$thumbnail_image   = '' !== $thumbnail_thumb ? $thumbnail_thumb : ( '' !== $thumbnail_full ? $thumbnail_full : $thumbnail_placeholder );
 						?>
 						<button
 							type="button"
@@ -149,6 +155,8 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 								class="ys-card-thumbnail-image"
 								src="<?php echo esc_url( $thumbnail_image ); ?>"
 								alt="<?php echo esc_attr( '' !== $thumbnail_title ? $thumbnail_title : sprintf( __( 'Yacht %d', 'yacht-selector' ), (int) ( $thumbnail_index + 1 ) ) ); ?>"
+								loading="lazy"
+								decoding="async"
 							>
 						</button>
 					<?php endforeach; ?>
@@ -182,8 +190,12 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 				sort( $month_numbers, SORT_NUMERIC );
 
 				$location_slug = isset( $item['country']['slug'] ) ? (string) $item['country']['slug'] : '';
-				$title         = isset( $item['title'] ) ? (string) $item['title'] : '';
-				$image_url     = isset( $item['image'] ) ? (string) $item['image'] : '';
+				$title           = isset( $item['title'] ) ? (string) $item['title'] : '';
+				$image_url       = isset( $item['image'] ) ? (string) $item['image'] : '';
+				$image_thumb_url = isset( $item['image_thumb'] ) ? (string) $item['image_thumb'] : '';
+				if ( '' === $image_thumb_url ) {
+					$image_thumb_url = $image_url;
+				}
 				$model         = isset( $item['model'] ) ? (string) $item['model'] : '';
 				$country_name  = isset( $item['country']['name'] ) ? (string) $item['country']['name'] : '';
 				$port          = isset( $item['port']['name'] ) ? (string) $item['port']['name'] : '';
@@ -219,7 +231,6 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 				$crew_members  = isset( $item['assigned_crew'] ) && is_array( $item['assigned_crew'] ) ? $item['assigned_crew'] : [];
 				$priority      = isset( $item['priority'] ) ? (int) $item['priority'] : 0;
 				$permalink     = isset( $item['url'] ) ? (string) $item['url'] : '';
-				$card_classes  = 'ys-card' . ( 0 === $index ? ' selected' : '' );
 				$dimensions    = [];
 				$length_value  = isset( $item['length'] ) && null !== $item['length'] ? (string) $item['length'] : '';
 				$beam_value    = isset( $item['beam'] ) && null !== $item['beam'] ? (string) $item['beam'] : '';
@@ -263,10 +274,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					}
 				}
 				
-				$card_classes = 'ys-card';
-				if ( $priority === 0 ) {
-					$card_classes .= ' is-active';
-				}
+				$card_classes = 'ys-card' . ( 0 === $index ? ' selected' : '' );
 				if ( $any_crew_online ) {
 					$card_classes .= ' crew-online';
 				}
@@ -284,8 +292,21 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 
 					<div class="ys-card-content-group">
 					<div class="ys-card-image-container">
-						<?php if ( '' !== $image_url ) : ?>
-							<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>">
+						<?php if ( '' !== $image_url || '' !== $image_thumb_url ) : ?>
+							<?php
+							$card_img_src   = '' !== $image_thumb_url ? $image_thumb_url : $image_url;
+							$card_img_full  = '' !== $image_url ? $image_url : $card_img_src;
+							$card_img_thumb = '' !== $image_thumb_url ? $image_thumb_url : $card_img_full;
+							?>
+							<img
+								class="ys-card-image"
+								src="<?php echo esc_url( $card_img_src ); ?>"
+								data-full-src="<?php echo esc_url( $card_img_full ); ?>"
+								data-thumb-src="<?php echo esc_url( $card_img_thumb ); ?>"
+								alt="<?php echo esc_attr( $title ); ?>"
+								loading="lazy"
+								decoding="async"
+							>
 						<?php endif; ?>
 					</div>
 
@@ -379,8 +400,21 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 							<div class="ys-card-contact-tools-group-container">
 							<button type="button" class="ys-card-crew-close" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>">&times;</button>
 							<div class="ys-card-image-container">
-								<?php if ( '' !== $image_url ) : ?>
-									<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $title ); ?>">
+								<?php if ( '' !== $image_url || '' !== $image_thumb_url ) : ?>
+									<?php
+									$card_img_src   = '' !== $image_thumb_url ? $image_thumb_url : $image_url;
+									$card_img_full  = '' !== $image_url ? $image_url : $card_img_src;
+									$card_img_thumb = '' !== $image_thumb_url ? $image_thumb_url : $card_img_full;
+									?>
+									<img
+										class="ys-card-image"
+										src="<?php echo esc_url( $card_img_src ); ?>"
+										data-full-src="<?php echo esc_url( $card_img_full ); ?>"
+										data-thumb-src="<?php echo esc_url( $card_img_thumb ); ?>"
+										alt="<?php echo esc_attr( $title ); ?>"
+										loading="lazy"
+										decoding="async"
+									>
 								<?php endif; ?>
 							</div>
 							<h3><?php echo esc_html( $title ); ?></h3>
@@ -472,4 +506,5 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 	<?php else : ?>
 		<div class="ys-empty-state-container"><?php echo esc_html( $empty_text ); ?></div>
 	<?php endif; ?>
+	</div>
 </div>

@@ -168,6 +168,7 @@ class YS_Data_Provider {
 			'title'        => get_the_title( $post ),
 			'url'          => get_permalink( $post ),
 			'image'        => $this->resolve_image_url( $post->ID ),
+			'image_thumb'  => $this->resolve_image_thumb_url( $post->ID ),
 			'country'      => $location['country'],
 			'port'         => $location['port'],
 			'booked'       => $this->get_booked_months( $post->ID ),
@@ -323,6 +324,32 @@ class YS_Data_Provider {
 		}
 
 		return $this->get_placeholder_image_url();
+	}
+
+	/**
+	 * Resolve card image URL for thumbnails / side cards (WordPress `thumbnail` size when attachment-backed).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	public function resolve_image_thumb_url( $post_id ) {
+		$card_image_id = absint( get_post_meta( $post_id, 'ys_card_image_id', true ) );
+
+		if ( $card_image_id ) {
+			$card_thumb_url = wp_get_attachment_image_url( $card_image_id, 'thumbnail' );
+
+			if ( $card_thumb_url ) {
+				return $card_thumb_url;
+			}
+		}
+
+		$featured_thumb_url = get_the_post_thumbnail_url( $post_id, 'thumbnail' );
+
+		if ( $featured_thumb_url ) {
+			return $featured_thumb_url;
+		}
+
+		return $this->resolve_image_url( $post_id );
 	}
 
 	/**
