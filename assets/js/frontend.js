@@ -936,7 +936,7 @@ function getActiveCardIndex(cards) {
 function applySliderWindowState(scope) {
   var root = getScopeRoot(scope);
   var cards = getVisibleCards(root);
-  var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'is-bg-card', 'slider-outside-window'];
+  var sliderStateClasses = ['is-active', 'is-pos-1', 'is-pos-2', 'is-pos-3', 'is-pos-4', 'is-pos-5', 'is-neg-1', 'is-neg-2', 'is-neg-3', 'is-neg-4', 'is-neg-5', 'is-bg-card', 'slider-outside-window'];
 
   root.querySelectorAll('.ys-card').forEach(function(card) {
     sliderStateClasses.forEach(function(className) {
@@ -961,13 +961,13 @@ function applySliderWindowState(scope) {
       return;
     }
 
-    if (forwardDistance <= 3 && (forwardDistance < backwardDistance || backwardDistance > 3)) {
+    if (forwardDistance <= 5 && (forwardDistance < backwardDistance || backwardDistance > 5)) {
       card.classList.add('is-pos-' + forwardDistance);
       card.classList.add('is-bg-card');
       return;
     }
 
-    if (backwardDistance <= 3) {
+    if (backwardDistance <= 5) {
       card.classList.add('is-neg-' + backwardDistance);
       card.classList.add('is-bg-card');
       return;
@@ -1308,11 +1308,31 @@ document.addEventListener('click', function(event) {
     return;
   }
 
-  var selectedCard = event.target.closest('.ys-card');
-  if (selectedCard && !selectedCard.classList.contains('location-hide') && !selectedCard.classList.contains('booked-hide')) {
-    var selectedScope = getBlockScope(selectedCard);
-    setSelectedCard(selectedCard, selectedScope);
-    applySliderWindowState(selectedScope);
+  var clickedCard = event.target.closest('.ys-card');
+  if (clickedCard && !clickedCard.classList.contains('location-hide') && !clickedCard.classList.contains('booked-hide')) {
+    var cardScope = getBlockScope(clickedCard);
+
+    // Active card clicked — nothing to do.
+    if (clickedCard.classList.contains('is-active') || clickedCard.classList.contains('selected')) {
+      return;
+    }
+
+    // Side card clicked — navigate one step in the card's direction.
+    var navStep = 0;
+    var cl = clickedCard.classList;
+    for (var n = 1; n <= 5; n++) {
+      if (cl.contains('is-pos-' + n)) { navStep =  1; break; }
+      if (cl.contains('is-neg-' + n)) { navStep = -1; break; }
+    }
+
+    if (navStep !== 0) {
+      goToRelativeCard(navStep, cardScope);
+      return;
+    }
+
+    // Fallback: direct selection (e.g. card has no window class yet).
+    setSelectedCard(clickedCard, cardScope);
+    applySliderWindowState(cardScope);
     return;
   }
 

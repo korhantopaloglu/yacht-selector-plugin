@@ -483,38 +483,73 @@
   filter: saturate(0.6);
 }
 
+.ys-card.is-pos-4,
+.ys-card.is-neg-4 {
+  z-index: 3;
+  opacity: 0.13;
+  filter: saturate(0.48);
+}
+
+.ys-card.is-pos-5,
+.ys-card.is-neg-5 {
+  z-index: 2;
+  opacity: 0.06;
+  filter: saturate(0.36);
+}
+
 .ys-card.is-pos-1 {
   top: 72px;
-  transform: translateX(calc(var(--ys-slider-step) * 0.5)) scale(0.97);
+  transform: translateX(calc(var(--ys-slider-step) * 0.35)) scale(0.97);
 }
 
 .ys-card.is-pos-2 {
   top: 92px;
-  transform: translateX(calc(var(--ys-slider-step) * 0.86)) scale(0.94);
+  transform: translateX(calc(var(--ys-slider-step) * 0.6)) scale(0.94);
 }
 
 .ys-card.is-pos-3 {
-  transform: translateX(calc(var(--ys-slider-step) * 1.22)) scale(0.88);
+  transform: translateX(calc(var(--ys-slider-step) * 0.9)) scale(0.88);
   top: 102px;
+}
+
+.ys-card.is-pos-4 {
+  transform: translateX(calc(var(--ys-slider-step) * 1.1)) scale(0.82);
+  top: 110px;
+}
+
+.ys-card.is-pos-5 {
+  transform: translateX(calc(var(--ys-slider-step) * 1.43)) scale(0.76);
+  top: 116px;
 }
 
 .ys-card.is-neg-1 {
   top: 72px;
-  transform: translateX(calc(var(--ys-slider-step) * -0.5)) scale(0.97);
+  transform: translateX(calc(var(--ys-slider-step) * -0.35)) scale(0.97);
 }
 
 .ys-card.is-neg-2 {
   top: 92px;
-  transform: translateX(calc(var(--ys-slider-step) * -0.86)) scale(0.94);
+  transform: translateX(calc(var(--ys-slider-step) * -0.6)) scale(0.94);
 }
 
 .ys-card.is-neg-3 {
-  transform: translateX(calc(var(--ys-slider-step) * -1.22)) scale(0.88);
+  transform: translateX(calc(var(--ys-slider-step) * -0.9)) scale(0.88);
   top: 102px;
+}
+
+.ys-card.is-neg-4 {
+  transform: translateX(calc(var(--ys-slider-step) * -1.1)) scale(0.82);
+  top: 110px;
+}
+
+.ys-card.is-neg-5 {
+  transform: translateX(calc(var(--ys-slider-step) * -1.43)) scale(0.76);
+  top: 116px;
 }
 
 .ys-card.is-bg-card {
   position: absolute;
+  cursor: pointer;
 }
 
 .ys-card.is-bg-card .ys-card-content-container,
@@ -565,6 +600,16 @@
 .ys-card.is-pos-3 .ys-card-image-container img,
 .ys-card.is-neg-3 .ys-card-image-container img {
   height: 40vh;
+}
+
+.ys-card.is-pos-4 .ys-card-image-container img,
+.ys-card.is-neg-4 .ys-card-image-container img {
+  height: 36vh;
+}
+
+.ys-card.is-pos-5 .ys-card-image-container img,
+.ys-card.is-neg-5 .ys-card-image-container img {
+  height: 32vh;
 }
 
 .ys-card-content-container {
@@ -1311,6 +1356,16 @@
   .ys-card.is-pos-3 .ys-card-image-container img,
   .ys-card.is-neg-3 .ys-card-image-container img {
     height: 36vw;
+  }
+
+  .ys-card.is-pos-4 .ys-card-image-container img,
+  .ys-card.is-neg-4 .ys-card-image-container img {
+    height: 32vw;
+  }
+
+  .ys-card.is-pos-5 .ys-card-image-container img,
+  .ys-card.is-neg-5 .ys-card-image-container img {
+    height: 28vw;
   }
 
   .ys-card-content-container h3::before {
