@@ -204,6 +204,13 @@
   -ms-overflow-style: none; /* IE/Edge */
 }
 
+/* Applied by normalizeMonthRailScroll() around every instant re-centre jump.
+   Forces scroll-behavior: auto so any in-flight CSS smooth scroll (e.g. from
+   scrollTo({ behavior: 'smooth' })) cannot animate the normalisation jump. */
+.ys-months-mask.is-normalizing-scroll {
+  scroll-behavior: auto !important;
+}
+
 .ys-months-mask.is-drag-scroll-ready {
   cursor: grab;
 }

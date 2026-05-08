@@ -193,7 +193,6 @@ function syncCardAvailabilityState(card) {
 
 // Month Overlay Controller
 var ENABLE_MONTH_TRACK_MOTION = false;
-var MONTH_SCROLL_THRESHOLD = 60;
 var MONTH_DRAG_THRESHOLD = 6;
 var MONTH_SNAP_DURATION_MS = 260;
 var suppressMonthClickOnce = false;
@@ -365,64 +364,80 @@ function findBestVisibleMonthItem(monthContainer, monthKey) {
   return closestItem;
 }
 
-function normalizeMonthScrollPosition(monthContainer) {
-  var mask = getMonthMask(monthContainer);
-  if (!mask) {
-    return;
+// Silently re-centre scrollLeft back into the track-2 (original) zone.
+// Uses getBoundingClientRect so the result is correct regardless of layout gaps.
+// threshold = max(15 % of trackWidth, full mask width) — wide enough to cover
+// legitimate centering positions for the first and last months of track-2.
+//
+// The jump is made invisible by:
+//   1. Adding .is-normalizing-scroll (scroll-behavior: auto !important) before the
+//      direct scrollLeft assignment — cancels any in-flight CSS smooth scroll.
+//   2. Removing the class in the next RAF so subsequent intentional smooth
+//      animations (snap, click-center) are unaffected.
+//
+// Returns true if a jump was made.
+function normalizeMonthRailScroll(mask, monthContainer) {
+  if (!mask || !monthContainer) { return false; }
+
+  var track2 = monthContainer.querySelector('.ys-months-track[data-track-role="original"]');
+  if (!track2) { return false; }
+
+  var trackWidth = track2.offsetWidth;
+  if (!trackWidth) { return false; }
+
+  // track2Start: left edge of track-2 in scroll-container coordinates.
+  var maskRect    = mask.getBoundingClientRect();
+  var track2Rect  = track2.getBoundingClientRect();
+  var track2Start = (track2Rect.left - maskRect.left) + mask.scrollLeft;
+
+  // Threshold must cover any legitimate centering position (first/last month).
+  var threshold = Math.max(trackWidth * 0.15, mask.clientWidth);
+  var sl        = mask.scrollLeft;
+
+  if (sl >= track2Start - threshold && sl <= track2Start + trackWidth + threshold) {
+    return false; // already in the safe zone
   }
 
-  var singleTrackWidth = getSingleMonthTrackWidth(monthContainer);
-  if (!singleTrackWidth) {
-    return;
-  }
+  // Disable CSS smooth scroll for the instant jump so any in-flight smooth
+  // animation (e.g. from centerMonthItemInMask) cannot animate the transition.
+  mask.classList.add('is-normalizing-scroll');
 
-  var currentScrollLeft = mask.scrollLeft;
-  var leftThreshold = MONTH_SCROLL_THRESHOLD;
-  var rightThreshold = MONTH_SCROLL_THRESHOLD;
+  // Wrap to the equivalent offset within track-2.
+  var offset      = ((sl - track2Start) % trackWidth + trackWidth) % trackWidth;
+  mask.scrollLeft = track2Start + offset;
 
-  // Normalize left edge
-  if (currentScrollLeft <= leftThreshold) {
-    mask.scrollLeft = currentScrollLeft + singleTrackWidth;
-    return;
-  }
+  // Restore normal scroll behaviour once the browser has processed the assignment.
+  requestAnimationFrame(function() {
+    mask.classList.remove('is-normalizing-scroll');
+  });
 
-  // Normalize right edge (2 tracks = singleTrackWidth * 2)
-  var rightEdge = singleTrackWidth * 2;
-  if (currentScrollLeft >= rightEdge - rightThreshold) {
-    mask.scrollLeft = currentScrollLeft - singleTrackWidth;
-  }
+  return true;
 }
 
 function bindInfiniteMonthScroll(monthContainer) {
   var mask = getMonthMask(monthContainer);
-  if (!mask) {
-    return;
-  }
+  if (!mask) { return; }
 
-  var isNormalizingMonthScroll = false;
-  var lastScrollLeft = 0;
+  // isNormalizing prevents re-entry: the scroll event fired by our own scrollLeft
+  // assignment inside normalizeMonthRailScroll must not trigger another cycle.
+  var isNormalizing = false;
 
   mask.addEventListener('scroll', function() {
-    if (isNormalizingMonthScroll) {
-      return;
-    }
+    if (isNormalizing) { return; }
+    isNormalizing = true;
 
-    // Prevent recursive scroll events during normalization
-    if (Math.abs(mask.scrollLeft - lastScrollLeft) > 100) {
-      isNormalizingMonthScroll = true;
-      requestAnimationFrame(function() {
-        normalizeMonthScrollPosition(monthContainer);
-        lastScrollLeft = mask.scrollLeft;
-        isNormalizingMonthScroll = false;
-      });
-    } else {
-      lastScrollLeft = mask.scrollLeft;
-    }
+    // Normalise SYNCHRONOUSLY — fires before the browser's next paint so the
+    // clone position is never rendered even for a single frame.
+    normalizeMonthRailScroll(mask, monthContainer);
+
+    // Reset the guard after one RAF so legitimate post-normalisation scroll
+    // events (e.g. from the snap animation) are processed normally.
+    requestAnimationFrame(function() { isNormalizing = false; });
   });
 }
 
 function bindMonthDragScroll(monthContainer) {
-  var mask     = getMonthMask(monthContainer);
+  var mask      = getMonthMask(monthContainer);
   var maskInner = monthContainer && monthContainer.querySelector
     ? monthContainer.querySelector('.ys-months-mask-inner')
     : null;
@@ -434,29 +449,29 @@ function bindMonthDragScroll(monthContainer) {
   mask.setAttribute('data-month-drag-ready', '1');
   mask.classList.add('is-drag-scroll-ready');
 
-  // Momentum tuning constants
-  var FRICTION         = 0.94;   // velocity multiplier per 60 fps frame (time-normalised below)
-  var MIN_VELOCITY     = 0.25;   // px/ms — stop momentum below this
-  var SAMPLE_WINDOW_MS = 100;    // rolling window used to compute release velocity
+  var FRICTION         = 0.94;
+  var MIN_VELOCITY     = 0.25;  // px/ms
+  var SAMPLE_WINDOW_MS = 100;   // ms — rolling velocity window
 
-  var isPointerDown    = false;
-  var isDragging       = false;
-  var activePointerId  = null;
-  var startX           = 0;
-  var startY           = 0;
-  var startScrollLeft  = 0;
+  var isPointerDown     = false;
+  var isDragging        = false;
+  var activePointerId   = null;
+  var startX            = 0;    // captured at pointerdown; used for threshold check only
+  var startY            = 0;
+  var lastX             = 0;    // updated each pointermove; used for per-frame delta
   var dragCaptureActive = false;
-  var velSamples       = [];     // { t, x } recent pointer positions
-  var momentumRafId    = null;
-  var cancelSnapFn     = null;   // cancel handle returned by animateScrollToCenter
+  var velSamples        = [];   // { t, x }
+  var momentumRafId     = null;
+  var cancelSnapFn      = null;
 
   function cancelAnimations() {
     if (momentumRafId !== null) { cancelAnimationFrame(momentumRafId); momentumRafId = null; }
     if (cancelSnapFn  !== null) { cancelSnapFn(); cancelSnapFn = null; }
   }
 
-  // Find the a.ys-month whose visual centre is closest to the mask centre.
-  function findNearestMonthItem() {
+  // Find the visually nearest a.ys-month, then resolve it to the canonical track-2 copy.
+  // This guarantees snap targets are always within the track-2 safe zone.
+  function findNearestTrack2Item() {
     var maskRect    = mask.getBoundingClientRect();
     var maskCenterX = maskRect.left + maskRect.width / 2;
     var items       = maskInner.querySelectorAll('a.ys-month[data-month]');
@@ -469,10 +484,15 @@ function bindMonthDragScroll(monthContainer) {
       var dist = Math.abs(cx - maskCenterX);
       if (dist < closestDist) { closestDist = dist; closest = items[i]; }
     }
-    return closest;
+    if (!closest) { return null; }
+
+    var monthKey   = closest.getAttribute('data-month-key') || closest.getAttribute('data-month') || '';
+    var track2Copy = monthKey
+      ? monthContainer.querySelector('.ys-months-track[data-track-role="original"] .ys-month[data-month-key="' + monthKey + '"]')
+      : null;
+    return track2Copy || closest;
   }
 
-  // Trigger existing month-selection flow for a programmatically centred item.
   function selectSnappedMonth(monthItem) {
     if (!monthItem) { return; }
     var scope = getBlockScope(monthItem);
@@ -480,7 +500,6 @@ function bindMonthDragScroll(monthContainer) {
     applySliderWindowState(scope);
   }
 
-  // Snap to a month item using the shared animation, then select it.
   function snapToItem(targetItem) {
     if (!targetItem) { return; }
     cancelSnapFn = animateScrollToCenter(mask, targetItem, function() {
@@ -489,7 +508,6 @@ function bindMonthDragScroll(monthContainer) {
     });
   }
 
-  // Derive release velocity (px/ms) from recent pointer samples.
   function calcReleaseVelocity() {
     if (velSamples.length < 2) { return 0; }
     var now    = Date.now();
@@ -499,51 +517,51 @@ function bindMonthDragScroll(monthContainer) {
     var last  = recent[recent.length - 1];
     var dt    = last.t - first.t;
     if (dt <= 0) { return 0; }
-    // Dragging right (+x) decreases scrollLeft, so velocity sign is negated.
+    // Dragging right (+x) decreases scrollLeft — negate.
     return -(last.x - first.x) / dt;
   }
 
-  // Friction-decay loop; snaps to nearest month when velocity falls below MIN_VELOCITY.
   function startMomentum(velocity) {
     var lastTs = null;
 
     function momentumStep(ts) {
       if (lastTs === null) { lastTs = ts; momentumRafId = requestAnimationFrame(momentumStep); return; }
 
-      var dt       = ts - lastTs;
-      lastTs       = ts;
-      velocity    *= Math.pow(FRICTION, dt / 16.667); // normalise friction to 60 fps
+      var dt        = ts - lastTs;
+      lastTs        = ts;
+      velocity     *= Math.pow(FRICTION, dt / 16.667);
 
-      var nextLeft = mask.scrollLeft + velocity * dt;
+      var nextLeft  = mask.scrollLeft + velocity * dt;
       var maxScroll = Math.max(0, mask.scrollWidth - mask.clientWidth);
 
       if (nextLeft <= 0 || nextLeft >= maxScroll) {
-        // Bounced into scroll boundary — snap immediately from here.
+        // Hard boundary — clamp, normalise, snap.
         mask.scrollLeft = Math.max(0, Math.min(nextLeft, maxScroll));
         momentumRafId   = null;
-        snapToItem(findNearestMonthItem());
+        normalizeMonthRailScroll(mask, monthContainer);
+        snapToItem(findNearestTrack2Item());
         return;
       }
 
       mask.scrollLeft = nextLeft;
+      // scroll event fires here and schedules normalisation via bindInfiniteMonthScroll.
 
       if (Math.abs(velocity) > MIN_VELOCITY) {
         momentumRafId = requestAnimationFrame(momentumStep);
       } else {
         momentumRafId = null;
-        snapToItem(findNearestMonthItem());
+        normalizeMonthRailScroll(mask, monthContainer);
+        snapToItem(findNearestTrack2Item());
       }
     }
 
     momentumRafId = requestAnimationFrame(momentumStep);
   }
 
-  // Central end-of-drag handler; starts momentum or bare snap as appropriate.
   function handleDragEnd(wasDragging) {
     if (!isPointerDown) { return; }
 
     if (wasDragging) {
-      // Suppress the synthetic click that fires immediately after pointerup.
       suppressMonthClickOnce = true;
       setTimeout(function() { suppressMonthClickOnce = false; }, 0);
     }
@@ -556,26 +574,27 @@ function bindMonthDragScroll(monthContainer) {
     velSamples        = [];
     mask.classList.remove('is-month-dragging');
 
-    if (!wasDragging) { return; } // plain tap → let the click handler take it
+    if (!wasDragging) { return; }
 
     if (Math.abs(velocity) > MIN_VELOCITY) {
       startMomentum(velocity);
     } else {
-      snapToItem(findNearestMonthItem());
+      normalizeMonthRailScroll(mask, monthContainer);
+      snapToItem(findNearestTrack2Item());
     }
   }
 
   maskInner.addEventListener('pointerdown', function(event) {
     if (event.pointerType === 'touch' || event.button !== 0) { return; }
 
-    cancelAnimations(); // interrupt any ongoing momentum/snap on new press
+    cancelAnimations();
     isPointerDown     = true;
     isDragging        = false;
     dragCaptureActive = false;
     activePointerId   = event.pointerId;
     startX            = event.clientX;
     startY            = event.clientY;
-    startScrollLeft   = mask.scrollLeft;
+    lastX             = event.clientX;  // per-frame delta anchor
     velSamples        = [{ t: Date.now(), x: event.clientX }];
   });
 
@@ -584,7 +603,6 @@ function bindMonthDragScroll(monthContainer) {
 
     var now = Date.now();
     velSamples.push({ t: now, x: event.clientX });
-    // Trim samples outside the velocity window.
     while (velSamples.length > 1 && now - velSamples[0].t > SAMPLE_WINDOW_MS) {
       velSamples.shift();
     }
@@ -595,21 +613,21 @@ function bindMonthDragScroll(monthContainer) {
     if (!isDragging) {
       if (Math.abs(deltaX) < MONTH_DRAG_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) { return; }
 
-      isDragging      = true;
+      isDragging = true;
       mask.classList.add('is-month-dragging');
-      // Re-anchor so the first scroll jump is zero.
-      startX          = event.clientX;
-      startY          = event.clientY;
-      startScrollLeft = mask.scrollLeft;
-      deltaX          = 0;
+      lastX = event.clientX; // anchor for per-frame deltas from this point
 
       if (maskInner.setPointerCapture) {
         try { maskInner.setPointerCapture(activePointerId); dragCaptureActive = true; }
         catch (e) { dragCaptureActive = false; }
       }
+      return; // zero scroll on the frame drag is confirmed
     }
 
-    mask.scrollLeft = startScrollLeft - deltaX;
+    // Per-frame relative delta — immune to normalisation jumps mid-drag.
+    var dx = event.clientX - lastX;
+    lastX  = event.clientX;
+    mask.scrollLeft -= dx;
     event.preventDefault();
   });
 
@@ -1231,16 +1249,25 @@ document.addEventListener('click', function(event) {
       return;
     }
 
-    var monthScope     = getBlockScope(monthLink);
     var clickContainer = monthLink.closest('.ys-months-container');
     var clickMask      = getMonthMask(clickContainer);
 
-    updateMonthState(monthLink);
+    // Normalise to track-2 zone first so the canonical item is in view.
+    if (clickMask) { normalizeMonthRailScroll(clickMask, clickContainer); }
+
+    // Resolve the clicked month to the track-2 canonical copy for consistent centering.
+    var clickMonthKey = monthLink.getAttribute('data-month-key') || monthLink.getAttribute('data-month') || '';
+    var track2Target  = clickMonthKey && clickContainer
+      ? clickContainer.querySelector('.ys-months-track[data-track-role="original"] .ys-month[data-month-key="' + clickMonthKey + '"]')
+      : null;
+    var targetItem = track2Target || monthLink;
+
+    var monthScope = getBlockScope(monthLink);
+    updateMonthState(targetItem);
     applySliderWindowState(monthScope);
 
-    // Smoothly center the clicked month under the overlay using the shared helper.
     if (clickMask) {
-      animateScrollToCenter(clickMask, monthLink, null);
+      animateScrollToCenter(clickMask, targetItem, null);
     }
 
     event.preventDefault();
