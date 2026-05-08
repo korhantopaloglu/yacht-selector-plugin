@@ -224,6 +224,15 @@ function animateScrollToCenter(mask, targetItem, onComplete) {
   var startTs = null;
   var rafId   = null;
 
+  // Suspend infinite-rail normalisation for the duration of the animation.
+  // If the snap target is in a clone track (e.g. track-3's January when
+  // swiping past December), each animation frame would otherwise be yanked
+  // back into track-2 by the scroll handler, causing visible ping-pong.
+  // Callers should explicitly call normalizeMonthRailScroll() once when the
+  // animation completes — the resulting jump is invisible because the clones
+  // are pixel-identical.
+  mask.classList.add('is-snap-animating');
+
   function step(ts) {
     if (startTs === null) { startTs = ts; }
     var t = Math.min((ts - startTs) / MONTH_SNAP_DURATION_MS, 1);
@@ -234,6 +243,7 @@ function animateScrollToCenter(mask, targetItem, onComplete) {
     } else {
       rafId = null;
       mask.scrollLeft = toScroll;
+      mask.classList.remove('is-snap-animating');
       if (onComplete) { onComplete(); }
     }
   }
@@ -242,6 +252,7 @@ function animateScrollToCenter(mask, targetItem, onComplete) {
 
   return function cancel() {
     if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    mask.classList.remove('is-snap-animating');
   };
 }
 
@@ -424,6 +435,9 @@ function bindInfiniteMonthScroll(monthContainer) {
 
   mask.addEventListener('scroll', function() {
     if (isNormalizing) { return; }
+    // Skip during a snap animation: targets may legitimately live in a clone
+    // track. The snap caller normalises once when the animation completes.
+    if (mask.classList.contains('is-snap-animating')) { return; }
     isNormalizing = true;
 
     // Normalise SYNCHRONOUSLY — fires before the browser's next paint so the
@@ -469,30 +483,34 @@ function bindMonthDragScroll(monthContainer) {
     if (cancelSnapFn  !== null) { cancelSnapFn(); cancelSnapFn = null; }
   }
 
-  // Find the best snap target in the given scroll direction, using only track-2
-  // (canonical) items so the snap animation never ventures into clone territory.
+  // Find the best snap target in the given scroll direction.
+  // Searches ALL three track clones — at year boundaries the next forward
+  // month exists in track-3 (e.g. January after December) and the next
+  // backward month exists in track-1 (e.g. December before January). Picking
+  // is purely visual (DOM centre vs. mask centre) — never compares calendar
+  // month numbers, so 12 → 1 across the boundary is treated as a normal step.
   //
   // direction > 0 : scrollLeft was increasing (content moved left).
-  //   The "next" uncentered month is to the RIGHT of mask centre (diff >= 0).
-  //   Pick the track-2 item with the smallest non-negative diff.
+  //   The "next" uncentered month is to the RIGHT of mask centre.
+  //   Pick the item with the smallest non-negative diff.
   //
   // direction < 0 : scrollLeft was decreasing (content moved right).
-  //   The "next" uncentered month is to the LEFT of mask centre (diff <= 0).
-  //   Pick the track-2 item with the smallest non-positive diff (abs).
+  //   The "next" uncentered month is to the LEFT of mask centre.
+  //   Pick the item with the smallest non-positive diff (abs).
   //
-  // direction === 0 : no clear direction — fall back to nearest item.
+  // direction === 0 : no clear direction — pick the nearest item by |diff|.
   //
-  // A ±1 px slack around mask centre lets items that land virtually on-centre
-  // qualify for either direction, avoiding a "wrong side" snap for tiny offsets.
+  // ±1 px slack around mask centre lets items that land virtually on-centre
+  // qualify for either direction, avoiding "wrong side" snaps for tiny offsets.
   //
-  // If no directional candidate exists (clone boundary edge case after
-  // normalisation), falls back to the nearest track-2 item.
+  // The returned element may live in track-1, track-2 or track-3. The snap
+  // caller is responsible for resolving it to the track-2 canonical copy
+  // AFTER the snap animation completes (so state stays anchored to track-2
+  // while the visible scroll travel remains continuous across year boundaries).
   function findSnapTarget(direction) {
     var maskRect    = mask.getBoundingClientRect();
     var maskCenterX = maskRect.left + maskRect.width / 2;
-    var items       = monthContainer.querySelectorAll(
-      '.ys-months-track[data-track-role="original"] a.ys-month[data-month]'
-    );
+    var items       = maskInner.querySelectorAll('a.ys-month[data-month]');
 
     var best     = null;
     var bestDist = Infinity;
@@ -504,11 +522,9 @@ function bindMonthDragScroll(monthContainer) {
 
       var isCandidate, dist;
       if (direction > 0) {
-        // Snap continues rightward in content: pick first item at/right-of centre.
         isCandidate = diff >= -1;
-        dist        = Math.max(0, diff);   // items within 1 px of centre treated as AT centre
+        dist        = Math.max(0, diff);
       } else if (direction < 0) {
-        // Snap continues leftward in content: pick first item at/left-of centre.
         isCandidate = diff <= 1;
         dist        = Math.max(0, -diff);
       } else {
@@ -519,7 +535,8 @@ function bindMonthDragScroll(monthContainer) {
       if (isCandidate && dist < bestDist) { bestDist = dist; best = items[i]; }
     }
 
-    // Fallback: no directional candidate — nearest track-2 item.
+    // Defensive fallback: should never trigger for a non-empty rail because
+    // direction-aware filters always have at least one matching clone.
     if (!best) {
       bestDist = Infinity;
       for (var j = 0; j < items.length; j++) {
@@ -530,7 +547,19 @@ function bindMonthDragScroll(monthContainer) {
       }
     }
 
-    return best || null; // already a track-2 item — no clone resolution needed
+    return best || null;
+  }
+
+  // Resolve any month item (track-1/2/3) to its canonical track-2 copy via
+  // data-month-key. Returns the original if no track-2 match exists.
+  function resolveToTrack2(item) {
+    if (!item) { return null; }
+    var key = item.getAttribute('data-month-key') || item.getAttribute('data-month') || '';
+    if (!key) { return item; }
+    var copy = monthContainer.querySelector(
+      '.ys-months-track[data-track-role="original"] .ys-month[data-month-key="' + key + '"]'
+    );
+    return copy || item;
   }
 
   function selectSnappedMonth(monthItem) {
@@ -544,7 +573,43 @@ function bindMonthDragScroll(monthContainer) {
     if (!targetItem) { return; }
     cancelSnapFn = animateScrollToCenter(mask, targetItem, function() {
       cancelSnapFn = null;
-      selectSnappedMonth(targetItem);
+
+      // If the snap landed in a clone track (track-1 "pre" or track-3 "post"),
+      // perform an instant, invisible same-offset teleport back into track-2.
+      //
+      // Why not use normalizeMonthRailScroll() here?
+      // Because `toScroll` for a nearby clone item (e.g. track-3's January
+      // when December was centred) is still within normalise's safe-zone
+      // threshold, so that function would be a no-op. We need an exact,
+      // targeted correction based on which track the snap element actually
+      // lives in.
+      //
+      // The delta is computed from getBoundingClientRect so it works
+      // regardless of flex gaps between tracks.
+      var trackRole   = targetItem.getAttribute('data-track-role');
+      if (trackRole && trackRole !== 'original') {
+        var track2El    = monthContainer.querySelector('.ys-months-track[data-track-role="original"]');
+        var targetTrack = targetItem.closest('.ys-months-track');
+        if (track2El && targetTrack) {
+          // Visual distance between the two tracks in the current viewport.
+          // Subtracting it from scrollLeft re-anchors the view to the
+          // equivalent position inside track-2.
+          var delta = targetTrack.getBoundingClientRect().left -
+                      track2El.getBoundingClientRect().left;
+          if (Math.abs(delta) > 1) {
+            mask.classList.add('is-normalizing-scroll');
+            mask.scrollLeft -= delta;
+            requestAnimationFrame(function() {
+              mask.classList.remove('is-normalizing-scroll');
+            });
+          }
+        }
+      }
+
+      // After the teleport the track-2 canonical copy is now visually
+      // centred. Pass it to selectSnappedMonth so updateMonthState's
+      // comfort-zone check finds the item in view and fires no extra scroll.
+      selectSnappedMonth(resolveToTrack2(targetItem));
     });
   }
 
