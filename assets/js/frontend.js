@@ -4,6 +4,19 @@ document.addEventListener('click', function(event) {
     return;
   }
 
+  // Month/country/tools use delegated handlers below; do not intercept those clicks here.
+  if (link.matches('a.ys-month[data-month]')) {
+    return;
+  }
+
+  if (link.closest('.ys-countries-container') && link.hasAttribute('data-country')) {
+    return;
+  }
+
+  if (link.classList.contains('ys-tool-card')) {
+    return;
+  }
+
   event.preventDefault();
 });
 
@@ -374,7 +387,9 @@ function bindMonthDragScroll(monthContainer) {
   var isDragging = false;
   var activePointerId = null;
   var startX = 0;
+  var startY = 0;
   var startScrollLeft = 0;
+  var dragCaptureActive = false;
 
   function endDrag() {
     if (!isPointerDown) {
@@ -391,6 +406,7 @@ function bindMonthDragScroll(monthContainer) {
     isPointerDown = false;
     isDragging = false;
     activePointerId = null;
+    dragCaptureActive = false;
     mask.classList.remove('is-month-dragging');
   }
 
@@ -401,19 +417,11 @@ function bindMonthDragScroll(monthContainer) {
 
     isPointerDown = true;
     isDragging = false;
+    dragCaptureActive = false;
     activePointerId = event.pointerId;
     startX = event.clientX;
+    startY = event.clientY;
     startScrollLeft = mask.scrollLeft;
-
-    mask.classList.add('is-month-dragging');
-
-    if (maskInner.setPointerCapture) {
-      try {
-        maskInner.setPointerCapture(activePointerId);
-      } catch (error) {
-        // Ignore capture failures.
-      }
-    }
   });
 
   maskInner.addEventListener('pointermove', function(event) {
@@ -422,13 +430,30 @@ function bindMonthDragScroll(monthContainer) {
     }
 
     var deltaX = event.clientX - startX;
-
-    if (!isDragging && Math.abs(deltaX) >= MONTH_DRAG_THRESHOLD) {
-      isDragging = true;
-    }
+    var deltaY = event.clientY - startY;
 
     if (!isDragging) {
-      return;
+      var pastThreshold = Math.abs(deltaX) >= MONTH_DRAG_THRESHOLD;
+      var horizontalIntent = Math.abs(deltaX) >= Math.abs(deltaY);
+      if (!pastThreshold || !horizontalIntent) {
+        return;
+      }
+
+      isDragging = true;
+      mask.classList.add('is-month-dragging');
+      startX = event.clientX;
+      startY = event.clientY;
+      startScrollLeft = mask.scrollLeft;
+      deltaX = 0;
+
+      if (maskInner.setPointerCapture) {
+        try {
+          maskInner.setPointerCapture(activePointerId);
+          dragCaptureActive = true;
+        } catch (error) {
+          dragCaptureActive = false;
+        }
+      }
     }
 
     mask.scrollLeft = startScrollLeft - deltaX;
@@ -440,7 +465,7 @@ function bindMonthDragScroll(monthContainer) {
       return;
     }
 
-    if (maskInner.releasePointerCapture && activePointerId !== null) {
+    if (dragCaptureActive && maskInner.releasePointerCapture && activePointerId !== null) {
       try {
         maskInner.releasePointerCapture(activePointerId);
       } catch (error) {

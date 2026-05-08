@@ -317,7 +317,8 @@
 
 .ys-month.active,
 .ys-month.selected {
-  pointer-events: none;
+  /* Links must stay clickable for JS month selection; overlay is already pointer-events: none. */
+  pointer-events: auto;
 }
 
 .ui-simple .ys-month.active .ys-month-label,
