@@ -591,7 +591,7 @@
 
 .ys-card-contact-tools-group  .ys-card-image-container img {
   min-height: auto;
-  height: 200px;
+  height: 20vh;
 }
 
 .ys-card.is-pos-1 .ys-card-image-container img,
@@ -641,14 +641,14 @@
   gap: 20px;
   padding: 0;
   font-family: "EB Garamond", serif;
-  font-size: clamp(2.4rem, 4.8vw, 3.5rem);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
   font-weight: 600;
   color: #fff;
   letter-spacing: 0.02em;
   line-height: 1;
   white-space: nowrap;
   text-transform: none;
-  margin-top: -80px;
+  margin-top: -60px;
 }
 
 .ys-card h3::before,
@@ -915,14 +915,14 @@
     justify-content: center;
 }
 .ys-card-crew-top-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #000;
 }
 
 .ys-card-crew-title {
   font-family: 'EB Garamond', serif;
-  font-size: 3.375rem;
+  font-size: 3rem;
   font-weight: 600;
   font-style: italic;
   color: #000;
@@ -930,7 +930,7 @@
 }
 
 .ys-card-crew-subtitle {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 400;
   color: #000;
 }
@@ -1305,8 +1305,8 @@
   }
 
   .ys-card h3 {
-    left: 12px;
-    right: 12px;
+    left: var(--ys-padding-around-2);
+    right: var(--ys-padding-around-2);
     font-size: clamp(1.9rem, 6vw, 2.8rem);
     margin-top: -50px;
   }

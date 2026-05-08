@@ -19,6 +19,32 @@ define( 'YS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'YS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'YS_PLUGIN_VERSION', '1.1.0' );
 
+/**
+ * Add Settings link on the Plugins screen (beside Deactivate).
+ *
+ * @param array $links Existing plugin action links.
+ * @return array
+ */
+function ys_plugin_action_links( $links ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return $links;
+	}
+
+	$settings_url = admin_url( 'options-general.php?page=ys-settings' );
+
+	$settings_link = sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( $settings_url ),
+		esc_html__( 'Settings', 'yacht-selector' )
+	);
+
+	array_unshift( $links, $settings_link );
+
+	return $links;
+}
+
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'ys_plugin_action_links' );
+
 // Includes
 require_once YS_PLUGIN_PATH . 'includes/class-ys-plugin.php';
 
