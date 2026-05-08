@@ -373,8 +373,10 @@ function bindInfiniteMonthScroll(monthContainer) {
 }
 
 function bindMonthDragScroll(monthContainer) {
-  var mask = getMonthMask(monthContainer);
-  var maskInner = monthContainer && monthContainer.querySelector ? monthContainer.querySelector('.ys-months-mask-inner') : null;
+  var mask     = getMonthMask(monthContainer);
+  var maskInner = monthContainer && monthContainer.querySelector
+    ? monthContainer.querySelector('.ys-months-mask-inner')
+    : null;
 
   if (!mask || !maskInner || mask.getAttribute('data-month-drag-ready') === '1') {
     return;
@@ -383,76 +385,209 @@ function bindMonthDragScroll(monthContainer) {
   mask.setAttribute('data-month-drag-ready', '1');
   mask.classList.add('is-drag-scroll-ready');
 
-  var isPointerDown = false;
-  var isDragging = false;
-  var activePointerId = null;
-  var startX = 0;
-  var startY = 0;
-  var startScrollLeft = 0;
-  var dragCaptureActive = false;
+  // Momentum / snap tuning constants
+  var FRICTION         = 0.94;   // velocity multiplier per 60 fps frame (time-normalised below)
+  var MIN_VELOCITY     = 0.25;   // px/ms — stop momentum below this
+  var SAMPLE_WINDOW_MS = 100;    // rolling window used to compute release velocity
+  var SNAP_DURATION_MS = 260;    // duration of the final snap-easing animation
 
-  function endDrag() {
-    if (!isPointerDown) {
+  var isPointerDown    = false;
+  var isDragging       = false;
+  var activePointerId  = null;
+  var startX           = 0;
+  var startY           = 0;
+  var startScrollLeft  = 0;
+  var dragCaptureActive = false;
+  var velSamples       = [];     // { t, x } recent pointer positions
+  var momentumRafId    = null;
+  var snapRafId        = null;
+
+  function cancelAnimations() {
+    if (momentumRafId !== null) { cancelAnimationFrame(momentumRafId); momentumRafId = null; }
+    if (snapRafId    !== null) { cancelAnimationFrame(snapRafId);    snapRafId    = null; }
+  }
+
+  // Find the a.ys-month whose visual centre is closest to the mask centre.
+  function findNearestMonthItem() {
+    var maskRect    = mask.getBoundingClientRect();
+    var maskCenterX = maskRect.left + maskRect.width / 2;
+    var items       = maskInner.querySelectorAll('a.ys-month[data-month]');
+    var closest     = null;
+    var closestDist = Infinity;
+
+    for (var i = 0; i < items.length; i++) {
+      var r    = items[i].getBoundingClientRect();
+      var cx   = r.left + r.width / 2;
+      var dist = Math.abs(cx - maskCenterX);
+      if (dist < closestDist) { closestDist = dist; closest = items[i]; }
+    }
+    return closest;
+  }
+
+  // Trigger existing month-selection flow for a programmatically centred item.
+  function selectSnappedMonth(monthItem) {
+    if (!monthItem) { return; }
+    var scope = getBlockScope(monthItem);
+    updateMonthState(monthItem, false);
+    applySliderWindowState(scope);
+  }
+
+  // Animate scroll so targetItem sits exactly at the mask centre, then select it.
+  function snapToItem(targetItem) {
+    if (!targetItem) { return; }
+
+    var maskRect   = mask.getBoundingClientRect();
+    var itemRect   = targetItem.getBoundingClientRect();
+    var offset     = (itemRect.left + itemRect.width / 2) - (maskRect.left + maskRect.width / 2);
+    var fromScroll = mask.scrollLeft;
+    var toScroll   = fromScroll + offset;
+    var maxScroll  = Math.max(0, mask.scrollWidth - mask.clientWidth);
+    toScroll       = Math.max(0, Math.min(toScroll, maxScroll));
+
+    if (Math.abs(toScroll - fromScroll) < 1) {
+      selectSnappedMonth(targetItem);
       return;
     }
 
-    if (isDragging) {
-      suppressMonthClickOnce = true;
-      setTimeout(function() {
-        suppressMonthClickOnce = false;
-      }, 0);
+    var dist    = toScroll - fromScroll;
+    var startTs = null;
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function snapStep(ts) {
+      if (startTs === null) { startTs = ts; }
+      var t = Math.min((ts - startTs) / SNAP_DURATION_MS, 1);
+      mask.scrollLeft = fromScroll + dist * easeOutCubic(t);
+
+      if (t < 1) {
+        snapRafId = requestAnimationFrame(snapStep);
+      } else {
+        snapRafId = null;
+        mask.scrollLeft = toScroll;
+        selectSnappedMonth(targetItem);
+      }
     }
 
-    isPointerDown = false;
-    isDragging = false;
-    activePointerId = null;
+    snapRafId = requestAnimationFrame(snapStep);
+  }
+
+  // Derive release velocity (px/ms) from recent pointer samples.
+  function calcReleaseVelocity() {
+    if (velSamples.length < 2) { return 0; }
+    var now    = Date.now();
+    var recent = velSamples.filter(function(s) { return now - s.t <= SAMPLE_WINDOW_MS; });
+    if (recent.length < 2) { return 0; }
+    var first = recent[0];
+    var last  = recent[recent.length - 1];
+    var dt    = last.t - first.t;
+    if (dt <= 0) { return 0; }
+    // Dragging right (+x) decreases scrollLeft, so velocity sign is negated.
+    return -(last.x - first.x) / dt;
+  }
+
+  // Friction-decay loop; snaps to nearest month when velocity falls below MIN_VELOCITY.
+  function startMomentum(velocity) {
+    var lastTs = null;
+
+    function momentumStep(ts) {
+      if (lastTs === null) { lastTs = ts; momentumRafId = requestAnimationFrame(momentumStep); return; }
+
+      var dt       = ts - lastTs;
+      lastTs       = ts;
+      velocity    *= Math.pow(FRICTION, dt / 16.667); // normalise friction to 60 fps
+
+      var nextLeft = mask.scrollLeft + velocity * dt;
+      var maxScroll = Math.max(0, mask.scrollWidth - mask.clientWidth);
+
+      if (nextLeft <= 0 || nextLeft >= maxScroll) {
+        // Bounced into scroll boundary — snap immediately from here.
+        mask.scrollLeft = Math.max(0, Math.min(nextLeft, maxScroll));
+        momentumRafId   = null;
+        snapToItem(findNearestMonthItem());
+        return;
+      }
+
+      mask.scrollLeft = nextLeft;
+
+      if (Math.abs(velocity) > MIN_VELOCITY) {
+        momentumRafId = requestAnimationFrame(momentumStep);
+      } else {
+        momentumRafId = null;
+        snapToItem(findNearestMonthItem());
+      }
+    }
+
+    momentumRafId = requestAnimationFrame(momentumStep);
+  }
+
+  // Central end-of-drag handler; starts momentum or bare snap as appropriate.
+  function handleDragEnd(wasDragging) {
+    if (!isPointerDown) { return; }
+
+    if (wasDragging) {
+      // Suppress the synthetic click that fires immediately after pointerup.
+      suppressMonthClickOnce = true;
+      setTimeout(function() { suppressMonthClickOnce = false; }, 0);
+    }
+
+    var velocity      = wasDragging ? calcReleaseVelocity() : 0;
+    isPointerDown     = false;
+    isDragging        = false;
+    activePointerId   = null;
     dragCaptureActive = false;
+    velSamples        = [];
     mask.classList.remove('is-month-dragging');
+
+    if (!wasDragging) { return; } // plain tap → let the click handler take it
+
+    if (Math.abs(velocity) > MIN_VELOCITY) {
+      startMomentum(velocity);
+    } else {
+      snapToItem(findNearestMonthItem());
+    }
   }
 
   maskInner.addEventListener('pointerdown', function(event) {
-    if (event.pointerType === 'touch' || event.button !== 0) {
-      return;
-    }
+    if (event.pointerType === 'touch' || event.button !== 0) { return; }
 
-    isPointerDown = true;
-    isDragging = false;
+    cancelAnimations(); // interrupt any ongoing momentum/snap on new press
+    isPointerDown     = true;
+    isDragging        = false;
     dragCaptureActive = false;
-    activePointerId = event.pointerId;
-    startX = event.clientX;
-    startY = event.clientY;
-    startScrollLeft = mask.scrollLeft;
+    activePointerId   = event.pointerId;
+    startX            = event.clientX;
+    startY            = event.clientY;
+    startScrollLeft   = mask.scrollLeft;
+    velSamples        = [{ t: Date.now(), x: event.clientX }];
   });
 
   maskInner.addEventListener('pointermove', function(event) {
-    if (!isPointerDown || (activePointerId !== null && event.pointerId !== activePointerId)) {
-      return;
+    if (!isPointerDown || (activePointerId !== null && event.pointerId !== activePointerId)) { return; }
+
+    var now = Date.now();
+    velSamples.push({ t: now, x: event.clientX });
+    // Trim samples outside the velocity window.
+    while (velSamples.length > 1 && now - velSamples[0].t > SAMPLE_WINDOW_MS) {
+      velSamples.shift();
     }
 
     var deltaX = event.clientX - startX;
     var deltaY = event.clientY - startY;
 
     if (!isDragging) {
-      var pastThreshold = Math.abs(deltaX) >= MONTH_DRAG_THRESHOLD;
-      var horizontalIntent = Math.abs(deltaX) >= Math.abs(deltaY);
-      if (!pastThreshold || !horizontalIntent) {
-        return;
-      }
+      if (Math.abs(deltaX) < MONTH_DRAG_THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY)) { return; }
 
-      isDragging = true;
+      isDragging      = true;
       mask.classList.add('is-month-dragging');
-      startX = event.clientX;
-      startY = event.clientY;
+      // Re-anchor so the first scroll jump is zero.
+      startX          = event.clientX;
+      startY          = event.clientY;
       startScrollLeft = mask.scrollLeft;
-      deltaX = 0;
+      deltaX          = 0;
 
       if (maskInner.setPointerCapture) {
-        try {
-          maskInner.setPointerCapture(activePointerId);
-          dragCaptureActive = true;
-        } catch (error) {
-          dragCaptureActive = false;
-        }
+        try { maskInner.setPointerCapture(activePointerId); dragCaptureActive = true; }
+        catch (e) { dragCaptureActive = false; }
       }
     }
 
@@ -461,23 +596,23 @@ function bindMonthDragScroll(monthContainer) {
   });
 
   maskInner.addEventListener('pointerup', function(event) {
-    if (activePointerId !== null && event.pointerId !== activePointerId) {
-      return;
-    }
+    if (activePointerId !== null && event.pointerId !== activePointerId) { return; }
 
     if (dragCaptureActive && maskInner.releasePointerCapture && activePointerId !== null) {
-      try {
-        maskInner.releasePointerCapture(activePointerId);
-      } catch (error) {
-        // Ignore release failures.
-      }
+      try { maskInner.releasePointerCapture(activePointerId); } catch (e) {}
     }
 
-    endDrag();
+    handleDragEnd(isDragging);
   });
 
-  maskInner.addEventListener('pointercancel', endDrag);
-  maskInner.addEventListener('lostpointercapture', endDrag);
+  maskInner.addEventListener('pointercancel', function() {
+    handleDragEnd(isDragging);
+  });
+
+  maskInner.addEventListener('lostpointercapture', function() {
+    if (isPointerDown) { handleDragEnd(isDragging); }
+  });
+
   maskInner.addEventListener('dragstart', function(event) {
     event.preventDefault();
   });
