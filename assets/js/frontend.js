@@ -952,22 +952,28 @@ function applySliderWindowState(scope) {
   var activeIndex = getActiveCardIndex(cards);
   var total = cards.length;
 
-  cards.forEach(function(card, index) {
-    var forwardDistance = getWrappedIndex(index - activeIndex, total);
-    var backwardDistance = getWrappedIndex(activeIndex - index, total);
+  // Bias the extra visible slot to the right side when total is even.
+  var maxSide          = 5;
+  var visibleSideSlots = Math.min(total - 1, maxSide * 2);
+  var leftCount        = Math.floor(visibleSideSlots / 2);
+  var rightCount       = Math.ceil(visibleSideSlots / 2);
 
+  cards.forEach(function(card, index) {
     if (index === activeIndex) {
       card.classList.add('is-active');
       return;
     }
 
-    if (forwardDistance <= 5 && (forwardDistance < backwardDistance || backwardDistance > 5)) {
+    var forwardDistance  = getWrappedIndex(index - activeIndex, total);
+    var backwardDistance = getWrappedIndex(activeIndex - index, total);
+
+    if (forwardDistance <= rightCount && forwardDistance <= backwardDistance) {
       card.classList.add('is-pos-' + forwardDistance);
       card.classList.add('is-bg-card');
       return;
     }
 
-    if (backwardDistance <= 5) {
+    if (backwardDistance <= leftCount) {
       card.classList.add('is-neg-' + backwardDistance);
       card.classList.add('is-bg-card');
       return;
