@@ -1,5 +1,25 @@
 # Yacht Selector Plugin — CHANGELOG
 
+## Documentation
+
+- Added initial user-facing help documentation structure under `docs/help/`.
+- Expanded `docs/help/user-guide.md` with full end-user documentation for v1.0 frontend experience and interaction flow.
+- Expanded `docs/help/admin-guide.md` with operational administration documentation for Yacht Selector v1.0.
+- Expanded `docs/help/json-import-guide.md` with full JSON import documentation and practical dataset examples for Yacht Selector v1.0.
+- Expanded `docs/help/contact-tools-guide.md` with complete contact routing, placeholder, and URL configuration documentation for Yacht Selector v1.0.
+- Expanded `docs/help/frontend-guide.md` with frontend selector behaviour and UX documentation.
+- Expanded `docs/help/troubleshooting.md` with operational troubleshooting and debugging guidance for Yacht Selector v1.0.
+- Polished help docs for GitHub: consistent headers, tables of contents, terminology (**frontend selector**, **country selector**, **month selector**, **yacht cards**, **crew panel**, **contact tools**, **availability**, **booked months**), NOTE/TIP/WARNING blockquotes, navigation blocks, and cross-links across `docs/help/*.md`.
+- Restructured `docs/help/README.md` into a documentation hub (welcome, reading paths, overview table, scope reminder) and clarified separation between technical contracts and user help in `docs/README.md`.
+
+## Release Cleanup — v1.1.0 polish
+
+- `readme.txt`: corrected shortcode in installation instructions from `[ys-selector-block]` to `[ys_yacht_selector]`.
+- `templates/shortcode-ys-selector-block.php`: fixed `esc_attr_e()` → `esc_html_e()` for the `.ys-card-crew-close-button` label (button inner text must use HTML escaping, not attribute escaping).
+- `assets/js/frontend.js`: removed unused variable `ENABLE_MONTH_TRACK_MOTION`; fixed `.ys-card-crew-close-button` click handler from `classList.toggle('show')` to `classList.remove('show')` (close button must always close, never re-open).
+- `assets/css/frontend.css`: merged split `.ys-months-track` rule blocks into one with a clarifying comment.
+- `includes/class-ys-meta-boxes.php`: removed trailing space from one `class="ys-admin-card-header "` attribute.
+
 ---
 
 ## v1.1.0 — Month Rail & Slider Interaction Overhaul

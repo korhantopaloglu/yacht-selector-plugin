@@ -18,7 +18,7 @@ Yacht Selector renders a fully interactive yacht browsing experience via shortco
 
 1. Upload the plugin files to the `/wp-content/plugins/yacht-selector-plugin/` directory.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Use the `[ys-selector-block]` shortcode on any page or template.
+3. Use the `[ys_yacht_selector]` shortcode on any page or template.
 
 == Changelog ==
 

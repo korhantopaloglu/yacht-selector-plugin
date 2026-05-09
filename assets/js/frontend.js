@@ -192,7 +192,6 @@ function syncCardAvailabilityState(card) {
 }
 
 // Month Overlay Controller
-var ENABLE_MONTH_TRACK_MOTION = false;
 var MONTH_DRAG_THRESHOLD = 6;
 var MONTH_SNAP_DURATION_MS = 260;
 var suppressMonthClickOnce = false;
@@ -1588,7 +1587,7 @@ document.addEventListener('click', function(event) {
     var crewCloseScope = getBlockScope(crewCloseButton);
 
     if (crewPanel) {
-      crewPanel.classList.toggle('show');
+      crewPanel.classList.remove('show');
     }
 
     syncCrewPanelOpenState(crewCloseScope);

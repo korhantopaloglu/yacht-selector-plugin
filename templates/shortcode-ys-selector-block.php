@@ -466,7 +466,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 						</div>
 					</div>
 					<div class="ys-card-contact-tools-action-group">
-								<button type="button" class="ys-card-crew-close-button" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>"><?php esc_attr_e( 'Go to back', 'yacht-selector' ); ?></button>
+								<button type="button" class="ys-card-crew-close-button" aria-label="<?php esc_attr_e( 'Close crew panel', 'yacht-selector' ); ?>"><?php esc_html_e( 'Go to back', 'yacht-selector' ); ?></button>
 							
 								<?php if ( ! empty( $crew_members ) ) : ?>
 									<div class="ys-card-crew-status-group" data-crew-online="0" data-online-text-template="<?php echo esc_attr( $on_board_text ); ?>" data-offline-text-template="<?php echo esc_attr( $offline_text ); ?>">

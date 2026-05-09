@@ -475,7 +475,7 @@ class YS_Meta_Boxes {
 		?>
 		<div class="ys-admin-grid">
 			<section class="ys-admin-card ys-admin-card-location">
-				<div class="ys-admin-card-header ">
+				<div class="ys-admin-card-header">
 					<h3><?php esc_html_e( 'Location', 'yacht-selector' ); ?></h3>
 					<p><?php esc_html_e( 'Assign the yacht to a country and port using the plugin location taxonomy.', 'yacht-selector' ); ?></p>
 				</div>

@@ -280,6 +280,7 @@
   gap: var(--ys-month-gap);
 }
 
+/* No transform transitions on the month track — normalization jumps must be instant */
 .ys-months-track {
   display: flex;
   flex-wrap: nowrap;
@@ -287,10 +288,6 @@
   align-items: center;
   width: max-content;
   flex-shrink: 0;
-}
-
-/* Remove transform transition from months tracks only */
-.ys-months-track {
   transition: none;
   will-change: auto;
 }
