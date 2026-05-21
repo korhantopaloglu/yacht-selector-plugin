@@ -1,5 +1,13 @@
 # Yacht Selector Plugin — CHANGELOG
 
+## v1.1.4 — WPML / Polylang compatibility (optional)
+
+- Added `includes/compatibility/multilingual.php` (loaded early from bootstrap) exposing **`ys_register_multilingual_string()`, `ys_translate_multilingual_string()`, `ys_frontend_option_display_text()`** plus internal registration on `init` / `admin_init` and immediately after **`ys_settings`** updates (`updated_option`).
+- Registers merged option-backed **frontend text strings** (`ys_watch_me_text`, `ys_book_now_text`, `ys_call_crew_text`, `ys_booked_text`, `ys_all_label_text`, `ys_empty_state_text`, `ys_connect_with_top_title`, `ys_crew_group_title`, `ys_crew_group_subtitle`, `ys_currently_on_board_text`, `ys_currently_offline_text`) with **WPML** (`wpml_register_single_string`, `wpml_translate_single_string`) when SitePress is present, otherwise with **Polylang** (`pll_register_string`, `pll__`), guarded so missing plugins cannot fatal-output.
+- **Shortcode/script output layer** consumes translated displays only (`includes/class-ys-shortcode.php`); translations never write back into `ys_settings`; placeholders such as **`{crew_member}`** remain literal in source strings — no multilingual yacht CPT content, taxonomy translation migration, dependency on WPML/Polylang, or change to JSON/model-feature storage (still repeatable settings rows, **not taxonomies**).
+- Admin/help note documents string-translation UX on the Frontend Text Settings section.
+- Bump plugin version metadata to **1.1.4** (patch).
+
 ## v1.1.3 — Turkish (tr_TR) translation pack
 
 - Added official **`tr_TR`** pack: `languages/yacht-selector-tr_TR.po` / `languages/yacht-selector-tr_TR.mo` (UTF-8, WordPress gettext, text domain `yacht-selector`). Source-aligned ordered strings live in **`languages/yacht-selector-tr_TR.msgrecords.txt`**; regenerate **`tools/emit_msgrecords_txt.py`** (edits **`LINES_TR`**) → `tools/build_tr_pack.py` rewrites `.po`/`.mo` from the POT walk order (`languages/yacht-selector.pot`). No runtime behaviour, CPT/taxonomy, option/meta keys, slugs, hooks, JSON contracts, CSS classes, or data-attribute changes — translation + versioning/docs/tooling only.

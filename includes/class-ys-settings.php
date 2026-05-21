@@ -732,6 +732,7 @@ class YS_Settings {
 	 */
 	public function render_frontend_text_settings_section() {
 		echo '<p>' . esc_html__( 'Customize reusable frontend labels and empty-state text for later shortcode output.', 'yacht-selector' ) . '</p>';
+		echo '<p class="description">' . esc_html__( "WPML/Polylang compatibility: plugin text settings can be translated through your multilingual plugin's string translation interface.", 'yacht-selector' ) . '</p>';
 	}
 
 	/**

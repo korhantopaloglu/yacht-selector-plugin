@@ -4,7 +4,7 @@ Tags: yacht, selector, shortcode
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,11 @@ Yacht Selector renders a fully interactive yacht browsing experience via shortco
 3. Use the `[ys_yacht_selector]` shortcode on any page or template.
 
 == Changelog ==
+
+= 1.1.4 =
+* Added optional multilingual compatibility layer (`includes/compatibility/multilingual.php`) for WPML and Polylang: registers admin-managed **Frontend Text Settings** (`ys_watch_me_text`, `ys_book_now_text`, etc.) without requiring either plugin or changing taxonomy, CPT, meta/import contracts, hooks, CSS, or stored option payloads.
+* Shortcode/script output resolves those strings via safe helpers (`ys_register_multilingual_string`, `ys_translate_multilingual_string`, `ys_frontend_option_display_text`) at render time only; gettext still covers bundled UI catalogs (including Turkish `tr_TR`).
+* Bump plugin version metadata to **1.1.4** (patch).
 
 = 1.1.3 =
 * Official Turkish (tr_TR) translation pack (`languages/yacht-selector-tr_TR.po` / `.mo`, UTF-8; text domain `yacht-selector`). Turkish strings ship as `languages/yacht-selector-tr_TR.msgrecords.txt` (generator: `tools/emit_msgrecords_txt.py`) and are assembled with `tools/build_tr_pack.py` — packaging only; no runtime, data-model, taxonomy, slug, hook, meta key, or option key changes.

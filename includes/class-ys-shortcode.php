@@ -96,10 +96,25 @@ class YS_Shortcode {
 		);
 
 		if ( function_exists( 'ys_frontend_script_i18n' ) ) {
+			$localized = ys_frontend_script_i18n();
+
+			if ( function_exists( 'ys_frontend_option_display_text' ) ) {
+				$localized['statusOnlineTpl'] = ys_frontend_option_display_text(
+					$this->settings,
+					'ys_currently_on_board_text',
+					__( 'Currently on board: {crew_member}', 'yacht-selector' )
+				);
+				$localized['statusOfflineTpl'] = ys_frontend_option_display_text(
+					$this->settings,
+					'ys_currently_offline_text',
+					__( 'Currently offline: {crew_member}', 'yacht-selector' )
+				);
+			}
+
 			wp_localize_script(
 				'ys-frontend-selector',
 				'ysFrontendI18n',
-				ys_frontend_script_i18n()
+				$localized
 			);
 		}
 	}
@@ -116,17 +131,29 @@ class YS_Shortcode {
 		$months         = $this->get_selector_months( $items );
 		$contact_tools  = $this->data_provider->get_registered_contact_tools();
 		$container_id   = $this->get_container_id();
-		$watch_text     = isset( $settings['ys_watch_me_text'] ) && '' !== $settings['ys_watch_me_text'] ? $settings['ys_watch_me_text'] : __( 'Watch Me', 'yacht-selector' );
-		$call_text      = isset( $settings['ys_call_crew_text'] ) && '' !== $settings['ys_call_crew_text'] ? $settings['ys_call_crew_text'] : __( 'Call the Crew', 'yacht-selector' );
-		$book_text      = isset( $settings['ys_book_now_text'] ) && '' !== $settings['ys_book_now_text'] ? $settings['ys_book_now_text'] : __( 'Book Now', 'yacht-selector' );
-		$booked_text    = isset( $settings['ys_booked_text'] ) && '' !== $settings['ys_booked_text'] ? $settings['ys_booked_text'] : __( 'Booked', 'yacht-selector' );
-		$all_label_text = isset( $settings['ys_all_label_text'] ) && '' !== $settings['ys_all_label_text'] ? $settings['ys_all_label_text'] : __( 'All', 'yacht-selector' );
-		$empty_text     = isset( $settings['ys_empty_state_text'] ) && '' !== $settings['ys_empty_state_text'] ? $settings['ys_empty_state_text'] : __( 'No results found', 'yacht-selector' );
-		$crew_top_title = isset( $settings['ys_connect_with_top_title'] ) && '' !== $settings['ys_connect_with_top_title'] ? $settings['ys_connect_with_top_title'] : __( 'Connect with', 'yacht-selector' );
-		$crew_title     = isset( $settings['ys_crew_group_title'] ) && '' !== $settings['ys_crew_group_title'] ? $settings['ys_crew_group_title'] : __( 'The Crew', 'yacht-selector' );
-		$crew_subtitle  = isset( $settings['ys_crew_group_subtitle'] ) && '' !== $settings['ys_crew_group_subtitle'] ? $settings['ys_crew_group_subtitle'] : __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' );
-		$on_board_text  = isset( $settings['ys_currently_on_board_text'] ) && '' !== $settings['ys_currently_on_board_text'] ? $settings['ys_currently_on_board_text'] : __( 'Currently on board: {crew_member}', 'yacht-selector' );
-		$offline_text   = isset( $settings['ys_currently_offline_text'] ) && '' !== $settings['ys_currently_offline_text'] ? $settings['ys_currently_offline_text'] : __( 'Currently offline: {crew_member}', 'yacht-selector' );
+		$watch_text     = ys_frontend_option_display_text( $this->settings, 'ys_watch_me_text', __( 'Watch Me', 'yacht-selector' ) );
+		$call_text      = ys_frontend_option_display_text( $this->settings, 'ys_call_crew_text', __( 'Call the Crew', 'yacht-selector' ) );
+		$book_text      = ys_frontend_option_display_text( $this->settings, 'ys_book_now_text', __( 'Book Now', 'yacht-selector' ) );
+		$booked_text    = ys_frontend_option_display_text( $this->settings, 'ys_booked_text', __( 'Booked', 'yacht-selector' ) );
+		$all_label_text = ys_frontend_option_display_text( $this->settings, 'ys_all_label_text', __( 'All', 'yacht-selector' ) );
+		$empty_text     = ys_frontend_option_display_text( $this->settings, 'ys_empty_state_text', __( 'No results found', 'yacht-selector' ) );
+		$crew_top_title = ys_frontend_option_display_text( $this->settings, 'ys_connect_with_top_title', __( 'Connect with', 'yacht-selector' ) );
+		$crew_title     = ys_frontend_option_display_text( $this->settings, 'ys_crew_group_title', __( 'The Crew', 'yacht-selector' ) );
+		$crew_subtitle  = ys_frontend_option_display_text(
+			$this->settings,
+			'ys_crew_group_subtitle',
+			__( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' )
+		);
+		$on_board_text = ys_frontend_option_display_text(
+			$this->settings,
+			'ys_currently_on_board_text',
+			__( 'Currently on board: {crew_member}', 'yacht-selector' )
+		);
+		$offline_text  = ys_frontend_option_display_text(
+			$this->settings,
+			'ys_currently_offline_text',
+			__( 'Currently offline: {crew_member}', 'yacht-selector' )
+		);
 		$online_icon_id = isset( $settings['ys_online_status_icon'] ) ? absint( $settings['ys_online_status_icon'] ) : 0;
 		$online_icon    = $online_icon_id ? wp_get_attachment_image_url( $online_icon_id, 'thumbnail' ) : '';
 

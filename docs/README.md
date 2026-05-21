@@ -21,22 +21,27 @@ Start from **[Project overview](00-project-overview.md)** for the full baseline 
 
 ### Internationalization (developers)
 
-Translation template: `languages/yacht-selector.pot` (text domain `yacht-selector`). To regenerate the POT file locally (no WP-CLI):
+**WordPress gettext** (`.pot` / bundled `.mo` catalogs, domain `yacht-selector`) translates plugin UI literals shipped with Yacht Selector:
 
 ```bash
 python3 tools/make-pot.py
 ```
 
-**Turkish (tr_TR) pack**
+**Bundled `tr_TR` pack**
 
-- Compiled catalog: `languages/yacht-selector-tr_TR.po` and `languages/yacht-selector-tr_TR.mo`.
-- Maintain ordered UTF-8 `msgstr` lines **one per POT `msgid` in extractor walk order** in `languages/yacht-selector-tr_TR.msgrecords.txt` (see `languages/.mid_index.tsv` for a labelled index audit trail), or edit the canonical tuples in **`tools/emit_msgrecords_txt.py`** then run:
+- `languages/yacht-selector-tr_TR.po` / `.mo` — maintain ordered `msgstr` rows in `languages/yacht-selector-tr_TR.msgrecords.txt` (use `languages/.mid_index.tsv` as a numbered audit trail) or **`tools/emit_msgrecords_txt.py`** tuples, then run:
 
 ```bash
 python3 tools/emit_msgrecords_txt.py && python3 tools/build_tr_pack.py
 ```
 
 Preserve every placeholder (`%s`, `%d`, `%1$s`, `{crew_member}`, …) exactly.
+
+**WPML / Polylang** (optional, no dependency)
+
+- `includes/compatibility/multilingual.php` registers **Frontend Text Settings** option-backed strings (`ys_watch_me_text`, `ys_book_now_text`, `{crew_member}` templates, etc.) into WPML String Translation **or** Polylang Strings. Resolve at runtime with **`ys_frontend_option_display_text()`** alongside **`ys_register_multilingual_string()` / `ys_translate_multilingual_string()`**. Stored **`ys_settings` values remain source-of-truth**; multilingual outputs do not overwrite options.
+
+**Explicit non-goals:** model option rows and extra-feature rows stay **repeatable settings text**, **not taxonomy terms** — compatibility hooks do **not** auto-convert them.
 
 (`package.json` / `composer.json` are not bundled in this repo; if you add aliases there, mirror that command.)
 
