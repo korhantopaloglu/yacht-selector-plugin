@@ -1,0 +1,272 @@
+1	%1$s (no longer available)
+2	%s flag
+3	Add Booked Months
+4	Add item
+5	Add New Contact Tool
+6	Add New Crew
+7	Add New Location
+8	Add New Yacht
+9	Add or remove contact tools
+10	Add reusable feature labels such as Internet, Jetski, or Joker Boat.
+11	Add the yacht models available for selection, such as Gulet or Trawler.
+12	Affected by online status
+13	All
+14	All Contact Tools
+15	All Days
+16	All Label Text
+17	All Locations
+18	Assign one or more crew members to this yacht.
+19	Assign the yacht to a country and port using the plugin location taxonomy.
+20	Available icons:
+21	Back to Locations
+22	Beam
+23	Behavior
+24	Book Now
+25	Book Now Button Text
+26	Booked
+27	Booked Label Text
+28	Booked Months
+29	Browse more icons
+30	Build Year
+31	Cabins
+32	Call Button Text
+33	Call the Crew
+34	Capacity
+35	Card Image
+36	Card Image Override
+37	Change Flag
+38	Change Icon
+39	Change Image
+40	Choose a Port using the native Location taxonomy box. The plugin-managed taxonomy slug is currently "%s", with Country as parent terms and Port as child terms.
+41	Choose from the most used contact tools
+42	Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type.
+43	Choose whole hours only. The value is saved as a normalized range like 09-18.
+44	Clear
+45	Close crew panel
+46	Comma-separated YYYY-MM values. Example: 2026-06, 2026-07
+47	Configure the post type, plugin-managed location taxonomy slug, and reusable option lists for yacht data management.
+48	Connect with
+49	Contact Availability
+50	Contact Crew
+51	Contact Tool
+52	Contact Tools
+53	Contact URL Help
+54	Copy JSON Template
+55	Country Flag
+56	Crew
+57	Crew Group Subtitle
+58	Crew Group Title
+59	Crew Members
+60	Crew Top Title
+61	Crews
+62	Currently Offline Text
+63	Currently offline: {crew_member}
+64	Currently On Board Text
+65	Currently on board: {crew_member}
+66	Customize reusable frontend labels and empty-state text for later shortcode output.
+67	Decimals are supported, for example 28.5.
+68	Decimals are supported, for example 6.2.
+69	Default URL
+70	Define the available yacht model labels used by the plugin. Add one item per row.
+71	Define the reusable extra feature labels available for yachts. Add one item per row.
+72	Dimensions
+73	Duş
+74	Each JSON item must be an object. Item %d is invalid.
+75	Edit Contact Tool
+76	Edit Crew
+77	Edit Location
+78	Edit Yacht
+79	Email
+80	Empty State Text
+81	Enable this if this crew member can be used later as a contact person.
+82	Enable this if this tool should behave differently when the crew member is offline/unavailable.
+83	End
+84	Engine
+85	Engine & Years
+86	Enter comma-separated YYYY-MM values. Replace overwrites all values, Add merges into existing values, Remove deletes matching values.
+87	Enter the direct communication URL for this crew member and selected tool. This URL will open when the related contact tool card is clicked on the frontend. The fields below are generated dynamically from the currently selected contact tools.
+88	Enter the icon identifier used by the frontend or icon map, for example: whatsapp, phone, calendar, email.
+89	Extra Features
+90	FaceTime
+91	Fallback URL used when no crew-specific URL is available for this tool.
+92	Fazlasi
+93	Features
+94	For web links use https://. For email use mailto:. For phone use tel:. For supported apps use their official direct link format.
+95	Friday
+96	Frontend Text Settings
+97	Frontend Texts
+98	General
+99	Generic
+100	Go to back
+101	Google Meet
+102	Guests
+103	Gulet
+104	Higher values will sort first in later phases.
+105	Icon
+106	Icon Name
+107	Icon Type
+108	If enabled, Yacht Selector will attach to an existing registered post type. If disabled, the plugin will create and use its own yacht post type.
+109	Image
+110	Internet
+111	Invalid JSON data: %s
+112	Jetski
+113	Joker Boat
+114	JSON Data
+115	JSON Data Import
+116	JSON data must contain a root array of yacht items.
+117	JSON Import
+118	Kabin
+119	Kano
+120	Length
+121	Liman
+122	Lists
+123	Location
+124	Location & Booked
+125	Location taxonomy is not available.
+126	Location Taxonomy Slug
+127	Locations
+128	Lucky You
+129	Main title shown inside the crew section.
+130	Media & CTA
+131	Minder
+132	Misafir
+133	Model
+134	Model Options
+135	Models
+136	Monday
+137	Motor
+138	Motor Yacht
+139	Motor Yat
+140	Murettebat
+141	New Contact Tool Name
+142	New Location Name
+143	No Change
+144	No contact tools found. Create terms in the Contact Tools taxonomy first.
+145	No crew members found yet. Add crew members first.
+146	No extra feature options are configured yet. Add them in Yacht Selector settings.
+147	No image selected.
+148	No locations found.
+149	No model options are configured yet. Add them in Yacht Selector settings.
+150	No results found
+151	Offline status line template. Use {crew_member} as the placeholder.
+152	Olculer
+153	Online Days
+154	Online Hours
+155	Online Status Icon
+156	Online-sensitive
+157	Only used for top-level locations (countries). If this term is saved as a child location, the flag will be ignored.
+158	Open settings
+159	Optional image shown before the crew status text.
+160	Parent Location
+161	Parent Location:
+162	Paste or upload structured yacht data in JSON format. The JSON is validated before it is saved.
+163	Paste structured yacht data as a JSON array. Valid JSON will be stored as raw text.
+164	Phone
+165	Please upload a valid .json file.
+166	Plugin-managed hierarchical taxonomy for Country > Port. Slug will be sanitized with sanitize_key().
+167	Popular Contact Tools
+168	Preparing your yacht selection...
+169	Priority
+170	Refit Year
+171	Remove
+172	Remove Booked Months
+173	Replace Booked Months
+174	Replace Image
+175	Saturday
+176	Schema Help
+177	Search Contact Tools
+178	Search Locations
+179	See the yacht live - choose how you'd like to connect. The crew is currently on board.
+180	Select %s
+181	Select a model
+182	Select a post type
+183	Select a UTC offset
+184	Select a valid post type before importing JSON data.
+185	Select an image to override the frontend card image. This will later take priority over the featured image.
+186	Select Card Image
+187	Select Contact Tool Image
+188	Select Country Flag
+189	Select Flag
+190	Select Icon
+191	Select Image
+192	Select one or more contact tools for this crew member.
+193	Select one or more contact tools for this crew member. Each selected tool reveals its own direct URL field immediately.
+194	Select the extra features available on this yacht.
+195	Select the months when this yacht is booked and unavailable. The list shows the current month plus the next 11 months.
+196	Select yacht %d
+197	Selected Post Type
+198	Separate contact tools with commas
+199	Settings
+200	Short yacht description
+201	Signal
+202	Specifications
+203	Start
+204	Status line template. Use {crew_member} as the placeholder.
+205	Subtitle shown below the crew section title.
+206	Sunday
+207	Telegram
+208	Template not found.
+209	Text shown on yacht cards when the selected month is booked.
+210	Text shown when no cards match the selected filters.
+211	Text used for the Book Now button.
+212	Text used for the Call button.
+213	Text used for the default country filter label.
+214	Text used for the Watch Me button.
+215	The Crew
+216	The example below reflects the plugin’s current meta boxes and frontend data contract.
+217	The JSON file could not be uploaded. Please try again.
+218	The JSON should follow the plugin’s current field structure.
+219	The uploaded JSON file could not be read.
+220	These icon names come from the icon library used by the plugin.
+221	This area accepts structured yacht data in JSON format.
+222	This post type will receive Yacht Selector taxonomy and meta box integrations.
+223	Thursday
+224	Tool Contact URLs
+225	Top title shown above the crew section.
+226	Trawler
+227	Tuesday
+228	TV
+229	Unknown
+230	Update Contact Tool
+231	Update Location
+232	Upload a .json file to replace the saved JSON data, or use the textarea above and click the import button to validate and save it.
+233	Upload a flag image for this country. Child locations do not support flags.
+234	Upload JSON Data
+235	Upload JSON File
+236	Uretim / R
+237	Use a direct profile or invite URL when available.
+238	Use a full valid URL or supported scheme for this contact method.
+239	Use an existing post type
+240	Use Existing Post Type
+241	Use flag
+242	Use icon
+243	Use image
+244	Use mailto: links. You can include a subject parameter if needed.
+245	Use tel: links for supported devices.
+246	Use the direct wa.me format, with an optional prefilled message.
+247	Use the facetime: scheme with an email address or phone number.
+248	UTC Offset
+249	View Crew
+250	View Location
+251	View Yacht
+252	Visual
+253	Watch Me
+254	Watch Me Button Text
+255	Wednesday
+256	Weekdays
+257	Weekend
+258	WhatsApp
+259	Yacht
+260	Yacht %d
+261	Yacht Options
+262	Yacht Selector
+263	Yacht Selector is set to use an existing post type, but no valid post type is selected. Please update the plugin settings.
+264	Yacht Selector location taxonomy is not attached because the saved post type "%s" is no longer available. Choose a valid post type in Yacht Selector settings.
+265	Yacht Selector location taxonomy is registered, but it is not attached to a post type yet. Choose a post type in Yacht Selector settings.
+266	Yacht Selector Sections
+267	Yacht Selector Settings Sections
+268	Yacht Selector will use its own built-in post type: %s
+269	Yacht thumbnails
+270	Yachts
+271	You can copy the example and adapt it.
+272	Zoom

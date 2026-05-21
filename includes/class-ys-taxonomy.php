@@ -95,6 +95,10 @@ class YS_Taxonomy {
 			true
 		);
 
+		if ( function_exists( 'ys_localize_admin_script' ) ) {
+			ys_localize_admin_script( 'ys-admin-taxonomy' );
+		}
+
 		wp_enqueue_media();
 	}
 

@@ -124,6 +124,10 @@ class YS_Meta_Boxes {
 			true
 		);
 
+		if ( function_exists( 'ys_localize_admin_script' ) ) {
+			ys_localize_admin_script( 'ys-admin-meta-boxes' );
+		}
+
 		wp_enqueue_media();
 	}
 

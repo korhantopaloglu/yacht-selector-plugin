@@ -19,6 +19,27 @@ These references describe **architecture**, the **data model**, and behaviour co
 
 Start from **[Project overview](00-project-overview.md)** for the full baseline narrative.
 
+### Internationalization (developers)
+
+Translation template: `languages/yacht-selector.pot` (text domain `yacht-selector`). To regenerate the POT file locally (no WP-CLI):
+
+```bash
+python3 tools/make-pot.py
+```
+
+**Turkish (tr_TR) pack**
+
+- Compiled catalog: `languages/yacht-selector-tr_TR.po` and `languages/yacht-selector-tr_TR.mo`.
+- Maintain ordered UTF-8 `msgstr` lines **one per POT `msgid` in extractor walk order** in `languages/yacht-selector-tr_TR.msgrecords.txt` (see `languages/.mid_index.tsv` for a labelled index audit trail), or edit the canonical tuples in **`tools/emit_msgrecords_txt.py`** then run:
+
+```bash
+python3 tools/emit_msgrecords_txt.py && python3 tools/build_tr_pack.py
+```
+
+Preserve every placeholder (`%s`, `%d`, `%1$s`, `{crew_member}`, …) exactly.
+
+(`package.json` / `composer.json` are not bundled in this repo; if you add aliases there, mirror that command.)
+
 ---
 
 ## User documentation

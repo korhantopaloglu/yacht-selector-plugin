@@ -4,7 +4,7 @@ Tags: yacht, selector, shortcode
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,18 @@ Yacht Selector renders a fully interactive yacht browsing experience via shortco
 3. Use the `[ys_yacht_selector]` shortcode on any page or template.
 
 == Changelog ==
+
+= 1.1.3 =
+* Official Turkish (tr_TR) translation pack (`languages/yacht-selector-tr_TR.po` / `.mo`, UTF-8; text domain `yacht-selector`). Turkish strings ship as `languages/yacht-selector-tr_TR.msgrecords.txt` (generator: `tools/emit_msgrecords_txt.py`) and are assembled with `tools/build_tr_pack.py` — packaging only; no runtime, data-model, taxonomy, slug, hook, meta key, or option key changes.
+* Bump plugin version metadata to **1.1.3** (patch).
+
+= 1.1.2 =
+* Developer tooling: `tools/make-pot.py` regenerates `languages/yacht-selector.pot` locally without WP-CLI (gettext scan for domain `yacht-selector`). Documentation in `docs/CHANGELOG.md`; run `python3 tools/make-pot.py`. No runtime, data-model, taxonomy, slug, hook, meta key, or option key changes.
+
+= 1.1.1 =
+* WordPress i18n foundation: load text domain (`yacht-selector`) on `plugins_loaded`; added `languages/yacht-selector.pot`.
+* Wrapped settings defaults, shortcode fallbacks, JSON import samples, admin media-picker JS fallbacks, and frontend crew-status JS fallbacks for translation (`includes/i18n.php`).
+* Behavior-preserving: no changes to taxonomy, meta keys, model/feature storage, CPT slugs, or frontend contracts.
 
 = 1.1.0 =
 * Month rail rebuilt as a 3-track infinite-scroll loop with invisible normalization.

@@ -142,8 +142,9 @@ function applyCrewStatusState(card, hasCrew, isOnline) {
   var textNode = statusGroup.querySelector('.ys-card-crew-status-text');
   var crew = getActiveCrewState(card);
   var crewName = crew && crew.name ? crew.name.trim() : '';
-  var onlineTemplate = statusGroup.getAttribute('data-online-text-template') || 'Currently on board: {crew_member}';
-  var offlineTemplate = statusGroup.getAttribute('data-offline-text-template') || 'Currently offline: {crew_member}';
+  var i18n = window.ysFrontendI18n || {};
+  var onlineTemplate = statusGroup.getAttribute('data-online-text-template') || i18n.statusOnlineTpl || 'Currently on board: {crew_member}';
+  var offlineTemplate = statusGroup.getAttribute('data-offline-text-template') || i18n.statusOfflineTpl || 'Currently offline: {crew_member}';
   var activeTemplate = isOnline ? onlineTemplate : offlineTemplate;
   var nextText = activeTemplate.replace('{crew_member}', crewName);
 

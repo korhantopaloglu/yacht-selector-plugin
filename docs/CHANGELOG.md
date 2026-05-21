@@ -1,5 +1,23 @@
 # Yacht Selector Plugin — CHANGELOG
 
+## v1.1.3 — Turkish (tr_TR) translation pack
+
+- Added official **`tr_TR`** pack: `languages/yacht-selector-tr_TR.po` / `languages/yacht-selector-tr_TR.mo` (UTF-8, WordPress gettext, text domain `yacht-selector`). Source-aligned ordered strings live in **`languages/yacht-selector-tr_TR.msgrecords.txt`**; regenerate **`tools/emit_msgrecords_txt.py`** (edits **`LINES_TR`**) → `tools/build_tr_pack.py` rewrites `.po`/`.mo` from the POT walk order (`languages/yacht-selector.pot`). No runtime behaviour, CPT/taxonomy, option/meta keys, slugs, hooks, JSON contracts, CSS classes, or data-attribute changes — translation + versioning/docs/tooling only.
+- Bump plugin version metadata to **1.1.3** (patch).
+
+## v1.1.2 — POT regeneration helper (developer tooling)
+
+- Added one-command POT regeneration helper: `tools/make-pot.py` (`python3 tools/make-pot.py` from plugin root). Scans PHP for gettext calls bound to domain `yacht-selector`, writes `languages/yacht-selector.pot` with standard headers (`X-Generator: tools/make-pot.py`, `X-Domain: yacht-selector`) and `#:` source references where practical.
+- Regenerated `languages/yacht-selector.pot` via the helper. No runtime behavior changes and no taxonomy, option key, meta key, slug, hook, CSS class, data-attribute, or JSON/token contract changes.
+- Bump plugin version metadata to **1.1.2** (patch).
+
+## v1.1.1 — WordPress i18n / translation foundation
+
+- Added text domain loader: `load_plugin_textdomain( 'yacht-selector' … )` on `plugins_loaded` (priority `5`) via `includes/i18n.php`; main bootstrap defines `YS_PLUGIN_FILE` for correct relative `languages/` path.
+- Added `languages/yacht-selector.pot` (scanner-generated catalog of gettext calls in PHP).
+- Wrapped admin defaults and shortcode/template fallback copy with gettext where English literals were embedded; localized admin `admin.js` media-modal fallbacks and frontend crew status template fallbacks via `wp_localize_script`.
+- Bump plugin version metadata to **1.1.1** (patch). No taxonomy, option key, meta key, slug, markup contract, CSS class, data-attribute, JSON field name, or model/options data-model changes.
+
 ## Documentation
 
 - Added initial user-facing help documentation structure under `docs/help/`.

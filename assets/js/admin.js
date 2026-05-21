@@ -376,9 +376,9 @@ document.addEventListener('click', function(event) {
     var removeButton = wrapper.querySelector('.ys-contact-tool-image-remove, [data-ys-media-remove]');
     var previewWrap = wrapper.querySelector('.ys-contact-tool-image-preview-wrap, [data-ys-image-preview-wrap]');
     var frame = selectButton._ysMediaFrame || wp.media({
-      title: selectButton.getAttribute('data-ys-media-title') || 'Select Card Image',
+      title: selectButton.getAttribute('data-ys-media-title') || (window.ysAdminI18n && window.ysAdminI18n.mediaTitleFallback) || 'Select Card Image',
       button: {
-        text: selectButton.getAttribute('data-ys-media-button') || 'Use image'
+        text: selectButton.getAttribute('data-ys-media-button') || (window.ysAdminI18n && window.ysAdminI18n.mediaButtonFallback) || 'Use image'
       },
       library: {
         type: 'image'
@@ -410,7 +410,7 @@ document.addEventListener('click', function(event) {
         previewWrap.classList.remove('is-empty');
       }
 
-      selectButton.textContent = selectButton.getAttribute('data-ys-media-replace') || 'Replace Image';
+      selectButton.textContent = selectButton.getAttribute('data-ys-media-replace') || (window.ysAdminI18n && window.ysAdminI18n.replaceImageFallback) || 'Replace Image';
     });
 
     frame.open();
@@ -450,7 +450,7 @@ document.addEventListener('click', function(event) {
     }
 
     if (selectButton) {
-      selectButton.textContent = selectButton.getAttribute('data-ys-media-default') || 'Select Image';
+      selectButton.textContent = selectButton.getAttribute('data-ys-media-default') || (window.ysAdminI18n && window.ysAdminI18n.selectImageFallback) || 'Select Image';
     }
 
     removeButton.classList.add('hidden');

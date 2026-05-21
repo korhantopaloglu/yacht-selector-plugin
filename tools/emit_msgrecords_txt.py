@@ -1,0 +1,408 @@
+#!/usr/bin/env python3
+"""Emit languages/yacht-selector-tr_TR.msgrecords.txt (exactly 272 UTF-8 lines)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+_REPO = Path(__file__).resolve().parent.parent
+_OUT = _REPO / "languages" / "yacht-selector-tr_TR.msgrecords.txt"
+
+# POT walk order → Turkish msgstr; preserve placeholders (%s %d %1$s …) and {crew_member}.
+LINES_TR = (
+    "%1$s (artık kullanılmıyor)",
+    "%s bayrağı",
+    "Rezerve ay ekle",
+    "Öğe ekle",
+    "Yeni iletişim aracı ekle",
+    "Yeni mürettebat ekle",
+    "Yeni konum ekle",
+    "Yeni yat ekle",
+    "İletişim araçlarını ekle veya kaldır",
+    (
+        "İnternet, jetski veya Joker Boat gibi yeniden kullanılabilir "
+        "özellik etiketleri ekleyin."
+    ),
+    (
+        "Seçim için sunulan yat modellerini (ör. Gulet veya Trawler) ekleyin."
+    ),
+    "Çevrimiçi durumdan etkilenir",
+    "Tümü",
+    "Tüm iletişim araçları",
+    "Tüm günler",
+    "Tüm etiket metni",
+    "Tüm konumlar",
+    "Bu yata bir veya daha fazla mürettebat üyesi atayın.",
+    (
+        "Yatı bir ülke ve limana atayın; eklentinin konum taksonomisini kullanın."
+    ),
+    "Kullanılabilir simgeler:",
+    "Konumlara dön",
+    "Genişlik",
+    "Davranış",
+    "Şimdi rezervasyon yap",
+    "«Şimdi rezervasyon yap» düğmesi metni",
+    "Rezerve",
+    "Rezerve etiketi metni",
+    "Rezerve aylar",
+    "Diğer simgelere göz at",
+    "Üretim yılı",
+    "Kabinler",
+    "«Ara» düğmesi metni",
+    "Mürettebatı ara",
+    "Kapasite",
+    "Kart görseli",
+    "Kart görseli üzerine yaz",
+    "Bayrağı değiştir",
+    "Simgesini değiştir",
+    "Görseli değiştir",
+    (
+        "Yerel WordPress Konum kutusundan liman seçin. Eklentinin kontrolündeki taksonomi "
+        'kalıcı adı şu anda "%s"; üst düzeyde ülkeler ve alt düzeyde limanlar tanımlanır.'
+    ),
+    "En çok kullanılan iletişim araçlarından seçin",
+    (
+        "Yacht Selector’un kayıtlı bir yazı türünü mü yoksa kendi dahili "
+        "yazı türünü mü kullanacağını seçin."
+    ),
+    (
+        "Yalnızca tam saatleri seçin. Değer, 09-18 biçimi gibi "
+        "normalleştirilmiş bir aralık olarak kaydedilir."
+    ),
+    "Temizle",
+    "Mürettebat panelini kapat",
+    "Virgülle ayrılmış YYYY-AA değerleri. Örnek: 2026-06, 2026-07",
+    (
+        "Yazı türünü, eklentinin kontrolündeki konum taksonomisi kalıcı adını ve "
+        "yat veri yönetimi için kullanılacak seçenek listelerini yapılandırın."
+    ),
+    "Şununla iletişime geç",
+    "İletişimin uygun olduğu zamanlar",
+    "Mürettebatla iletişim kur",
+    "İletişim aracı",
+    "İletişim araçları",
+    "İletişim URL yardımı",
+    "JSON şablonunu kopyalayın",
+    "Ülke bayrağı",
+    "Mürettebat",
+    "Mürettebat grubu alt başlığı",
+    "Mürettebat grubu başlığı",
+    "Mürettebat üyeleri",
+    "Mürettebat üst başlığı",
+    "Mürettebatlar",
+    "Şu an çevrimdışı metni",
+    "Şu an çevrimdışı: {crew_member}",
+    "Şu an gemide metni",
+    "Şu an gemide: {crew_member}",
+    (
+        "Daha sonra shortcode çıktısı için ön yüzdeki yeniden kullanılabilir "
+        "etiketleri ve boş durum metnini özelleştirin."
+    ),
+    "Ondalıklar desteklenir; örneğin 28,5.",
+    "Ondalıklar desteklenir; örneğin 6,2.",
+    "Varsayılan URL",
+    (
+        "Eklentinin kullandığı yat modeli etiketlerini tanımlayın. "
+        "Satır başına tek öğe ekleyin."
+    ),
+    (
+        "Yatlar için kullanılabilen yeniden kullanılabilir ek özellik etiketlerini "
+        "tanımlayın. Satır başına tek öğe ekleyin."
+    ),
+    "Boyutlar",
+    "Duş",
+    "Her bir JSON öğesi bir nesne olmalıdır. %d öğesi geçersiz.",
+    "İletişim aracını düzenleyin",
+    "Mürettebatı düzenleyin",
+    "Konumu düzenleyin",
+    "Yatı düzenleyin",
+    "E-posta",
+    "Boş durum metni",
+    (
+        "Bu mürettebat üyesinin daha sonra iletişim kişisi olarak "
+        "kullanılabilmesi gerekiyorsa etkinleştirin."
+    ),
+    (
+        "Mürettebat üyesi çevrimdışı ya da uygun olmadığında bu aracın farklı "
+        "davranması gerekiyorsa etkinleştirin."
+    ),
+    "Bitiş",
+    "Motor",
+    "Motor ve yıllar",
+    (
+        "Virgülle ayrılmış YYYY-AA değerlerini girin. Replace tüm değerlerin yerine yazar, "
+        "Add mevcut değerlere ekler, Remove eşleşenleri siler."
+    ),
+    (
+        "Bu mürettebat üyesi ve seçilen araç için doğrudan iletişim URL'sini "
+        "girin. Ön yüzde ilgili iletişim aracı kartına tıklandığında bu adres açılır. "
+        "Aşağıdaki alanlar şu an seçili araçlarınıza göre dinamik üretilir."
+    ),
+    (
+        "Ön yüz veya simge eşlemesinin kullandığı simge tanımlayıcısını girin; örneğin "
+        "whatsapp, phone, calendar, email."
+    ),
+    "Ek özellikler",
+    "FaceTime",
+    (
+        "Bu araç için mürettebata özel URL yoksa kullanılacak "
+        "yedek URL."
+    ),
+    "Fazlası",
+    "Özellikler",
+    (
+        "Web bağlantıları için https:// kullanın; e-posta için mailto:; "
+        "telefon için tel:; desteklenen uygulamalarda resmi doğrudan bağlantı biçimi."
+    ),
+    "Cuma",
+    "Ön yüz metinleri ayarları",
+    "Ön yüz metinleri",
+    "Genel",
+    "Varsayılan",
+    "Geri dönün",
+    "Google Meet",
+    "Misafirler",
+    "Gulet",
+    "Daha yüksek değerler daha sonra sıralamanın başına gelir.",
+    "Simge",
+    "Simge adı",
+    "Simge türü",
+    (
+        "Etkinse Yacht Selector kayıtlı bir yazı türüne eklenir. "
+        "Değilse eklenti kendi yat yazı türünü oluşturur ve kullanır."
+    ),
+    "Görsel",
+    "İnternet",
+    "Geçersiz JSON verisi: %s",
+    "Jetski",
+    "Joker Boat",
+    "JSON verisi",
+    "JSON veri içe aktarma",
+    "JSON verisi, kökte yat öğeleri dizisi içermelidir.",
+    "JSON içe aktarma",
+    "Kabin",
+    "Kano",
+    "Uzunluk",
+    "Liman",
+    "Listeler",
+    "Konum",
+    "Konum ve rezerve",
+    "Konum taksonomisi kullanılabilir değil.",
+    "Konum taksonomisi kalıcı adı",
+    "Konumlar",
+    "Harika seçim!",
+    "Mürettebat bölümündeki ana başlık.",
+    "Medya ve eyleme çağrısı",
+    "minder",
+    "Misafir",
+    "Model",
+    "Model seçenekleri",
+    "Modeller",
+    "Pazartesi",
+    "Motor",
+    "Motoryat",
+    "Motoryat",
+    "Mürettebat",
+    "Yeni iletişim aracı adı",
+    "Yeni konum adı",
+    "Değişiklik yok",
+    (
+        "İletişim aracı bulunamadı. Önce İletişim araçları "
+        "taksonomisinde terim oluşturun."
+    ),
+    "Henüz mürettebat üyesi yok. Önce ekleyin.",
+    (
+        "Henüz ek özellik seçeneği yok. Yacht Selector ayarlarından "
+        "tek tek ekleyin."
+    ),
+    "Görsel seçilmedi.",
+    "Konum bulunamadı.",
+    (
+        "Henüz model seçeneği yok. Yacht Selector ayarlarından tek tek "
+        "ekleyin."
+    ),
+    "Sonuç yok",
+    "Çevrimdışı durum şablonu; yer tutucu olarak {crew_member} kullanın.",
+    "Ölçüler",
+    "Çevrimiçi günleri",
+    "Çevrimiçi saatleri",
+    "Çevrimiçi durum simgesi",
+    "Çevrimiçiye duyarlı",
+    (
+        "Yalnızca üst düzey konumlarda (ülkede) kullanılır; "
+        "alt konum olarak kaydedilirse bayrak yoksayılır."
+    ),
+    "Ayarları aç",
+    "Mürettebat durumu metni öncesinde isteğe bağlı küçük görsel.",
+    "Üst konum",
+    "Üst konum:",
+    (
+        "Yapılandırılmış yat JSON verisini yapıştırın veya yükleyin. "
+        "Kaydetmeden önce doğrulanır."
+    ),
+    (
+        "Yapılandırılmış yat JSON'unu dizge olarak yapıştırın. "
+        "Geçerli JSON düz metin olarak saklanır."
+    ),
+    "Telefon",
+    "Geçerli bir .json dosyası yükleyin.",
+    (
+        "Ülke → liman için eklenti taksonomisi. Kalıcı ad sanitize_key() ile "
+        "temizlenecektir."
+    ),
+    "Sık kullanılan araçlar",
+    "Yat seçiminiz hazırlanıyor…",
+    "Öncelik",
+    "Yenileme yılı",
+    "Kaldır",
+    "Rezerve ayları sil",
+    "Rezerve aylarını yenile",
+    "Görseli değiştir",
+    "Cumartesi",
+    "Şema yardımı",
+    "İletişim araçlarında ara",
+    "Konum ara",
+    (
+        "Tekneyi yakından görün ve bağlantı seçeneklerinizi seçin; mürettebat "
+        "şu an görev başında."
+    ),
+    "%s seçin",
+    "Bir model seçin",
+    "Bir yazı türü seçin",
+    "Bir UTC farkı seçin",
+    (
+        "JSON verisini içe aktarmadan önce yazı "
+        "türü seçilmiş ve geçerli olmalı."
+    ),
+    (
+        "Ön yüz kart görselinin yerini alacak bir görsel seçin; bu görsel "
+        "öne çıkan görselin önceliğinin üzerine çıkar."
+    ),
+    "Kart görseli seç",
+    "İletişim aracı görseli seç",
+    "Ülke bayrağı seç",
+    "Bayrak seç",
+    "Simge seç",
+    "Görsel seç",
+    "Bu mürettebat için bir ya da daha çok araç seçin.",
+    (
+        "Bu mürettebat için araç seçin; her seçim doğrudan kendi URL "
+        "alanını gösterir."
+    ),
+    "Bu yatta bulunan ek özellikleri seçin.",
+    (
+        "Yatın uygun olmadığı rezerve aylarını seçin; liste güncel ve "
+        "sonraki 11 ayı gösterir."
+    ),
+    "Yat %d seçin",
+    "Seçilen yazı türü",
+    "Çoklu araçları virgülle ayırın",
+    "Ayarlar",
+    "Kısa yat özeti",
+    "Signal",
+    "Teknik özellikler",
+    "Başlangıç",
+    "Durum satırı şablonu; yer tutucu olarak {crew_member} kullanın.",
+    "Üst başlığın altındaki alt başlık.",
+    "Pazar",
+    "Telegram",
+    "Şablon bulunamadı.",
+    "Seçili ay rezerveyken kartlarda kullanılacak metin.",
+    (
+        "Filtreler hiçbir karta denk düşmezken gösterilecek boş liste "
+        "metni."
+    ),
+    "«Şimdi rezervasyon yap» düğmesi için kullanılacak metin.",
+    "«Mürettebatı ara» düğmesi için metin.",
+    "Ülke filtresinin varsayılan etiketi için metin.",
+    "«İzlemek için tıklayın» düğmesi için kullanılacak metin.",
+    "Mürettebat",
+    (
+        "Aşağıdaki örnek, eklentinin güncel meta kutularını ve ön yüz veri "
+        "şemasını yansıtır."
+    ),
+    "JSON yüklenemedi. Tekrar deneyin.",
+    "JSON, eklentinin güncel alan yapısına uygun olmalı.",
+    "Yüklenen JSON okunamadı.",
+    "Simge adları eklentinin simge kitaplığından gelir.",
+    "Bu alan JSON biçiminde yapılandırılmış yat verisi kabul eder.",
+    "Bu yazı türüne Yacht Selector taksonomisi ve meta kutuları eklenir.",
+    "Perşembe",
+    "Araç iletişim URL'leri",
+    "Mürettebat bölümünün üzerinde görünen üst başlık.",
+    "Trawler",
+    "Salı",
+    "Televizyon",
+    "Bilinmeyen",
+    "İletişim aracını güncelle",
+    "Konumu güncelle",
+    (
+        "Kaydedilmiş JSON'un yerine geçmek için bir .json dosyası yükleyin veya "
+        "yukarıdaki metin alanına yapıştırıp doğrulama ve içe aktarma düğmesine basın."
+    ),
+    (
+        "Ülkeye bayrak görseli yükleyin. Alt düzey (çocuk) konumlarda bayrak "
+        "kullanılamaz."
+    ),
+    "JSON verisi yükle",
+    "JSON dosyası yükle",
+    "Üretim · Yenileme",
+    "Uygun ise doğrudan profil ya da davet URL'sini kullanın.",
+    "Tam geçerli URL ya da şema kullanın.",
+    "Var olan yazı türünü kullan",
+    "Var olan yazı türünü kullanın",
+    "Bayrak göster",
+    "Simge göster",
+    "Görsel göster",
+    "mailto bağlantılarını kullanın; gerekli ise konu parametresi ekleyin.",
+    "Desteklenen cihazlarda tel bağlantılarını kullanın.",
+    "wa.me doğrudan bağlantı biçimini kullanın; isteğe bağlı sabit ileti ekleyin.",
+    "facetime: şemasında e‑posta ya da GSM.",
+    "UTC farkı",
+    "Mürettebatı görüntüle",
+    "Konumu görüntüle",
+    "Yatı görüntüle",
+    "Görsel",
+    "İzlemek için tıklayın",
+    "«İzlemek için tıklayın» düğmesi metni",
+    "Çarşamba",
+    "Hafta içi",
+    "Hafta sonu",
+    "WhatsApp",
+    "Yat",
+    "Yat %d",
+    "Yat seçenekleri",
+    "Yacht Selector",
+    (
+        "Yacht Selector var olan bir yazı türü kullanılacak şekilde ayarlı, ancak geçerli "
+        "bir seçim yapılmamış. Eklenti ayarlarını güncelleyin."
+    ),
+    (
+        'Kaydedilen "%s" yazı türü artık mevcut olmadığından Yacht Selector konum '
+        "taksonomisi etkin değil. Yacht Selector ayarlarında uygun yazı türünü seçin."
+    ),
+    (
+        "Yacht Selector konum taksonomisi kaydedildi ama henüz bir yazı türüne "
+        "bağlanmadı. Yacht Selector ayarlarından yazı türünü seçin."
+    ),
+    "Yacht Selector bölümleri",
+    "Yacht Selector ayarları bölümleri",
+    "Yacht Selector kendi dahili yazı türünü kullanır: %s",
+    "Yat küçük resmi",
+    "Yatlar",
+    "Örneği kopyalayabilir ve gerektiği gibi uyarlayabilirsiniz.",
+    "Zoom",
+)
+
+
+def main() -> int:
+    if len(LINES_TR) != 272:
+        raise SystemExit(f"Expected 272 lines, got {len(LINES_TR)}")
+    body = "\n".join(LINES_TR) + "\n"
+    _OUT.write_text(body, encoding="utf-8")
+    print("Wrote", _OUT.relative_to(_REPO))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

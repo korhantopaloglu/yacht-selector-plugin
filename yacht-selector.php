@@ -3,7 +3,7 @@
  * Plugin Name: Yacht Selector
  * Plugin URI:  https://github.com/korhantopaloglu/yacht-selector-plugin
  * Description: Yacht selection plugin with shortcode-based frontend rendering.
- * Version:     1.1.0
+ * Version:     1.1.3
  * Author:      Korhan Topaloglu
  * Author URI:  https://www.linkedin.com/in/korhantopaloglu/
  * Text Domain: yacht-selector
@@ -15,9 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Constants
+define( 'YS_PLUGIN_FILE', __FILE__ );
 define( 'YS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'YS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'YS_PLUGIN_VERSION', '1.1.0' );
+define( 'YS_PLUGIN_VERSION', '1.1.3' );
+
+require_once YS_PLUGIN_PATH . 'includes/i18n.php';
+
+add_action( 'plugins_loaded', 'ys_plugin_load_textdomain', 5 );
 
 /**
  * Add Settings link on the Plugins screen (beside Deactivate).

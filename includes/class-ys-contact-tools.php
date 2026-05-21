@@ -104,6 +104,10 @@ class YS_Contact_Tools {
 			true
 		);
 
+		if ( function_exists( 'ys_localize_admin_script' ) ) {
+			ys_localize_admin_script( 'ys-admin-contact-tools' );
+		}
+
 		wp_enqueue_media();
 	}
 

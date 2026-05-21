@@ -282,6 +282,10 @@ class YS_Settings {
 			true
 		);
 
+		if ( function_exists( 'ys_localize_admin_script' ) ) {
+			ys_localize_admin_script( 'ys-admin-settings' );
+		}
+
 		wp_enqueue_media();
 	}
 
@@ -1129,7 +1133,7 @@ class YS_Settings {
 				$taxonomy,
 				isset( $item['country'] ) && is_array( $item['country'] ) ? $item['country'] : [],
 				[
-					'name' => 'Unknown',
+					'name' => __( 'Unknown', 'yacht-selector' ),
 					'slug' => 'unknown',
 				]
 			);
@@ -1412,7 +1416,7 @@ class YS_Settings {
 			$taxonomy,
 			isset( $item['country'] ) && is_array( $item['country'] ) ? $item['country'] : [],
 			[
-				'name' => 'Unknown',
+				'name' => __( 'Unknown', 'yacht-selector' ),
 				'slug' => 'unknown',
 			]
 		);
@@ -1722,41 +1726,40 @@ class YS_Settings {
 	 * @return string
 	 */
 	private function get_json_schema_example() {
-		return <<<'JSON'
-[
-  {
-    "title": "Lucky You",
-    "description": "Short yacht description",
-    "url": "https://example.com/yachts/lucky-you",
-    "image": "https://example.com/image.jpg",
+		$data = [
+			[
+				'title'       => __( 'Lucky You', 'yacht-selector' ),
+				'description' => __( 'Short yacht description', 'yacht-selector' ),
+				'url'         => 'https://example.com/yachts/lucky-you',
+				'image'       => 'https://example.com/image.jpg',
+				'country'     => [
+					'name' => 'Turkey',
+					'slug' => 'turkey',
+				],
+				'port'        => [
+					'name' => 'Bodrum',
+					'slug' => 'bodrum',
+				],
+				'booked'      => [ '2026-03', '2026-04', '2026-06' ],
+				'model'       => __( 'Motor Yacht', 'yacht-selector' ),
+				'length'      => 28.5,
+				'beam'        => 6.2,
+				'engine'      => '2x280hp',
+				'build_year'  => 2018,
+				'refit_year'  => 2021,
+				'cabins'      => 4,
+				'guests'      => 10,
+				'crew'        => 4,
+				'priority'    => 90,
+				'features'    => [
+					__( 'Internet', 'yacht-selector' ),
+					__( 'TV', 'yacht-selector' ),
+					__( 'Jetski', 'yacht-selector' ),
+				],
+			],
+		];
 
-    "country": {
-      "name": "Turkey",
-      "slug": "turkey"
-    },
-
-    "port": {
-      "name": "Bodrum",
-      "slug": "bodrum"
-    },
-
-    "booked": ["2026-03", "2026-04", "2026-06"],
-
-    "model": "Motor Yacht",
-    "length": 28.5,
-    "beam": 6.2,
-    "engine": "2x280hp",
-    "build_year": 2018,
-    "refit_year": 2021,
-    "cabins": 4,
-    "guests": 10,
-    "crew": 4,
-    "priority": 90,
-
-    "features": ["Internet", "TV", "Jetski"]
-  }
-]
-JSON;
+		return wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "\n";
 	}
 
 	/**
@@ -1830,31 +1833,31 @@ JSON;
 			'ys_use_existing_post_type' => '0',
 			'ys_selected_post_type'      => '',
 			'ys_location_taxonomy_slug'  => 'ys_location',
-			'ys_watch_me_text'           => 'Watch Me',
-			'ys_book_now_text'           => 'Book Now',
-			'ys_call_crew_text'          => 'Call the Crew',
-			'ys_booked_text'             => 'Booked',
-			'ys_all_label_text'          => 'All',
-			'ys_empty_state_text'        => 'No results found',
-			'ys_connect_with_top_title'  => 'Connect with',
-			'ys_crew_group_title'        => 'The Crew',
-			'ys_crew_group_subtitle'     => 'See the yacht live - choose how you’d like to connect. The crew is currently on board.',
-			'ys_currently_on_board_text' => 'Currently on board: {crew_member}',
-			'ys_currently_offline_text'  => 'Currently offline: {crew_member}',
+			'ys_watch_me_text'           => __( 'Watch Me', 'yacht-selector' ),
+			'ys_book_now_text'           => __( 'Book Now', 'yacht-selector' ),
+			'ys_call_crew_text'          => __( 'Call the Crew', 'yacht-selector' ),
+			'ys_booked_text'             => __( 'Booked', 'yacht-selector' ),
+			'ys_all_label_text'          => __( 'All', 'yacht-selector' ),
+			'ys_empty_state_text'        => __( 'No results found', 'yacht-selector' ),
+			'ys_connect_with_top_title'  => __( 'Connect with', 'yacht-selector' ),
+			'ys_crew_group_title'        => __( 'The Crew', 'yacht-selector' ),
+			'ys_crew_group_subtitle'     => __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' ),
+			'ys_currently_on_board_text' => __( 'Currently on board: {crew_member}', 'yacht-selector' ),
+			'ys_currently_offline_text'  => __( 'Currently offline: {crew_member}', 'yacht-selector' ),
 			'ys_online_status_icon'      => '',
 			'ys_model_options'           => [
-				'Gulet',
-				'Motor Yat',
-				'Trawler',
+				__( 'Gulet', 'yacht-selector' ),
+				__( 'Motor Yat', 'yacht-selector' ),
+				__( 'Trawler', 'yacht-selector' ),
 			],
 			'ys_extra_feature_options'   => [
-				'Internet',
-				'TV',
-				'Joker Boat',
-				'Jetski',
-				'Kano',
-				'Minder',
-				'Duş',
+				__( 'Internet', 'yacht-selector' ),
+				__( 'TV', 'yacht-selector' ),
+				__( 'Joker Boat', 'yacht-selector' ),
+				__( 'Jetski', 'yacht-selector' ),
+				__( 'Kano', 'yacht-selector' ),
+				__( 'Minder', 'yacht-selector' ),
+				__( 'Duş', 'yacht-selector' ),
 			],
 		];
 	}

@@ -126,6 +126,10 @@ class YS_Crew_Meta_Boxes {
 			YS_PLUGIN_VERSION,
 			true
 		);
+
+		if ( function_exists( 'ys_localize_admin_script' ) ) {
+			ys_localize_admin_script( 'ys-admin-meta-boxes' );
+		}
 	}
 
 	/**

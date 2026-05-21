@@ -1,0 +1,1200 @@
+# Yacht Selector POT file.
+# Copyright (C) YEAR Yacht Selector Plugin contributors
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Yacht Selector\n"
+"Report-Msgid-Bugs-To:\n"
+"POT-Creation-Date: 2026-05-21 21:34+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: tools/make-pot.py\n"
+"X-Domain: yacht-selector\n"
+
+#: includes/class-ys-settings.php:767
+msgid "%1$s (no longer available)"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:70
+msgid "%s flag"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:215
+msgid "Add Booked Months"
+msgstr ""
+
+#: includes/class-ys-settings.php:1796
+msgid "Add item"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:509
+msgid "Add New Contact Tool"
+msgstr ""
+
+#: includes/class-ys-post-types.php:73
+msgid "Add New Crew"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:301
+msgid "Add New Location"
+msgstr ""
+
+#: includes/class-ys-post-types.php:47
+msgid "Add New Yacht"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:512
+msgid "Add or remove contact tools"
+msgstr ""
+
+#: includes/class-ys-settings.php:820
+msgid "Add reusable feature labels such as Internet, Jetski, or Joker Boat."
+msgstr ""
+
+#: includes/class-ys-settings.php:808
+msgid "Add the yacht models available for selection, such as Gulet or Trawler."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:435
+msgid "Affected by online status"
+msgstr ""
+
+#: includes/class-ys-settings.php:1840
+#: includes/class-ys-shortcode.php:123
+#: templates/shortcode-ys-selector-block.php:15
+msgid "All"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:506
+msgid "All Contact Tools"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:210
+msgid "All Days"
+msgstr ""
+
+#: includes/class-ys-settings.php:173
+msgid "All Label Text"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:295
+msgid "All Locations"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:643
+msgid "Assign one or more crew members to this yacht."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:484
+msgid "Assign the yacht to a country and port using the plugin location taxonomy."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:392
+msgid "Available icons:"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:305
+msgid "Back to Locations"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:560
+#: includes/class-ys-meta-boxes.php:768
+msgid "Beam"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:211
+#: includes/class-ys-contact-tools.php:235
+msgid "Behavior"
+msgstr ""
+
+#: includes/class-ys-settings.php:1837
+#: includes/class-ys-shortcode.php:121
+#: templates/shortcode-ys-selector-block.php:13
+msgid "Book Now"
+msgstr ""
+
+#: includes/class-ys-settings.php:149
+msgid "Book Now Button Text"
+msgstr ""
+
+#: includes/class-ys-settings.php:1839
+#: includes/class-ys-shortcode.php:122
+#: templates/shortcode-ys-selector-block.php:14
+msgid "Booked"
+msgstr ""
+
+#: includes/class-ys-settings.php:165
+msgid "Booked Label Text"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:141
+#: includes/class-ys-meta-boxes.php:186
+#: includes/class-ys-meta-boxes.php:211
+#: includes/class-ys-meta-boxes.php:451
+#: includes/class-ys-meta-boxes.php:493
+msgid "Booked Months"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:403
+msgid "Browse more icons"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:570
+#: includes/class-ys-meta-boxes.php:770
+msgid "Build Year"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:580
+#: includes/class-ys-meta-boxes.php:772
+msgid "Cabins"
+msgstr ""
+
+#: includes/class-ys-settings.php:157
+msgid "Call Button Text"
+msgstr ""
+
+#: includes/class-ys-settings.php:1838
+#: includes/class-ys-shortcode.php:120
+#: templates/shortcode-ys-selector-block.php:12
+msgid "Call the Crew"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:577
+#: templates/shortcode-ys-selector-block.php:339
+msgid "Capacity"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:680
+msgid "Card Image"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:823
+msgid "Card Image Override"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:222
+#: includes/class-ys-taxonomy.php:223
+msgid "Change Flag"
+msgstr ""
+
+#: includes/class-ys-settings.php:966
+msgid "Change Icon"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:463
+#: includes/class-ys-contact-tools.php:464
+msgid "Change Image"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:443
+msgid "Choose a Port using the native Location taxonomy box. The plugin-managed taxonomy slug is currently \"%s\", with Country as parent terms and Port as child terms."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:513
+msgid "Choose from the most used contact tools"
+msgstr ""
+
+#: includes/class-ys-settings.php:691
+msgid "Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:189
+msgid "Choose whole hours only. The value is saved as a normalized range like 09-18."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:211
+msgid "Clear"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:401
+#: templates/shortcode-ys-selector-block.php:469
+msgid "Close crew panel"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:189
+msgid "Comma-separated YYYY-MM values. Example: 2026-06, 2026-07"
+msgstr ""
+
+#: includes/class-ys-settings.php:305
+msgid "Configure the post type, plugin-managed location taxonomy slug, and reusable option lists for yacht data management."
+msgstr ""
+
+#: includes/class-ys-settings.php:1842
+#: includes/class-ys-shortcode.php:125
+#: templates/shortcode-ys-selector-block.php:17
+msgid "Connect with"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:90
+msgid "Contact Availability"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:160
+msgid "Contact Crew"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:503
+msgid "Contact Tool"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:502
+#: includes/class-ys-contact-tools.php:514
+#: includes/class-ys-crew-meta-boxes.php:225
+msgid "Contact Tools"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:233
+msgid "Contact URL Help"
+msgstr ""
+
+#: includes/class-ys-settings.php:1007
+msgid "Copy JSON Template"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:113
+#: includes/class-ys-taxonomy.php:133
+msgid "Country Flag"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:582
+#: includes/class-ys-meta-boxes.php:774
+#: includes/class-ys-post-types.php:71
+#: includes/class-ys-post-types.php:72
+msgid "Crew"
+msgstr ""
+
+#: includes/class-ys-settings.php:205
+msgid "Crew Group Subtitle"
+msgstr ""
+
+#: includes/class-ys-settings.php:197
+msgid "Crew Group Title"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:242
+#: includes/class-ys-meta-boxes.php:642
+msgid "Crew Members"
+msgstr ""
+
+#: includes/class-ys-settings.php:189
+msgid "Crew Top Title"
+msgstr ""
+
+#: includes/class-ys-post-types.php:76
+msgid "Crews"
+msgstr ""
+
+#: includes/class-ys-settings.php:221
+msgid "Currently Offline Text"
+msgstr ""
+
+#: includes/class-ys-settings.php:1846
+#: includes/class-ys-shortcode.php:129
+#: includes/i18n.php:33
+#: templates/shortcode-ys-selector-block.php:21
+msgid "Currently offline: {crew_member}"
+msgstr ""
+
+#: includes/class-ys-settings.php:213
+msgid "Currently On Board Text"
+msgstr ""
+
+#: includes/class-ys-settings.php:1845
+#: includes/class-ys-shortcode.php:128
+#: includes/i18n.php:32
+#: templates/shortcode-ys-selector-block.php:20
+msgid "Currently on board: {crew_member}"
+msgstr ""
+
+#: includes/class-ys-settings.php:734
+msgid "Customize reusable frontend labels and empty-state text for later shortcode output."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:559
+#: includes/class-ys-meta-boxes.php:767
+msgid "Decimals are supported, for example 28.5."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:560
+#: includes/class-ys-meta-boxes.php:768
+msgid "Decimals are supported, for example 6.2."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:428
+msgid "Default URL"
+msgstr ""
+
+#: includes/class-ys-settings.php:716
+msgid "Define the available yacht model labels used by the plugin. Add one item per row."
+msgstr ""
+
+#: includes/class-ys-settings.php:725
+msgid "Define the reusable extra feature labels available for yachts. Add one item per row."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:556
+msgid "Dimensions"
+msgstr ""
+
+#: includes/class-ys-settings.php:1860
+msgid "Duş"
+msgstr ""
+
+#: includes/class-ys-settings.php:556
+msgid "Each JSON item must be an object. Item %d is invalid."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:507
+msgid "Edit Contact Tool"
+msgstr ""
+
+#: includes/class-ys-post-types.php:74
+msgid "Edit Crew"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:298
+msgid "Edit Location"
+msgstr ""
+
+#: includes/class-ys-post-types.php:48
+msgid "Edit Yacht"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:240
+msgid "Email"
+msgstr ""
+
+#: includes/class-ys-settings.php:181
+msgid "Empty State Text"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:163
+msgid "Enable this if this crew member can be used later as a contact person."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:437
+msgid "Enable this if this tool should behave differently when the crew member is offline/unavailable."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:181
+msgid "End"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:569
+#: includes/class-ys-meta-boxes.php:769
+msgid "Engine"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:566
+msgid "Engine & Years"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:219
+msgid "Enter comma-separated YYYY-MM values. Replace overwrites all values, Add merges into existing values, Remove deletes matching values."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:237
+msgid "Enter the direct communication URL for this crew member and selected tool. This URL will open when the related contact tool card is clicked on the frontend. The fields below are generated dynamically from the currently selected contact tools."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:390
+msgid "Enter the icon identifier used by the frontend or icon map, for example: whatsapp, phone, calendar, email."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:604
+#: includes/class-ys-settings.php:119
+#: includes/class-ys-settings.php:126
+#: templates/shortcode-ys-selector-block.php:354
+msgid "Extra Features"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:243
+msgid "FaceTime"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:431
+msgid "Fallback URL used when no crew-specific URL is available for this tool."
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:385
+msgid "Fazlasi"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:241
+msgid "Features"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:247
+msgid "For web links use https://. For email use mailto:. For phone use tel:. For supported apps use their official direct link format."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:629
+msgid "Friday"
+msgstr ""
+
+#: includes/class-ys-settings.php:134
+msgid "Frontend Text Settings"
+msgstr ""
+
+#: includes/class-ys-settings.php:318
+msgid "Frontend Texts"
+msgstr ""
+
+#: includes/class-ys-settings.php:316
+#: includes/class-ys-settings.php:73
+msgid "General"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:247
+msgid "Generic"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:469
+msgid "Go to back"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:242
+msgid "Google Meet"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:581
+#: includes/class-ys-meta-boxes.php:773
+msgid "Guests"
+msgstr ""
+
+#: includes/class-ys-settings.php:1849
+msgid "Gulet"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:516
+#: includes/class-ys-meta-boxes.php:775
+msgid "Higher values will sort first in later phases."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:379
+msgid "Icon"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:388
+msgid "Icon Name"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:374
+msgid "Icon Type"
+msgstr ""
+
+#: includes/class-ys-settings.php:706
+msgid "If enabled, Yacht Selector will attach to an existing registered post type. If disabled, the plugin will create and use its own yacht post type."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:383
+#: includes/class-ys-contact-tools.php:409
+msgid "Image"
+msgstr ""
+
+#: includes/class-ys-settings.php:1755
+#: includes/class-ys-settings.php:1854
+msgid "Internet"
+msgstr ""
+
+#: includes/class-ys-settings.php:529
+msgid "Invalid JSON data: %s"
+msgstr ""
+
+#: includes/class-ys-settings.php:1757
+#: includes/class-ys-settings.php:1857
+msgid "Jetski"
+msgstr ""
+
+#: includes/class-ys-settings.php:1856
+msgid "Joker Boat"
+msgstr ""
+
+#: includes/class-ys-settings.php:244
+msgid "JSON Data"
+msgstr ""
+
+#: includes/class-ys-settings.php:237
+msgid "JSON Data Import"
+msgstr ""
+
+#: includes/class-ys-settings.php:542
+msgid "JSON data must contain a root array of yacht items."
+msgstr ""
+
+#: includes/class-ys-settings.php:319
+msgid "JSON Import"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:342
+msgid "Kabin"
+msgstr ""
+
+#: includes/class-ys-settings.php:1858
+msgid "Kano"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:559
+#: includes/class-ys-meta-boxes.php:767
+msgid "Length"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:333
+msgid "Liman"
+msgstr ""
+
+#: includes/class-ys-settings.php:317
+msgid "Lists"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:483
+#: includes/class-ys-taxonomy.php:293
+msgid "Location"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:239
+msgid "Location & Booked"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:717
+#: includes/class-ys-meta-boxes.php:724
+msgid "Location taxonomy is not available."
+msgstr ""
+
+#: includes/class-ys-settings.php:96
+msgid "Location Taxonomy Slug"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:292
+#: includes/class-ys-taxonomy.php:303
+msgid "Locations"
+msgstr ""
+
+#: includes/class-ys-settings.php:1731
+msgid "Lucky You"
+msgstr ""
+
+#: includes/class-ys-settings.php:916
+msgid "Main title shown inside the crew section."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:243
+msgid "Media & CTA"
+msgstr ""
+
+#: includes/class-ys-settings.php:1859
+msgid "Minder"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:345
+msgid "Misafir"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:535
+#: includes/class-ys-meta-boxes.php:538
+#: includes/class-ys-meta-boxes.php:752
+#: templates/shortcode-ys-selector-block.php:321
+msgid "Model"
+msgstr ""
+
+#: includes/class-ys-settings.php:104
+msgid "Model Options"
+msgstr ""
+
+#: includes/class-ys-settings.php:111
+msgid "Models"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:625
+msgid "Monday"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:327
+msgid "Motor"
+msgstr ""
+
+#: includes/class-ys-settings.php:1744
+msgid "Motor Yacht"
+msgstr ""
+
+#: includes/class-ys-settings.php:1850
+msgid "Motor Yat"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:348
+msgid "Murettebat"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:510
+msgid "New Contact Tool Name"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:302
+msgid "New Location Name"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:213
+msgid "No Change"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:136
+#: includes/class-ys-crew-meta-boxes.php:252
+msgid "No contact tools found. Create terms in the Contact Tools taxonomy first."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:646
+msgid "No crew members found yet. Add crew members first."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:608
+#: includes/class-ys-meta-boxes.php:792
+msgid "No extra feature options are configured yet. Add them in Yacht Selector settings."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:456
+#: includes/class-ys-contact-tools.php:459
+#: includes/class-ys-meta-boxes.php:690
+#: includes/class-ys-meta-boxes.php:831
+#: includes/class-ys-settings.php:1079
+#: includes/class-ys-settings.php:1082
+#: includes/class-ys-taxonomy.php:215
+#: includes/class-ys-taxonomy.php:218
+msgid "No image selected."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:304
+msgid "No locations found."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:540
+#: includes/class-ys-meta-boxes.php:754
+msgid "No model options are configured yet. Add them in Yacht Selector settings."
+msgstr ""
+
+#: includes/class-ys-settings.php:1841
+#: includes/class-ys-shortcode.php:124
+#: templates/shortcode-ys-selector-block.php:16
+msgid "No results found"
+msgstr ""
+
+#: includes/class-ys-settings.php:952
+msgid "Offline status line template. Use {crew_member} as the placeholder."
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:324
+msgid "Olculer"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:206
+msgid "Online Days"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:169
+msgid "Online Hours"
+msgstr ""
+
+#: includes/class-ys-settings.php:229
+msgid "Online Status Icon"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:152
+#: includes/class-ys-crew-meta-boxes.php:275
+msgid "Online-sensitive"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:115
+msgid "Only used for top-level locations (countries). If this term is saved as a child location, the flag will be ignored."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:342
+msgid "Open settings"
+msgstr ""
+
+#: includes/class-ys-settings.php:964
+msgid "Optional image shown before the crew status text."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:296
+msgid "Parent Location"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:297
+msgid "Parent Location:"
+msgstr ""
+
+#: includes/class-ys-settings.php:743
+msgid "Paste or upload structured yacht data in JSON format. The JSON is validated before it is saved."
+msgstr ""
+
+#: includes/class-ys-settings.php:985
+msgid "Paste structured yacht data as a JSON array. Valid JSON will be stored as raw text."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:239
+msgid "Phone"
+msgstr ""
+
+#: includes/class-ys-settings.php:493
+msgid "Please upload a valid .json file."
+msgstr ""
+
+#: includes/class-ys-settings.php:795
+msgid "Plugin-managed hierarchical taxonomy for Country > Port. Slug will be sanitized with sanitize_key()."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:505
+msgid "Popular Contact Tools"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:52
+msgid "Preparing your yacht selection..."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:513
+#: includes/class-ys-meta-boxes.php:516
+#: includes/class-ys-meta-boxes.php:775
+msgid "Priority"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:571
+#: includes/class-ys-meta-boxes.php:771
+msgid "Refit Year"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:467
+#: includes/class-ys-meta-boxes.php:698
+#: includes/class-ys-meta-boxes.php:839
+#: includes/class-ys-settings.php:1090
+#: includes/class-ys-settings.php:1820
+#: includes/class-ys-taxonomy.php:226
+msgid "Remove"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:216
+msgid "Remove Booked Months"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:214
+msgid "Replace Booked Months"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:695
+#: includes/class-ys-meta-boxes.php:836
+#: includes/i18n.php:46
+msgid "Replace Image"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:630
+msgid "Saturday"
+msgstr ""
+
+#: includes/class-ys-settings.php:1000
+msgid "Schema Help"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:504
+msgid "Search Contact Tools"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:294
+msgid "Search Locations"
+msgstr ""
+
+#: includes/class-ys-settings.php:1844
+#: includes/class-ys-shortcode.php:127
+#: templates/shortcode-ys-selector-block.php:19
+msgid "See the yacht live - choose how you'd like to connect. The crew is currently on board."
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:151
+msgid "Select %s"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:543
+#: includes/class-ys-meta-boxes.php:757
+msgid "Select a model"
+msgstr ""
+
+#: includes/class-ys-settings.php:759
+msgid "Select a post type"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:195
+msgid "Select a UTC offset"
+msgstr ""
+
+#: includes/class-ys-settings.php:1288
+msgid "Select a valid post type before importing JSON data."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:681
+#: includes/class-ys-meta-boxes.php:824
+msgid "Select an image to override the frontend card image. This will later take priority over the featured image."
+msgstr ""
+
+#: includes/i18n.php:44
+msgid "Select Card Image"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:463
+msgid "Select Contact Tool Image"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:222
+msgid "Select Country Flag"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:222
+#: includes/class-ys-taxonomy.php:223
+msgid "Select Flag"
+msgstr ""
+
+#: includes/class-ys-settings.php:965
+msgid "Select Icon"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:463
+#: includes/class-ys-contact-tools.php:464
+#: includes/class-ys-meta-boxes.php:695
+#: includes/class-ys-meta-boxes.php:836
+#: includes/i18n.php:47
+msgid "Select Image"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:134
+msgid "Select one or more contact tools for this crew member."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:226
+msgid "Select one or more contact tools for this crew member. Each selected tool reveals its own direct URL field immediately."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:605
+msgid "Select the extra features available on this yacht."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:452
+#: includes/class-ys-meta-boxes.php:494
+msgid "Select the months when this yacht is booked and unavailable. The list shows the current month plus the next 11 months."
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:151
+msgid "Select yacht %d"
+msgstr ""
+
+#: includes/class-ys-settings.php:88
+msgid "Selected Post Type"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:511
+msgid "Separate contact tools with commas"
+msgstr ""
+
+#: yacht-selector.php:43
+msgid "Settings"
+msgstr ""
+
+#: includes/class-ys-settings.php:1732
+msgid "Short yacht description"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:246
+msgid "Signal"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:240
+#: templates/shortcode-ys-selector-block.php:318
+msgid "Specifications"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:172
+msgid "Start"
+msgstr ""
+
+#: includes/class-ys-settings.php:940
+msgid "Status line template. Use {crew_member} as the placeholder."
+msgstr ""
+
+#: includes/class-ys-settings.php:928
+msgid "Subtitle shown below the crew section title."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:631
+msgid "Sunday"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:245
+msgid "Telegram"
+msgstr ""
+
+#: includes/class-ys-shortcode.php:358
+msgid "Template not found."
+msgstr ""
+
+#: includes/class-ys-settings.php:868
+msgid "Text shown on yacht cards when the selected month is booked."
+msgstr ""
+
+#: includes/class-ys-settings.php:892
+msgid "Text shown when no cards match the selected filters."
+msgstr ""
+
+#: includes/class-ys-settings.php:844
+msgid "Text used for the Book Now button."
+msgstr ""
+
+#: includes/class-ys-settings.php:856
+msgid "Text used for the Call button."
+msgstr ""
+
+#: includes/class-ys-settings.php:880
+msgid "Text used for the default country filter label."
+msgstr ""
+
+#: includes/class-ys-settings.php:832
+msgid "Text used for the Watch Me button."
+msgstr ""
+
+#: includes/class-ys-settings.php:1843
+#: includes/class-ys-shortcode.php:126
+#: templates/shortcode-ys-selector-block.php:18
+msgid "The Crew"
+msgstr ""
+
+#: includes/class-ys-settings.php:1003
+msgid "The example below reflects the plugin’s current meta boxes and frontend data contract."
+msgstr ""
+
+#: includes/class-ys-settings.php:479
+msgid "The JSON file could not be uploaded. Please try again."
+msgstr ""
+
+#: includes/class-ys-settings.php:1002
+msgid "The JSON should follow the plugin’s current field structure."
+msgstr ""
+
+#: includes/class-ys-settings.php:506
+msgid "The uploaded JSON file could not be read."
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:402
+msgid "These icon names come from the icon library used by the plugin."
+msgstr ""
+
+#: includes/class-ys-settings.php:1001
+msgid "This area accepts structured yacht data in JSON format."
+msgstr ""
+
+#: includes/class-ys-settings.php:772
+msgid "This post type will receive Yacht Selector taxonomy and meta box integrations."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:628
+msgid "Thursday"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:232
+msgid "Tool Contact URLs"
+msgstr ""
+
+#: includes/class-ys-settings.php:904
+msgid "Top title shown above the crew section."
+msgstr ""
+
+#: includes/class-ys-settings.php:1851
+msgid "Trawler"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:626
+msgid "Tuesday"
+msgstr ""
+
+#: includes/class-ys-settings.php:1756
+#: includes/class-ys-settings.php:1855
+msgid "TV"
+msgstr ""
+
+#: includes/class-ys-settings.php:1136
+#: includes/class-ys-settings.php:1419
+msgid "Unknown"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:508
+msgid "Update Contact Tool"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:300
+msgid "Update Location"
+msgstr ""
+
+#: includes/class-ys-settings.php:1036
+msgid "Upload a .json file to replace the saved JSON data, or use the textarea above and click the import button to validate and save it."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:137
+msgid "Upload a flag image for this country. Child locations do not support flags."
+msgstr ""
+
+#: includes/class-ys-settings.php:998
+msgid "Upload JSON Data"
+msgstr ""
+
+#: includes/class-ys-settings.php:252
+msgid "Upload JSON File"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:330
+msgid "Uretim / R"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:246
+msgid "Use a direct profile or invite URL when available."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:513
+msgid "Use a full valid URL or supported scheme for this contact method."
+msgstr ""
+
+#: includes/class-ys-settings.php:704
+msgid "Use an existing post type"
+msgstr ""
+
+#: includes/class-ys-settings.php:80
+msgid "Use Existing Post Type"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:222
+msgid "Use flag"
+msgstr ""
+
+#: includes/class-ys-settings.php:967
+msgid "Use icon"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:463
+#: includes/i18n.php:45
+msgid "Use image"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:507
+msgid "Use mailto: links. You can include a subject parameter if needed."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:504
+msgid "Use tel: links for supported devices."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:509
+msgid "Use the direct wa.me format, with an optional prefilled message."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:511
+msgid "Use the facetime: scheme with an email address or phone number."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:193
+msgid "UTC Offset"
+msgstr ""
+
+#: includes/class-ys-post-types.php:75
+msgid "View Crew"
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:299
+msgid "View Location"
+msgstr ""
+
+#: includes/class-ys-post-types.php:49
+msgid "View Yacht"
+msgstr ""
+
+#: includes/class-ys-contact-tools.php:206
+#: includes/class-ys-contact-tools.php:229
+msgid "Visual"
+msgstr ""
+
+#: includes/class-ys-settings.php:1836
+#: includes/class-ys-shortcode.php:119
+#: templates/shortcode-ys-selector-block.php:11
+msgid "Watch Me"
+msgstr ""
+
+#: includes/class-ys-settings.php:141
+msgid "Watch Me Button Text"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:627
+msgid "Wednesday"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:208
+msgid "Weekdays"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:209
+msgid "Weekend"
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:241
+msgid "WhatsApp"
+msgstr ""
+
+#: includes/class-ys-post-types.php:46
+msgid "Yacht"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:157
+msgid "Yacht %d"
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:80
+msgid "Yacht Options"
+msgstr ""
+
+#: includes/class-ys-settings.php:303
+#: includes/class-ys-settings.php:37
+#: includes/class-ys-settings.php:38
+msgid "Yacht Selector"
+msgstr ""
+
+#: includes/class-ys-settings.php:1904
+msgid "Yacht Selector is set to use an existing post type, but no valid post type is selected. Please update the plugin settings."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:334
+msgid "Yacht Selector location taxonomy is not attached because the saved post type \"%s\" is no longer available. Choose a valid post type in Yacht Selector settings."
+msgstr ""
+
+#: includes/class-ys-taxonomy.php:331
+msgid "Yacht Selector location taxonomy is registered, but it is not attached to a post type yet. Choose a post type in Yacht Selector settings."
+msgstr ""
+
+#: includes/class-ys-meta-boxes.php:238
+msgid "Yacht Selector Sections"
+msgstr ""
+
+#: includes/class-ys-settings.php:315
+msgid "Yacht Selector Settings Sections"
+msgstr ""
+
+#: includes/class-ys-settings.php:774
+msgid "Yacht Selector will use its own built-in post type: %s"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:136
+msgid "Yacht thumbnails"
+msgstr ""
+
+#: includes/class-ys-post-types.php:45
+#: includes/class-ys-post-types.php:50
+msgid "Yachts"
+msgstr ""
+
+#: includes/class-ys-settings.php:1004
+msgid "You can copy the example and adapt it."
+msgstr ""
+
+#: includes/class-ys-crew-meta-boxes.php:244
+msgid "Zoom"
+msgstr ""
