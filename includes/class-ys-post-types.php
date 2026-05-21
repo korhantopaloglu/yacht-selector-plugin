@@ -37,30 +37,32 @@ class YS_Post_Types {
 	 * @return void
 	 */
 	public function register_post_types() {
-		register_post_type(
-			$this->settings->get_plugin_post_type(),
-			[
-				'labels' => [
-					'name'          => __( 'Yachts', 'yacht-selector' ),
-					'singular_name' => __( 'Yacht', 'yacht-selector' ),
-					'add_new_item'  => __( 'Add New Yacht', 'yacht-selector' ),
-					'edit_item'     => __( 'Edit Yacht', 'yacht-selector' ),
-					'view_item'     => __( 'View Yacht', 'yacht-selector' ),
-					'menu_name'     => __( 'Yachts', 'yacht-selector' ),
-				],
-				'public'       => true,
-				'show_ui'      => true,
-				'show_in_menu' => true,
-				'show_in_rest' => true,
-				'has_archive'  => true,
-				'rewrite'      => [
-					'slug'       => 'yachts',
-					'with_front' => false,
-				],
-				'menu_icon'    => 'dashicons-palmtree',
-				'supports'     => [ 'title', 'editor', 'thumbnail' ],
-			]
-		);
+		if ( $this->settings->should_register_plugin_yacht_post_type() ) {
+			register_post_type(
+				$this->settings->get_plugin_post_type(),
+				[
+					'labels' => [
+						'name'          => __( 'Yachts', 'yacht-selector' ),
+						'singular_name' => __( 'Yacht', 'yacht-selector' ),
+						'add_new_item'  => __( 'Add New Yacht', 'yacht-selector' ),
+						'edit_item'     => __( 'Edit Yacht', 'yacht-selector' ),
+						'view_item'     => __( 'View Yacht', 'yacht-selector' ),
+						'menu_name'     => __( 'Yachts', 'yacht-selector' ),
+					],
+					'public'       => true,
+					'show_ui'      => true,
+					'show_in_menu' => true,
+					'show_in_rest' => true,
+					'has_archive'  => true,
+					'rewrite'      => [
+						'slug'       => 'yachts',
+						'with_front' => false,
+					],
+					'menu_icon'    => 'dashicons-palmtree',
+					'supports'     => [ 'title', 'editor', 'thumbnail' ],
+				]
+			);
+		}
 
 		register_post_type(
 			'ys_crew',

@@ -19,6 +19,7 @@
 - `assets/js/frontend.js`: removed unused variable `ENABLE_MONTH_TRACK_MOTION`; fixed `.ys-card-crew-close-button` click handler from `classList.toggle('show')` to `classList.remove('show')` (close button must always close, never re-open).
 - `assets/css/frontend.css`: merged split `.ys-months-track` rule blocks into one with a clarifying comment.
 - `includes/class-ys-meta-boxes.php`: removed trailing space from one `class="ys-admin-card-header "` attribute.
+- **Existing CPT mode:** internal `ys_yacht` post type (and **Yachts** admin menu) is registered only when “Use an existing post type” is **off**. Rewrites are flushed when that setting toggles on save (`includes/class-ys-settings.php`, `includes/class-ys-post-types.php`).
 
 ---
 

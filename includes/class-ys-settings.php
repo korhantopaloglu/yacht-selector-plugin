@@ -433,7 +433,15 @@ class YS_Settings {
 		$output['ys_model_options']          = $this->sanitize_repeatable_list( isset( $input['ys_model_options'] ) ? $input['ys_model_options'] : [] );
 		$output['ys_extra_feature_options']  = $this->sanitize_repeatable_list( isset( $input['ys_extra_feature_options'] ) ? $input['ys_extra_feature_options'] : [] );
 
-		return wp_parse_args( $output, $current );
+		$merged = wp_parse_args( $output, $current );
+
+		$had_internal_cpt = '1' !== (string) $current['ys_use_existing_post_type'];
+		$has_internal_cpt = '1' !== (string) $merged['ys_use_existing_post_type'];
+		if ( $had_internal_cpt !== $has_internal_cpt ) {
+			flush_rewrite_rules( false );
+		}
+
+		return $merged;
 	}
 
 	/**
@@ -620,6 +628,18 @@ class YS_Settings {
 	 */
 	public function get_use_existing_post_type() {
 		return '1' === (string) $this->get_setting( 'ys_use_existing_post_type', '0' );
+	}
+
+	/**
+	 * Whether to register the built-in yacht post type (admin menu + archives).
+	 *
+	 * When “Use an existing post type” is enabled, the internal CPT is omitted so only
+	 * the selected CPT is used as the yacht source.
+	 *
+	 * @return bool
+	 */
+	public function should_register_plugin_yacht_post_type() {
+		return ! $this->get_use_existing_post_type();
 	}
 
 	/**
