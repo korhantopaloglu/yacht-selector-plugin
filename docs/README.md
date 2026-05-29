@@ -41,9 +41,17 @@ Preserve every placeholder (`%s`, `%d`, `%1$s`, `{crew_member}`, …) exactly.
 
 **WPML / Polylang** (optional, no dependency)
 
-- Translate frontend/admin UI through the **normal gettext / `.po` workflow** (bundled `tr_TR` pack or your own `.mo` files). `includes/compatibility/multilingual.php` exposes optional **`ys_register_multilingual_string()`** / **`ys_translate_multilingual_string()`** helpers only — it does **not** register frontend text from plugin options.
+- **Frontend UI** (buttons, headings, crew templates, etc.): translate through the normal **gettext / `.po` workflow** (bundled `tr_TR` pack or your own `.mo` files).
+- **Model options** and **extra feature options** remain **repeatable settings text**, **not taxonomy terms**. They are registered as **individual strings** for WPML/Polylang and translated **at render time only** — canonical values in `ys_settings`, `ys_model`, and `ys_extra_features` stay unchanged.
 
-**Explicit non-goals:** model option rows and extra-feature rows stay **repeatable settings text**, **not taxonomy terms**.
+| Plugin | Where to translate model/feature labels |
+| ------ | --------------------------------------- |
+| **Polylang** | **Languages → Translations** — group **Yacht Selector** |
+| **WPML** | **WPML → String Translation** — domain/context **Yacht Selector** |
+
+Helpers live in `includes/compatibility/multilingual.php`: **`ys_register_model_feature_translation_strings()`**, **`ys_translate_model_option_label()`**, **`ys_translate_extra_feature_label()`**. Registration runs on `init`, `admin_init`, and after `ys_settings` updates (including JSON import sync). Imported labels are stored canonically; translators add display translations in WPML/Polylang — the plugin does not auto-translate imports.
+
+**Explicit non-goals:** model option rows and extra-feature rows stay **repeatable settings text**, **not taxonomy terms**; do not expose the full serialized `ys_settings` blob as a single translatable option.
 
 (`package.json` / `composer.json` are not bundled in this repo; if you add aliases there, mirror that command.)
 

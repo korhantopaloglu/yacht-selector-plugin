@@ -161,31 +161,71 @@ class YS_Data_Provider {
 			return null;
 		}
 
-		$priority = $this->get_integer_meta( $post->ID, 'ys_priority', 0 );
+		$priority           = $this->get_integer_meta( $post->ID, 'ys_priority', 0 );
+		$model_canonical    = $this->get_text_meta( $post->ID, 'ys_model' );
+		$features_canonical = $this->get_array_meta( $post->ID, 'ys_extra_features' );
+		$model              = $this->translate_model_label_for_display( $model_canonical );
+		$features           = $this->translate_feature_labels_for_display( $features_canonical );
 
 		return [
-			'id'           => (int) $post->ID,
-			'title'        => get_the_title( $post ),
-			'url'          => get_permalink( $post ),
-			'image'        => $this->resolve_image_url( $post->ID ),
-			'image_thumb'  => $this->resolve_image_thumb_url( $post->ID ),
-			'country'      => $location['country'],
-			'port'         => $location['port'],
-			'booked'       => $this->get_booked_months( $post->ID ),
-			'priority'     => $priority,
-			'model'        => $this->get_text_meta( $post->ID, 'ys_model' ),
-			'length'       => $this->get_numeric_meta( $post->ID, 'ys_length' ),
-			'beam'         => $this->get_numeric_meta( $post->ID, 'ys_beam' ),
-			'engine'       => $this->get_text_meta( $post->ID, 'ys_engine' ),
-			'build_year'   => $this->get_integer_meta( $post->ID, 'ys_build_year' ),
-			'refit_year'   => $this->get_integer_meta( $post->ID, 'ys_refit_year' ),
-			'cabins'       => $this->get_integer_meta( $post->ID, 'ys_cabins' ),
-			'guests'       => $this->get_integer_meta( $post->ID, 'ys_guests' ),
-			'crew'         => $this->get_integer_meta( $post->ID, 'ys_crew' ),
-			'features'     => $this->get_array_meta( $post->ID, 'ys_extra_features' ),
-			'assigned_crew'=> $this->get_assigned_crew( $post->ID ),
-			'cta'          => $this->resolve_cta( $post->ID ),
+			'id'                 => (int) $post->ID,
+			'title'              => get_the_title( $post ),
+			'url'                => get_permalink( $post ),
+			'image'              => $this->resolve_image_url( $post->ID ),
+			'image_thumb'        => $this->resolve_image_thumb_url( $post->ID ),
+			'country'            => $location['country'],
+			'port'               => $location['port'],
+			'booked'             => $this->get_booked_months( $post->ID ),
+			'priority'           => $priority,
+			'model'              => $model,
+			'model_canonical'    => $model_canonical,
+			'length'             => $this->get_numeric_meta( $post->ID, 'ys_length' ),
+			'beam'               => $this->get_numeric_meta( $post->ID, 'ys_beam' ),
+			'engine'             => $this->get_text_meta( $post->ID, 'ys_engine' ),
+			'build_year'         => $this->get_integer_meta( $post->ID, 'ys_build_year' ),
+			'refit_year'         => $this->get_integer_meta( $post->ID, 'ys_refit_year' ),
+			'cabins'             => $this->get_integer_meta( $post->ID, 'ys_cabins' ),
+			'guests'             => $this->get_integer_meta( $post->ID, 'ys_guests' ),
+			'crew'               => $this->get_integer_meta( $post->ID, 'ys_crew' ),
+			'features'           => $features,
+			'features_canonical' => $features_canonical,
+			'assigned_crew'      => $this->get_assigned_crew( $post->ID ),
+			'cta'                => $this->resolve_cta( $post->ID ),
 		];
+	}
+
+	/**
+	 * Translate a model label for frontend display without changing stored meta.
+	 *
+	 * @param string|null $label Canonical model label.
+	 * @return string|null
+	 */
+	private function translate_model_label_for_display( $label ) {
+		if ( null === $label || ! function_exists( 'ys_translate_model_option_label' ) ) {
+			return $label;
+		}
+
+		return ys_translate_model_option_label( $label );
+	}
+
+	/**
+	 * Translate feature labels for frontend display without changing stored meta.
+	 *
+	 * @param array $labels Canonical feature labels.
+	 * @return array
+	 */
+	private function translate_feature_labels_for_display( $labels ) {
+		if ( empty( $labels ) || ! function_exists( 'ys_translate_extra_feature_label' ) ) {
+			return $labels;
+		}
+
+		$translated = [];
+
+		foreach ( $labels as $label ) {
+			$translated[] = ys_translate_extra_feature_label( (string) $label );
+		}
+
+		return $translated;
 	}
 
 	/**

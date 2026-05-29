@@ -4,7 +4,7 @@ Tags: yacht, selector, shortcode
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.5
+Stable tag: 1.1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,17 @@ Yacht Selector renders a fully interactive yacht browsing experience via shortco
 3. Use the `[ys_yacht_selector]` shortcode on any page or template.
 
 == Changelog ==
+
+= 1.1.7 =
+* Fixed Polylang frontend fatal caused by `pll_translate_string()` being called without the required language slug argument.
+* Preserved render-only translation behavior for model and feature labels; canonical DB values unchanged.
+* Bump plugin version metadata to **1.1.7** (patch).
+
+= 1.1.6 =
+* Registered **model options** and **extra feature options** as individual WPML/Polylang strings (`includes/compatibility/multilingual.php`); stable string IDs use `md5( 'model|' . $label )` / `md5( 'feature|' . $label )` (UTF-8 safe).
+* Frontend display translates model/feature labels at render time via `includes/class-ys-data-provider.php`; canonical `ys_settings`, `ys_model`, and `ys_extra_features` values are unchanged.
+* Strings re-register on `init`, `admin_init`, and after `ys_settings` updates (including JSON import sync). No taxonomy, import-schema, or meta-key changes.
+* Bump plugin version metadata to **1.1.6** (patch).
 
 = 1.1.5 =
 * Removed **Frontend Text Settings** from the admin UI; frontend button/label copy is now **gettext-only** (`ys_frontend_display_strings()` / template `__()` calls). Legacy `ys_*` text keys in saved options are ignored (not deleted from the database).

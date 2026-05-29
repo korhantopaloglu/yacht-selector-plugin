@@ -58,9 +58,9 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 			<div class="ys-countries-mask">
 				<div class="ys-countries-track">
 				<a href="#" class="ys-country active" data-country="all">
-					<span class="ys-country-option__flag-wrap">
+					<!-- <span class="ys-country-option__flag-wrap">
 						<span class="ys-country-option__flag ys-country-option__flag--placeholder" aria-hidden="true"></span>
-					</span>
+					</span> -->
 					<span class="ys-country-option__label"><?php echo esc_html( $all_label_text ); ?></span>
 				</a>
 				<?php foreach ( $countries as $country ) : ?>

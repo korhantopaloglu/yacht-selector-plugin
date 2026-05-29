@@ -469,6 +469,7 @@
   justify-content: center;
   position: relative;
   width: 100%;
+  min-height: 175px;
   z-index: 1;
   --ys-slider-step: clamp(96px, 12vw, 186px);
 }
@@ -632,7 +633,7 @@
   height: clamp(360px, 65vh, 720px);
   min-height: 240px;
   object-fit: cover;
-  object-position: center top ;
+  object-position: center;
 }
 
 .ys-card-contact-tools-group  .ys-card-image-container img {

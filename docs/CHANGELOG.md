@@ -1,5 +1,19 @@
 # Yacht Selector Plugin — CHANGELOG
 
+## v1.1.7 — Polylang translation fatal fix
+
+- Fixed frontend **ArgumentCountError** when Polylang is active: `pll_translate_string()` now receives the current language slug from `pll_current_language( 'slug' )` in **`ys_ml_translate_registered_option_label()`** (`includes/compatibility/multilingual.php`).
+- WPML precedence unchanged; falls back to original canonical label when Polylang language is unavailable. Render-only model/feature translation preserved; no DB, taxonomy, option, or meta key changes.
+- Bump plugin version metadata to **1.1.7** (patch).
+
+## v1.1.6 — Model & feature option string translation (WPML / Polylang)
+
+- Registered **model options** (`ys_model_options`) and **extra feature options** (`ys_extra_feature_options`) as individual WPML/Polylang strings in context **Yacht Selector** (`includes/compatibility/multilingual.php`). Stable IDs: `model_option_{md5}` / `extra_feature_{md5}` from canonical labels (UTF-8 safe; no `sanitize_key`-only identifiers).
+- Added render-time translation helpers: **`ys_register_model_feature_translation_strings()`**, **`ys_translate_model_option_label()`**, **`ys_translate_extra_feature_label()`**. Registration runs on **`init`**, **`admin_init`**, and **`updated_option`** when **`ys_settings`** changes (covers JSON import sync).
+- **`includes/class-ys-data-provider.php`**: frontend **`model`** / **`features`** are translated for display; optional **`model_canonical`** / **`features_canonical`** preserve stored meta values. Canonical DB/settings/meta values are never overwritten.
+- No taxonomy conversion, option/meta key renames, import schema changes, or admin form value translation (settings/meta inputs remain canonical).
+- Bump plugin version metadata to **1.1.6** (patch).
+
 ## v1.1.5 — Frontend UI text via gettext only
 
 - Removed **Frontend Text Settings** admin section/tab and all related settings fields (`ys_watch_me_text`, `ys_book_now_text`, `ys_call_crew_text`, `ys_booked_text`, `ys_all_label_text`, `ys_empty_state_text`, crew/connect strings, etc.). **Online Status Icon** (`ys_online_status_icon`) remains under **General**.
