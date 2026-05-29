@@ -4,7 +4,7 @@ Tags: yacht, selector, shortcode
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,12 @@ Yacht Selector renders a fully interactive yacht browsing experience via shortco
 3. Use the `[ys_yacht_selector]` shortcode on any page or template.
 
 == Changelog ==
+
+= 1.1.5 =
+* Removed **Frontend Text Settings** from the admin UI; frontend button/label copy is now **gettext-only** (`ys_frontend_display_strings()` / template `__()` calls). Legacy `ys_*` text keys in saved options are ignored (not deleted from the database).
+* Replaced Turkish hardcoded frontend labels with English msgids (`Dimensions`, `Crew`, `Cabins`, `Watch Video`, etc.); regenerated `languages/yacht-selector.pot` and updated `languages/yacht-selector-tr_TR.po` / `.mo`.
+* WPML/Polylang layer no longer registers option-backed frontend strings; use normal `.po`/gettext translation workflow instead.
+* Bump plugin version metadata to **1.1.5** (patch).
 
 = 1.1.4 =
 * Added optional multilingual compatibility layer (`includes/compatibility/multilingual.php`) for WPML and Polylang: registers admin-managed **Frontend Text Settings** (`ys_watch_me_text`, `ys_book_now_text`, etc.) without requiring either plugin or changing taxonomy, CPT, meta/import contracts, hooks, CSS, or stored option payloads.

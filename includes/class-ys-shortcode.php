@@ -96,25 +96,10 @@ class YS_Shortcode {
 		);
 
 		if ( function_exists( 'ys_frontend_script_i18n' ) ) {
-			$localized = ys_frontend_script_i18n();
-
-			if ( function_exists( 'ys_frontend_option_display_text' ) ) {
-				$localized['statusOnlineTpl'] = ys_frontend_option_display_text(
-					$this->settings,
-					'ys_currently_on_board_text',
-					__( 'Currently on board: {crew_member}', 'yacht-selector' )
-				);
-				$localized['statusOfflineTpl'] = ys_frontend_option_display_text(
-					$this->settings,
-					'ys_currently_offline_text',
-					__( 'Currently offline: {crew_member}', 'yacht-selector' )
-				);
-			}
-
 			wp_localize_script(
 				'ys-frontend-selector',
 				'ysFrontendI18n',
-				$localized
+				ys_frontend_script_i18n()
 			);
 		}
 	}
@@ -125,59 +110,29 @@ class YS_Shortcode {
 	 * @return string
 	 */
 	private function render_selector_shortcode( $ui_class = '' ) {
-		$settings       = $this->get_selector_settings();
-		$items          = $this->get_selector_items( $settings );
-		$countries      = $this->get_selector_country_terms();
-		$months         = $this->get_selector_months( $items );
-		$contact_tools  = $this->data_provider->get_registered_contact_tools();
-		$container_id   = $this->get_container_id();
-		$watch_text     = ys_frontend_option_display_text( $this->settings, 'ys_watch_me_text', __( 'Watch Me', 'yacht-selector' ) );
-		$call_text      = ys_frontend_option_display_text( $this->settings, 'ys_call_crew_text', __( 'Call the Crew', 'yacht-selector' ) );
-		$book_text      = ys_frontend_option_display_text( $this->settings, 'ys_book_now_text', __( 'Book Now', 'yacht-selector' ) );
-		$booked_text    = ys_frontend_option_display_text( $this->settings, 'ys_booked_text', __( 'Booked', 'yacht-selector' ) );
-		$all_label_text = ys_frontend_option_display_text( $this->settings, 'ys_all_label_text', __( 'All', 'yacht-selector' ) );
-		$empty_text     = ys_frontend_option_display_text( $this->settings, 'ys_empty_state_text', __( 'No results found', 'yacht-selector' ) );
-		$crew_top_title = ys_frontend_option_display_text( $this->settings, 'ys_connect_with_top_title', __( 'Connect with', 'yacht-selector' ) );
-		$crew_title     = ys_frontend_option_display_text( $this->settings, 'ys_crew_group_title', __( 'The Crew', 'yacht-selector' ) );
-		$crew_subtitle  = ys_frontend_option_display_text(
-			$this->settings,
-			'ys_crew_group_subtitle',
-			__( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' )
-		);
-		$on_board_text = ys_frontend_option_display_text(
-			$this->settings,
-			'ys_currently_on_board_text',
-			__( 'Currently on board: {crew_member}', 'yacht-selector' )
-		);
-		$offline_text  = ys_frontend_option_display_text(
-			$this->settings,
-			'ys_currently_offline_text',
-			__( 'Currently offline: {crew_member}', 'yacht-selector' )
-		);
-		$online_icon_id = isset( $settings['ys_online_status_icon'] ) ? absint( $settings['ys_online_status_icon'] ) : 0;
+		$settings      = $this->get_selector_settings();
+		$items         = $this->get_selector_items( $settings );
+		$countries     = $this->get_selector_country_terms();
+		$months        = $this->get_selector_months( $items );
+		$contact_tools = $this->data_provider->get_registered_contact_tools();
+		$container_id  = $this->get_container_id();
+		$labels        = function_exists( 'ys_frontend_display_strings' ) ? ys_frontend_display_strings() : [];
+		$online_icon_id = absint( $this->settings->get_setting( 'ys_online_status_icon', 0 ) );
 		$online_icon    = $online_icon_id ? wp_get_attachment_image_url( $online_icon_id, 'thumbnail' ) : '';
 
 		return $this->render_template(
-			[
-				'items'          => $items,
-				'countries'      => $countries,
-				'months'         => $months,
-				'contact_tools'  => $contact_tools,
-				'container_id'   => $container_id,
-				'watch_text'     => $watch_text,
-				'call_text'      => $call_text,
-				'book_text'      => $book_text,
-				'booked_text'    => $booked_text,
-				'all_label_text' => $all_label_text,
-				'empty_text'     => $empty_text,
-				'crew_top_title' => $crew_top_title,
-				'crew_title'     => $crew_title,
-				'crew_subtitle'  => $crew_subtitle,
-				'on_board_text'  => $on_board_text,
-				'offline_text'   => $offline_text,
-				'online_icon'    => $online_icon,
-				'ui_class'       => is_string( $ui_class ) ? $ui_class : '',
-			],
+			array_merge(
+				$labels,
+				[
+					'items'         => $items,
+					'countries'     => $countries,
+					'months'        => $months,
+					'contact_tools' => $contact_tools,
+					'container_id'  => $container_id,
+					'online_icon'   => $online_icon,
+					'ui_class'      => is_string( $ui_class ) ? $ui_class : '',
+				]
+			),
 			YS_PLUGIN_PATH . 'templates/shortcode-ys-selector-block.php'
 		);
 	}

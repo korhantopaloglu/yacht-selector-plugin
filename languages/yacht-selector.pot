@@ -5,18 +5,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yacht Selector\n"
 "Report-Msgid-Bugs-To:\n"
-"POT-Creation-Date: 2026-05-21 21:34+0000\n"
+"POT-Creation-Date: 2026-05-29 13:41+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: tools/make-pot.py\n"
 "X-Domain: yacht-selector\n"
 
-#: includes/class-ys-settings.php:767
+#: includes/class-ys-settings.php:637
 msgid "%1$s (no longer available)"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:70
+#: templates/shortcode-ys-selector-block.php:71
 msgid "%s flag"
 msgstr ""
 
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Add Booked Months"
 msgstr ""
 
-#: includes/class-ys-settings.php:1796
+#: includes/class-ys-settings.php:1534
 msgid "Add item"
 msgstr ""
 
@@ -48,11 +48,11 @@ msgstr ""
 msgid "Add or remove contact tools"
 msgstr ""
 
-#: includes/class-ys-settings.php:820
+#: includes/class-ys-settings.php:690
 msgid "Add reusable feature labels such as Internet, Jetski, or Joker Boat."
 msgstr ""
 
-#: includes/class-ys-settings.php:808
+#: includes/class-ys-settings.php:678
 msgid "Add the yacht models available for selection, such as Gulet or Trawler."
 msgstr ""
 
@@ -60,9 +60,8 @@ msgstr ""
 msgid "Affected by online status"
 msgstr ""
 
-#: includes/class-ys-settings.php:1840
-#: includes/class-ys-shortcode.php:123
-#: templates/shortcode-ys-selector-block.php:15
+#: includes/i18n.php:36
+#: templates/shortcode-ys-selector-block.php:16
 msgid "All"
 msgstr ""
 
@@ -72,10 +71,6 @@ msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:210
 msgid "All Days"
-msgstr ""
-
-#: includes/class-ys-settings.php:173
-msgid "All Label Text"
 msgstr ""
 
 #: includes/class-ys-taxonomy.php:295
@@ -108,24 +103,14 @@ msgstr ""
 msgid "Behavior"
 msgstr ""
 
-#: includes/class-ys-settings.php:1837
-#: includes/class-ys-shortcode.php:121
-#: templates/shortcode-ys-selector-block.php:13
+#: includes/i18n.php:34
+#: templates/shortcode-ys-selector-block.php:14
 msgid "Book Now"
 msgstr ""
 
-#: includes/class-ys-settings.php:149
-msgid "Book Now Button Text"
-msgstr ""
-
-#: includes/class-ys-settings.php:1839
-#: includes/class-ys-shortcode.php:122
-#: templates/shortcode-ys-selector-block.php:14
+#: includes/i18n.php:35
+#: templates/shortcode-ys-selector-block.php:15
 msgid "Booked"
-msgstr ""
-
-#: includes/class-ys-settings.php:165
-msgid "Booked Label Text"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:141
@@ -140,6 +125,10 @@ msgstr ""
 msgid "Browse more icons"
 msgstr ""
 
+#: templates/shortcode-ys-selector-block.php:331
+msgid "Build / Refit Year"
+msgstr ""
+
 #: includes/class-ys-meta-boxes.php:570
 #: includes/class-ys-meta-boxes.php:770
 msgid "Build Year"
@@ -147,21 +136,17 @@ msgstr ""
 
 #: includes/class-ys-meta-boxes.php:580
 #: includes/class-ys-meta-boxes.php:772
+#: templates/shortcode-ys-selector-block.php:343
 msgid "Cabins"
 msgstr ""
 
-#: includes/class-ys-settings.php:157
-msgid "Call Button Text"
-msgstr ""
-
-#: includes/class-ys-settings.php:1838
-#: includes/class-ys-shortcode.php:120
-#: templates/shortcode-ys-selector-block.php:12
+#: includes/i18n.php:33
+#: templates/shortcode-ys-selector-block.php:13
 msgid "Call the Crew"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:577
-#: templates/shortcode-ys-selector-block.php:339
+#: templates/shortcode-ys-selector-block.php:340
 msgid "Capacity"
 msgstr ""
 
@@ -178,7 +163,7 @@ msgstr ""
 msgid "Change Flag"
 msgstr ""
 
-#: includes/class-ys-settings.php:966
+#: includes/class-ys-settings.php:704
 msgid "Change Icon"
 msgstr ""
 
@@ -195,7 +180,7 @@ msgstr ""
 msgid "Choose from the most used contact tools"
 msgstr ""
 
-#: includes/class-ys-settings.php:691
+#: includes/class-ys-settings.php:570
 msgid "Choose whether Yacht Selector should use an existing registered post type or its own built-in yacht post type."
 msgstr ""
 
@@ -207,8 +192,8 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:401
-#: templates/shortcode-ys-selector-block.php:469
+#: templates/shortcode-ys-selector-block.php:402
+#: templates/shortcode-ys-selector-block.php:470
 msgid "Close crew panel"
 msgstr ""
 
@@ -216,13 +201,12 @@ msgstr ""
 msgid "Comma-separated YYYY-MM values. Example: 2026-06, 2026-07"
 msgstr ""
 
-#: includes/class-ys-settings.php:305
+#: includes/class-ys-settings.php:210
 msgid "Configure the post type, plugin-managed location taxonomy slug, and reusable option lists for yacht data management."
 msgstr ""
 
-#: includes/class-ys-settings.php:1842
-#: includes/class-ys-shortcode.php:125
-#: templates/shortcode-ys-selector-block.php:17
+#: includes/i18n.php:38
+#: templates/shortcode-ys-selector-block.php:18
 msgid "Connect with"
 msgstr ""
 
@@ -248,7 +232,7 @@ msgstr ""
 msgid "Contact URL Help"
 msgstr ""
 
-#: includes/class-ys-settings.php:1007
+#: includes/class-ys-settings.php:745
 msgid "Copy JSON Template"
 msgstr ""
 
@@ -261,15 +245,8 @@ msgstr ""
 #: includes/class-ys-meta-boxes.php:774
 #: includes/class-ys-post-types.php:71
 #: includes/class-ys-post-types.php:72
+#: templates/shortcode-ys-selector-block.php:349
 msgid "Crew"
-msgstr ""
-
-#: includes/class-ys-settings.php:205
-msgid "Crew Group Subtitle"
-msgstr ""
-
-#: includes/class-ys-settings.php:197
-msgid "Crew Group Title"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:242
@@ -277,38 +254,20 @@ msgstr ""
 msgid "Crew Members"
 msgstr ""
 
-#: includes/class-ys-settings.php:189
-msgid "Crew Top Title"
-msgstr ""
-
 #: includes/class-ys-post-types.php:76
 msgid "Crews"
 msgstr ""
 
-#: includes/class-ys-settings.php:221
-msgid "Currently Offline Text"
-msgstr ""
-
-#: includes/class-ys-settings.php:1846
-#: includes/class-ys-shortcode.php:129
-#: includes/i18n.php:33
-#: templates/shortcode-ys-selector-block.php:21
+#: includes/i18n.php:42
+#: includes/i18n.php:54
+#: templates/shortcode-ys-selector-block.php:22
 msgid "Currently offline: {crew_member}"
 msgstr ""
 
-#: includes/class-ys-settings.php:213
-msgid "Currently On Board Text"
-msgstr ""
-
-#: includes/class-ys-settings.php:1845
-#: includes/class-ys-shortcode.php:128
-#: includes/i18n.php:32
-#: templates/shortcode-ys-selector-block.php:20
+#: includes/i18n.php:41
+#: includes/i18n.php:53
+#: templates/shortcode-ys-selector-block.php:21
 msgid "Currently on board: {crew_member}"
-msgstr ""
-
-#: includes/class-ys-settings.php:734
-msgid "Customize reusable frontend labels and empty-state text for later shortcode output."
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:559
@@ -325,23 +284,24 @@ msgstr ""
 msgid "Default URL"
 msgstr ""
 
-#: includes/class-ys-settings.php:716
+#: includes/class-ys-settings.php:595
 msgid "Define the available yacht model labels used by the plugin. Add one item per row."
 msgstr ""
 
-#: includes/class-ys-settings.php:725
+#: includes/class-ys-settings.php:604
 msgid "Define the reusable extra feature labels available for yachts. Add one item per row."
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:556
+#: templates/shortcode-ys-selector-block.php:325
 msgid "Dimensions"
 msgstr ""
 
-#: includes/class-ys-settings.php:1860
+#: includes/class-ys-settings.php:1587
 msgid "Duş"
 msgstr ""
 
-#: includes/class-ys-settings.php:556
+#: includes/class-ys-settings.php:446
 msgid "Each JSON item must be an object. Item %d is invalid."
 msgstr ""
 
@@ -365,10 +325,6 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: includes/class-ys-settings.php:181
-msgid "Empty State Text"
-msgstr ""
-
 #: includes/class-ys-crew-meta-boxes.php:163
 msgid "Enable this if this crew member can be used later as a contact person."
 msgstr ""
@@ -383,6 +339,7 @@ msgstr ""
 
 #: includes/class-ys-meta-boxes.php:569
 #: includes/class-ys-meta-boxes.php:769
+#: templates/shortcode-ys-selector-block.php:328
 msgid "Engine"
 msgstr ""
 
@@ -403,9 +360,9 @@ msgid "Enter the icon identifier used by the frontend or icon map, for example: 
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:604
-#: includes/class-ys-settings.php:119
-#: includes/class-ys-settings.php:126
-#: templates/shortcode-ys-selector-block.php:354
+#: includes/class-ys-settings.php:127
+#: includes/class-ys-settings.php:134
+#: templates/shortcode-ys-selector-block.php:355
 msgid "Extra Features"
 msgstr ""
 
@@ -415,10 +372,6 @@ msgstr ""
 
 #: includes/class-ys-contact-tools.php:431
 msgid "Fallback URL used when no crew-specific URL is available for this tool."
-msgstr ""
-
-#: templates/shortcode-ys-selector-block.php:385
-msgid "Fazlasi"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:241
@@ -433,15 +386,7 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-#: includes/class-ys-settings.php:134
-msgid "Frontend Text Settings"
-msgstr ""
-
-#: includes/class-ys-settings.php:318
-msgid "Frontend Texts"
-msgstr ""
-
-#: includes/class-ys-settings.php:316
+#: includes/class-ys-settings.php:221
 #: includes/class-ys-settings.php:73
 msgid "General"
 msgstr ""
@@ -450,7 +395,7 @@ msgstr ""
 msgid "Generic"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:469
+#: templates/shortcode-ys-selector-block.php:470
 msgid "Go to back"
 msgstr ""
 
@@ -460,10 +405,11 @@ msgstr ""
 
 #: includes/class-ys-meta-boxes.php:581
 #: includes/class-ys-meta-boxes.php:773
+#: templates/shortcode-ys-selector-block.php:346
 msgid "Guests"
 msgstr ""
 
-#: includes/class-ys-settings.php:1849
+#: includes/class-ys-settings.php:1576
 msgid "Gulet"
 msgstr ""
 
@@ -484,7 +430,7 @@ msgstr ""
 msgid "Icon Type"
 msgstr ""
 
-#: includes/class-ys-settings.php:706
+#: includes/class-ys-settings.php:585
 msgid "If enabled, Yacht Selector will attach to an existing registered post type. If disabled, the plugin will create and use its own yacht post type."
 msgstr ""
 
@@ -493,45 +439,41 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: includes/class-ys-settings.php:1755
-#: includes/class-ys-settings.php:1854
+#: includes/class-ys-settings.php:1493
+#: includes/class-ys-settings.php:1581
 msgid "Internet"
 msgstr ""
 
-#: includes/class-ys-settings.php:529
+#: includes/class-ys-settings.php:419
 msgid "Invalid JSON data: %s"
 msgstr ""
 
-#: includes/class-ys-settings.php:1757
-#: includes/class-ys-settings.php:1857
+#: includes/class-ys-settings.php:1495
+#: includes/class-ys-settings.php:1584
 msgid "Jetski"
 msgstr ""
 
-#: includes/class-ys-settings.php:1856
+#: includes/class-ys-settings.php:1583
 msgid "Joker Boat"
 msgstr ""
 
-#: includes/class-ys-settings.php:244
+#: includes/class-ys-settings.php:149
 msgid "JSON Data"
 msgstr ""
 
-#: includes/class-ys-settings.php:237
+#: includes/class-ys-settings.php:142
 msgid "JSON Data Import"
 msgstr ""
 
-#: includes/class-ys-settings.php:542
+#: includes/class-ys-settings.php:432
 msgid "JSON data must contain a root array of yacht items."
 msgstr ""
 
-#: includes/class-ys-settings.php:319
+#: includes/class-ys-settings.php:223
 msgid "JSON Import"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:342
-msgid "Kabin"
-msgstr ""
-
-#: includes/class-ys-settings.php:1858
+#: includes/class-ys-settings.php:1585
 msgid "Kano"
 msgstr ""
 
@@ -540,11 +482,7 @@ msgstr ""
 msgid "Length"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:333
-msgid "Liman"
-msgstr ""
-
-#: includes/class-ys-settings.php:317
+#: includes/class-ys-settings.php:222
 msgid "Lists"
 msgstr ""
 
@@ -571,38 +509,30 @@ msgstr ""
 msgid "Locations"
 msgstr ""
 
-#: includes/class-ys-settings.php:1731
+#: includes/class-ys-settings.php:1469
 msgid "Lucky You"
-msgstr ""
-
-#: includes/class-ys-settings.php:916
-msgid "Main title shown inside the crew section."
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:243
 msgid "Media & CTA"
 msgstr ""
 
-#: includes/class-ys-settings.php:1859
+#: includes/class-ys-settings.php:1586
 msgid "Minder"
-msgstr ""
-
-#: templates/shortcode-ys-selector-block.php:345
-msgid "Misafir"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:535
 #: includes/class-ys-meta-boxes.php:538
 #: includes/class-ys-meta-boxes.php:752
-#: templates/shortcode-ys-selector-block.php:321
+#: templates/shortcode-ys-selector-block.php:322
 msgid "Model"
 msgstr ""
 
-#: includes/class-ys-settings.php:104
+#: includes/class-ys-settings.php:112
 msgid "Model Options"
 msgstr ""
 
-#: includes/class-ys-settings.php:111
+#: includes/class-ys-settings.php:119
 msgid "Models"
 msgstr ""
 
@@ -610,20 +540,16 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:327
-msgid "Motor"
+#: templates/shortcode-ys-selector-block.php:386
+msgid "More"
 msgstr ""
 
-#: includes/class-ys-settings.php:1744
+#: includes/class-ys-settings.php:1482
 msgid "Motor Yacht"
 msgstr ""
 
-#: includes/class-ys-settings.php:1850
+#: includes/class-ys-settings.php:1577
 msgid "Motor Yat"
-msgstr ""
-
-#: templates/shortcode-ys-selector-block.php:348
-msgid "Murettebat"
 msgstr ""
 
 #: includes/class-ys-contact-tools.php:510
@@ -656,8 +582,8 @@ msgstr ""
 #: includes/class-ys-contact-tools.php:459
 #: includes/class-ys-meta-boxes.php:690
 #: includes/class-ys-meta-boxes.php:831
-#: includes/class-ys-settings.php:1079
-#: includes/class-ys-settings.php:1082
+#: includes/class-ys-settings.php:817
+#: includes/class-ys-settings.php:820
 #: includes/class-ys-taxonomy.php:215
 #: includes/class-ys-taxonomy.php:218
 msgid "No image selected."
@@ -672,18 +598,9 @@ msgstr ""
 msgid "No model options are configured yet. Add them in Yacht Selector settings."
 msgstr ""
 
-#: includes/class-ys-settings.php:1841
-#: includes/class-ys-shortcode.php:124
-#: templates/shortcode-ys-selector-block.php:16
+#: includes/i18n.php:37
+#: templates/shortcode-ys-selector-block.php:17
 msgid "No results found"
-msgstr ""
-
-#: includes/class-ys-settings.php:952
-msgid "Offline status line template. Use {crew_member} as the placeholder."
-msgstr ""
-
-#: templates/shortcode-ys-selector-block.php:324
-msgid "Olculer"
 msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:206
@@ -694,7 +611,7 @@ msgstr ""
 msgid "Online Hours"
 msgstr ""
 
-#: includes/class-ys-settings.php:229
+#: includes/class-ys-settings.php:104
 msgid "Online Status Icon"
 msgstr ""
 
@@ -711,7 +628,7 @@ msgstr ""
 msgid "Open settings"
 msgstr ""
 
-#: includes/class-ys-settings.php:964
+#: includes/class-ys-settings.php:702
 msgid "Optional image shown before the crew status text."
 msgstr ""
 
@@ -723,11 +640,11 @@ msgstr ""
 msgid "Parent Location:"
 msgstr ""
 
-#: includes/class-ys-settings.php:743
+#: includes/class-ys-settings.php:613
 msgid "Paste or upload structured yacht data in JSON format. The JSON is validated before it is saved."
 msgstr ""
 
-#: includes/class-ys-settings.php:985
+#: includes/class-ys-settings.php:723
 msgid "Paste structured yacht data as a JSON array. Valid JSON will be stored as raw text."
 msgstr ""
 
@@ -735,11 +652,11 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: includes/class-ys-settings.php:493
+#: includes/class-ys-settings.php:383
 msgid "Please upload a valid .json file."
 msgstr ""
 
-#: includes/class-ys-settings.php:795
+#: includes/class-ys-settings.php:665
 msgid "Plugin-managed hierarchical taxonomy for Country > Port. Slug will be sanitized with sanitize_key()."
 msgstr ""
 
@@ -747,7 +664,11 @@ msgstr ""
 msgid "Popular Contact Tools"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:52
+#: templates/shortcode-ys-selector-block.php:334
+msgid "Port"
+msgstr ""
+
+#: templates/shortcode-ys-selector-block.php:53
 msgid "Preparing your yacht selection..."
 msgstr ""
 
@@ -765,8 +686,8 @@ msgstr ""
 #: includes/class-ys-contact-tools.php:467
 #: includes/class-ys-meta-boxes.php:698
 #: includes/class-ys-meta-boxes.php:839
-#: includes/class-ys-settings.php:1090
-#: includes/class-ys-settings.php:1820
+#: includes/class-ys-settings.php:1558
+#: includes/class-ys-settings.php:828
 #: includes/class-ys-taxonomy.php:226
 msgid "Remove"
 msgstr ""
@@ -781,7 +702,7 @@ msgstr ""
 
 #: includes/class-ys-meta-boxes.php:695
 #: includes/class-ys-meta-boxes.php:836
-#: includes/i18n.php:46
+#: includes/i18n.php:67
 msgid "Replace Image"
 msgstr ""
 
@@ -789,7 +710,7 @@ msgstr ""
 msgid "Saturday"
 msgstr ""
 
-#: includes/class-ys-settings.php:1000
+#: includes/class-ys-settings.php:738
 msgid "Schema Help"
 msgstr ""
 
@@ -801,13 +722,12 @@ msgstr ""
 msgid "Search Locations"
 msgstr ""
 
-#: includes/class-ys-settings.php:1844
-#: includes/class-ys-shortcode.php:127
-#: templates/shortcode-ys-selector-block.php:19
+#: includes/i18n.php:40
+#: templates/shortcode-ys-selector-block.php:20
 msgid "See the yacht live - choose how you'd like to connect. The crew is currently on board."
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:151
+#: templates/shortcode-ys-selector-block.php:152
 msgid "Select %s"
 msgstr ""
 
@@ -816,7 +736,7 @@ msgstr ""
 msgid "Select a model"
 msgstr ""
 
-#: includes/class-ys-settings.php:759
+#: includes/class-ys-settings.php:629
 msgid "Select a post type"
 msgstr ""
 
@@ -824,7 +744,7 @@ msgstr ""
 msgid "Select a UTC offset"
 msgstr ""
 
-#: includes/class-ys-settings.php:1288
+#: includes/class-ys-settings.php:1026
 msgid "Select a valid post type before importing JSON data."
 msgstr ""
 
@@ -833,7 +753,7 @@ msgstr ""
 msgid "Select an image to override the frontend card image. This will later take priority over the featured image."
 msgstr ""
 
-#: includes/i18n.php:44
+#: includes/i18n.php:65
 msgid "Select Card Image"
 msgstr ""
 
@@ -850,7 +770,7 @@ msgstr ""
 msgid "Select Flag"
 msgstr ""
 
-#: includes/class-ys-settings.php:965
+#: includes/class-ys-settings.php:703
 msgid "Select Icon"
 msgstr ""
 
@@ -858,7 +778,7 @@ msgstr ""
 #: includes/class-ys-contact-tools.php:464
 #: includes/class-ys-meta-boxes.php:695
 #: includes/class-ys-meta-boxes.php:836
-#: includes/i18n.php:47
+#: includes/i18n.php:68
 msgid "Select Image"
 msgstr ""
 
@@ -879,7 +799,7 @@ msgstr ""
 msgid "Select the months when this yacht is booked and unavailable. The list shows the current month plus the next 11 months."
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:151
+#: templates/shortcode-ys-selector-block.php:152
 msgid "Select yacht %d"
 msgstr ""
 
@@ -891,11 +811,11 @@ msgstr ""
 msgid "Separate contact tools with commas"
 msgstr ""
 
-#: yacht-selector.php:43
+#: yacht-selector.php:44
 msgid "Settings"
 msgstr ""
 
-#: includes/class-ys-settings.php:1732
+#: includes/class-ys-settings.php:1470
 msgid "Short yacht description"
 msgstr ""
 
@@ -904,20 +824,12 @@ msgid "Signal"
 msgstr ""
 
 #: includes/class-ys-meta-boxes.php:240
-#: templates/shortcode-ys-selector-block.php:318
+#: templates/shortcode-ys-selector-block.php:319
 msgid "Specifications"
 msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:172
 msgid "Start"
-msgstr ""
-
-#: includes/class-ys-settings.php:940
-msgid "Status line template. Use {crew_member} as the placeholder."
-msgstr ""
-
-#: includes/class-ys-settings.php:928
-msgid "Subtitle shown below the crew section title."
 msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:631
@@ -928,53 +840,28 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
-#: includes/class-ys-shortcode.php:358
+#: includes/class-ys-shortcode.php:340
 msgid "Template not found."
 msgstr ""
 
-#: includes/class-ys-settings.php:868
-msgid "Text shown on yacht cards when the selected month is booked."
-msgstr ""
-
-#: includes/class-ys-settings.php:892
-msgid "Text shown when no cards match the selected filters."
-msgstr ""
-
-#: includes/class-ys-settings.php:844
-msgid "Text used for the Book Now button."
-msgstr ""
-
-#: includes/class-ys-settings.php:856
-msgid "Text used for the Call button."
-msgstr ""
-
-#: includes/class-ys-settings.php:880
-msgid "Text used for the default country filter label."
-msgstr ""
-
-#: includes/class-ys-settings.php:832
-msgid "Text used for the Watch Me button."
-msgstr ""
-
-#: includes/class-ys-settings.php:1843
-#: includes/class-ys-shortcode.php:126
-#: templates/shortcode-ys-selector-block.php:18
+#: includes/i18n.php:39
+#: templates/shortcode-ys-selector-block.php:19
 msgid "The Crew"
 msgstr ""
 
-#: includes/class-ys-settings.php:1003
+#: includes/class-ys-settings.php:741
 msgid "The example below reflects the plugin’s current meta boxes and frontend data contract."
 msgstr ""
 
-#: includes/class-ys-settings.php:479
+#: includes/class-ys-settings.php:369
 msgid "The JSON file could not be uploaded. Please try again."
 msgstr ""
 
-#: includes/class-ys-settings.php:1002
+#: includes/class-ys-settings.php:740
 msgid "The JSON should follow the plugin’s current field structure."
 msgstr ""
 
-#: includes/class-ys-settings.php:506
+#: includes/class-ys-settings.php:396
 msgid "The uploaded JSON file could not be read."
 msgstr ""
 
@@ -982,11 +869,11 @@ msgstr ""
 msgid "These icon names come from the icon library used by the plugin."
 msgstr ""
 
-#: includes/class-ys-settings.php:1001
+#: includes/class-ys-settings.php:739
 msgid "This area accepts structured yacht data in JSON format."
 msgstr ""
 
-#: includes/class-ys-settings.php:772
+#: includes/class-ys-settings.php:642
 msgid "This post type will receive Yacht Selector taxonomy and meta box integrations."
 msgstr ""
 
@@ -998,11 +885,7 @@ msgstr ""
 msgid "Tool Contact URLs"
 msgstr ""
 
-#: includes/class-ys-settings.php:904
-msgid "Top title shown above the crew section."
-msgstr ""
-
-#: includes/class-ys-settings.php:1851
+#: includes/class-ys-settings.php:1578
 msgid "Trawler"
 msgstr ""
 
@@ -1010,13 +893,13 @@ msgstr ""
 msgid "Tuesday"
 msgstr ""
 
-#: includes/class-ys-settings.php:1756
-#: includes/class-ys-settings.php:1855
+#: includes/class-ys-settings.php:1494
+#: includes/class-ys-settings.php:1582
 msgid "TV"
 msgstr ""
 
-#: includes/class-ys-settings.php:1136
-#: includes/class-ys-settings.php:1419
+#: includes/class-ys-settings.php:1157
+#: includes/class-ys-settings.php:874
 msgid "Unknown"
 msgstr ""
 
@@ -1028,7 +911,7 @@ msgstr ""
 msgid "Update Location"
 msgstr ""
 
-#: includes/class-ys-settings.php:1036
+#: includes/class-ys-settings.php:774
 msgid "Upload a .json file to replace the saved JSON data, or use the textarea above and click the import button to validate and save it."
 msgstr ""
 
@@ -1036,16 +919,12 @@ msgstr ""
 msgid "Upload a flag image for this country. Child locations do not support flags."
 msgstr ""
 
-#: includes/class-ys-settings.php:998
+#: includes/class-ys-settings.php:736
 msgid "Upload JSON Data"
 msgstr ""
 
-#: includes/class-ys-settings.php:252
+#: includes/class-ys-settings.php:157
 msgid "Upload JSON File"
-msgstr ""
-
-#: templates/shortcode-ys-selector-block.php:330
-msgid "Uretim / R"
 msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:246
@@ -1056,7 +935,7 @@ msgstr ""
 msgid "Use a full valid URL or supported scheme for this contact method."
 msgstr ""
 
-#: includes/class-ys-settings.php:704
+#: includes/class-ys-settings.php:583
 msgid "Use an existing post type"
 msgstr ""
 
@@ -1068,12 +947,12 @@ msgstr ""
 msgid "Use flag"
 msgstr ""
 
-#: includes/class-ys-settings.php:967
+#: includes/class-ys-settings.php:705
 msgid "Use icon"
 msgstr ""
 
 #: includes/class-ys-contact-tools.php:463
-#: includes/i18n.php:45
+#: includes/i18n.php:66
 msgid "Use image"
 msgstr ""
 
@@ -1114,14 +993,9 @@ msgstr ""
 msgid "Visual"
 msgstr ""
 
-#: includes/class-ys-settings.php:1836
-#: includes/class-ys-shortcode.php:119
-#: templates/shortcode-ys-selector-block.php:11
-msgid "Watch Me"
-msgstr ""
-
-#: includes/class-ys-settings.php:141
-msgid "Watch Me Button Text"
+#: includes/i18n.php:32
+#: templates/shortcode-ys-selector-block.php:12
+msgid "Watch Video"
 msgstr ""
 
 #: includes/class-ys-crew-meta-boxes.php:627
@@ -1144,7 +1018,7 @@ msgstr ""
 msgid "Yacht"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:157
+#: templates/shortcode-ys-selector-block.php:158
 msgid "Yacht %d"
 msgstr ""
 
@@ -1152,13 +1026,13 @@ msgstr ""
 msgid "Yacht Options"
 msgstr ""
 
-#: includes/class-ys-settings.php:303
+#: includes/class-ys-settings.php:208
 #: includes/class-ys-settings.php:37
 #: includes/class-ys-settings.php:38
 msgid "Yacht Selector"
 msgstr ""
 
-#: includes/class-ys-settings.php:1904
+#: includes/class-ys-settings.php:1631
 msgid "Yacht Selector is set to use an existing post type, but no valid post type is selected. Please update the plugin settings."
 msgstr ""
 
@@ -1174,15 +1048,15 @@ msgstr ""
 msgid "Yacht Selector Sections"
 msgstr ""
 
-#: includes/class-ys-settings.php:315
+#: includes/class-ys-settings.php:220
 msgid "Yacht Selector Settings Sections"
 msgstr ""
 
-#: includes/class-ys-settings.php:774
+#: includes/class-ys-settings.php:644
 msgid "Yacht Selector will use its own built-in post type: %s"
 msgstr ""
 
-#: templates/shortcode-ys-selector-block.php:136
+#: templates/shortcode-ys-selector-block.php:137
 msgid "Yacht thumbnails"
 msgstr ""
 
@@ -1191,7 +1065,7 @@ msgstr ""
 msgid "Yachts"
 msgstr ""
 
-#: includes/class-ys-settings.php:1004
+#: includes/class-ys-settings.php:742
 msgid "You can copy the example and adapt it."
 msgstr ""
 

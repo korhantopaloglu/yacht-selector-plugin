@@ -4,10 +4,9 @@
 Build languages/yacht-selector-tr_TR.po and yacht-selector-tr_TR.mo from the POT catalog
 plus languages/yacht-selector-tr_TR.msgrecords.txt (newline-ordered Turkish msgstrs).
 
-Maintain strings in ``tools/emit_msgrecords_txt.py`` (tuple ``LINES_TR``), then regenerate
-the msgrecords newline file:
+Maintain Turkish strings in ``tools/tr_translations.json``, then:
 
-    python3 tools/emit_msgrecords_txt.py
+    python3 tools/sync_tr_from_pot.py
 
 Usage (repo root):
 

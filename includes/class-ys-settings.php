@@ -99,6 +99,14 @@ class YS_Settings {
 			'ys_general_section'
 		);
 
+		add_settings_field(
+			'ys_online_status_icon',
+			__( 'Online Status Icon', 'yacht-selector' ),
+			[ $this, 'render_online_status_icon_field' ],
+			'ys-settings',
+			'ys_general_section'
+		);
+
 		add_settings_section(
 			'ys_model_options_section',
 			__( 'Model Options', 'yacht-selector' ),
@@ -127,109 +135,6 @@ class YS_Settings {
 			[ $this, 'render_extra_feature_options_field' ],
 			'ys-settings',
 			'ys_extra_feature_options_section'
-		);
-
-		add_settings_section(
-			'ys_frontend_text_settings_section',
-			__( 'Frontend Text Settings', 'yacht-selector' ),
-			[ $this, 'render_frontend_text_settings_section' ],
-			'ys-settings'
-		);
-
-		add_settings_field(
-			'ys_watch_me_text',
-			__( 'Watch Me Button Text', 'yacht-selector' ),
-			[ $this, 'render_watch_me_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_book_now_text',
-			__( 'Book Now Button Text', 'yacht-selector' ),
-			[ $this, 'render_book_now_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_call_crew_text',
-			__( 'Call Button Text', 'yacht-selector' ),
-			[ $this, 'render_call_crew_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_booked_text',
-			__( 'Booked Label Text', 'yacht-selector' ),
-			[ $this, 'render_booked_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_all_label_text',
-			__( 'All Label Text', 'yacht-selector' ),
-			[ $this, 'render_all_label_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_empty_state_text',
-			__( 'Empty State Text', 'yacht-selector' ),
-			[ $this, 'render_empty_state_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_connect_with_top_title',
-			__( 'Crew Top Title', 'yacht-selector' ),
-			[ $this, 'render_connect_with_top_title_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_crew_group_title',
-			__( 'Crew Group Title', 'yacht-selector' ),
-			[ $this, 'render_crew_group_title_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_crew_group_subtitle',
-			__( 'Crew Group Subtitle', 'yacht-selector' ),
-			[ $this, 'render_crew_group_subtitle_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_currently_on_board_text',
-			__( 'Currently On Board Text', 'yacht-selector' ),
-			[ $this, 'render_currently_on_board_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_currently_offline_text',
-			__( 'Currently Offline Text', 'yacht-selector' ),
-			[ $this, 'render_currently_offline_text_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
-		);
-
-		add_settings_field(
-			'ys_online_status_icon',
-			__( 'Online Status Icon', 'yacht-selector' ),
-			[ $this, 'render_online_status_icon_field' ],
-			'ys-settings',
-			'ys_frontend_text_settings_section'
 		);
 
 		add_settings_section(
@@ -315,7 +220,6 @@ class YS_Settings {
 					<div class="ys-admin-tabs-nav" role="tablist" aria-label="<?php esc_attr_e( 'Yacht Selector Settings Sections', 'yacht-selector' ); ?>">
 						<button type="button" class="ys-tab-button is-active" data-ys-tab="general" aria-selected="true"><?php esc_html_e( 'General', 'yacht-selector' ); ?></button>
 						<button type="button" class="ys-tab-button" data-ys-tab="lists" aria-selected="false"><?php esc_html_e( 'Lists', 'yacht-selector' ); ?></button>
-						<button type="button" class="ys-tab-button" data-ys-tab="texts" aria-selected="false"><?php esc_html_e( 'Frontend Texts', 'yacht-selector' ); ?></button>
 						<button type="button" class="ys-tab-button" data-ys-tab="import" aria-selected="false"><?php esc_html_e( 'JSON Import', 'yacht-selector' ); ?></button>
 					</div>
 
@@ -325,9 +229,6 @@ class YS_Settings {
 						</div>
 						<div class="ys-tab-panel" data-ys-panel="lists" hidden>
 							<?php $this->render_settings_tab_sections( [ 'ys_model_options_section', 'ys_extra_feature_options_section' ] ); ?>
-						</div>
-						<div class="ys-tab-panel" data-ys-panel="texts" hidden>
-							<?php $this->render_settings_tab_sections( [ 'ys_frontend_text_settings_section' ] ); ?>
 						</div>
 						<div class="ys-tab-panel" data-ys-panel="import" hidden>
 							<?php $this->render_settings_tab_sections( [ 'ys_json_data_import_section' ] ); ?>
@@ -422,17 +323,6 @@ class YS_Settings {
 		}
 		$output['ys_location_taxonomy_slug'] = $taxonomy_slug;
 
-		$output['ys_watch_me_text']          = isset( $input['ys_watch_me_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_watch_me_text'] ) ) : $defaults['ys_watch_me_text'];
-		$output['ys_book_now_text']          = isset( $input['ys_book_now_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_book_now_text'] ) ) : $defaults['ys_book_now_text'];
-		$output['ys_call_crew_text']         = isset( $input['ys_call_crew_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_call_crew_text'] ) ) : $defaults['ys_call_crew_text'];
-		$output['ys_booked_text']            = isset( $input['ys_booked_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_booked_text'] ) ) : $defaults['ys_booked_text'];
-		$output['ys_all_label_text']         = isset( $input['ys_all_label_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_all_label_text'] ) ) : $defaults['ys_all_label_text'];
-		$output['ys_empty_state_text']       = isset( $input['ys_empty_state_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_empty_state_text'] ) ) : $defaults['ys_empty_state_text'];
-		$output['ys_connect_with_top_title'] = isset( $input['ys_connect_with_top_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_connect_with_top_title'] ) ) : $defaults['ys_connect_with_top_title'];
-		$output['ys_crew_group_title']       = isset( $input['ys_crew_group_title'] ) ? sanitize_text_field( wp_unslash( $input['ys_crew_group_title'] ) ) : $defaults['ys_crew_group_title'];
-		$output['ys_crew_group_subtitle']    = isset( $input['ys_crew_group_subtitle'] ) ? sanitize_text_field( wp_unslash( $input['ys_crew_group_subtitle'] ) ) : $defaults['ys_crew_group_subtitle'];
-		$output['ys_currently_on_board_text']= isset( $input['ys_currently_on_board_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_currently_on_board_text'] ) ) : $defaults['ys_currently_on_board_text'];
-		$output['ys_currently_offline_text'] = isset( $input['ys_currently_offline_text'] ) ? sanitize_text_field( wp_unslash( $input['ys_currently_offline_text'] ) ) : $defaults['ys_currently_offline_text'];
 		$output['ys_online_status_icon']     = $this->sanitize_attachment_id( isset( $input['ys_online_status_icon'] ) ? wp_unslash( $input['ys_online_status_icon'] ) : '' );
 		$output['ys_model_options']          = $this->sanitize_repeatable_list( isset( $input['ys_model_options'] ) ? $input['ys_model_options'] : [] );
 		$output['ys_extra_feature_options']  = $this->sanitize_repeatable_list( isset( $input['ys_extra_feature_options'] ) ? $input['ys_extra_feature_options'] : [] );
@@ -592,18 +482,7 @@ class YS_Settings {
 		$settings['ys_model_options']       = $this->sanitize_repeatable_list( $settings['ys_model_options'] );
 		$settings['ys_extra_feature_options'] = $this->sanitize_repeatable_list( $settings['ys_extra_feature_options'] );
 		$settings['ys_location_taxonomy_slug'] = sanitize_key( $settings['ys_location_taxonomy_slug'] );
-		$settings['ys_watch_me_text']          = sanitize_text_field( (string) $settings['ys_watch_me_text'] );
-		$settings['ys_book_now_text']          = sanitize_text_field( (string) $settings['ys_book_now_text'] );
-		$settings['ys_call_crew_text']         = sanitize_text_field( (string) $settings['ys_call_crew_text'] );
-		$settings['ys_booked_text']            = sanitize_text_field( (string) $settings['ys_booked_text'] );
-		$settings['ys_connect_with_top_title'] = sanitize_text_field( (string) $settings['ys_connect_with_top_title'] );
-		$settings['ys_crew_group_title']       = sanitize_text_field( (string) $settings['ys_crew_group_title'] );
-		$settings['ys_crew_group_subtitle']    = sanitize_text_field( (string) $settings['ys_crew_group_subtitle'] );
-		$settings['ys_currently_on_board_text']= sanitize_text_field( (string) $settings['ys_currently_on_board_text'] );
-		$settings['ys_currently_offline_text'] = sanitize_text_field( (string) $settings['ys_currently_offline_text'] );
 		$settings['ys_online_status_icon']     = $this->sanitize_attachment_id( $settings['ys_online_status_icon'] );
-		$settings['ys_all_label_text']         = sanitize_text_field( (string) $settings['ys_all_label_text'] );
-		$settings['ys_empty_state_text']       = sanitize_text_field( (string) $settings['ys_empty_state_text'] );
 
 		return $settings;
 	}
@@ -726,16 +605,6 @@ class YS_Settings {
 	}
 
 	/**
-	 * Render frontend text settings section description.
-	 *
-	 * @return void
-	 */
-	public function render_frontend_text_settings_section() {
-		echo '<p>' . esc_html__( 'Customize reusable frontend labels and empty-state text for later shortcode output.', 'yacht-selector' ) . '</p>';
-		echo '<p class="description">' . esc_html__( "WPML/Polylang compatibility: plugin text settings can be translated through your multilingual plugin's string translation interface.", 'yacht-selector' ) . '</p>';
-	}
-
-	/**
 	 * Render JSON data import section description.
 	 *
 	 * @return void
@@ -819,138 +688,6 @@ class YS_Settings {
 		$this->render_repeatable_field(
 			'ys_extra_feature_options',
 			__( 'Add reusable feature labels such as Internet, Jetski, or Joker Boat.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render watch me text field.
-	 *
-	 * @return void
-	 */
-	public function render_watch_me_text_field() {
-		$this->render_text_field(
-			'ys_watch_me_text',
-			__( 'Text used for the Watch Me button.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render book now text field.
-	 *
-	 * @return void
-	 */
-	public function render_book_now_text_field() {
-		$this->render_text_field(
-			'ys_book_now_text',
-			__( 'Text used for the Book Now button.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render call crew text field.
-	 *
-	 * @return void
-	 */
-	public function render_call_crew_text_field() {
-		$this->render_text_field(
-			'ys_call_crew_text',
-			__( 'Text used for the Call button.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render booked text field.
-	 *
-	 * @return void
-	 */
-	public function render_booked_text_field() {
-		$this->render_text_field(
-			'ys_booked_text',
-			__( 'Text shown on yacht cards when the selected month is booked.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render all label text field.
-	 *
-	 * @return void
-	 */
-	public function render_all_label_text_field() {
-		$this->render_text_field(
-			'ys_all_label_text',
-			__( 'Text used for the default country filter label.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render empty state text field.
-	 *
-	 * @return void
-	 */
-	public function render_empty_state_text_field() {
-		$this->render_text_field(
-			'ys_empty_state_text',
-			__( 'Text shown when no cards match the selected filters.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render connect with top title field.
-	 *
-	 * @return void
-	 */
-	public function render_connect_with_top_title_field() {
-		$this->render_text_field(
-			'ys_connect_with_top_title',
-			__( 'Top title shown above the crew section.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render crew group title field.
-	 *
-	 * @return void
-	 */
-	public function render_crew_group_title_field() {
-		$this->render_text_field(
-			'ys_crew_group_title',
-			__( 'Main title shown inside the crew section.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render crew group subtitle field.
-	 *
-	 * @return void
-	 */
-	public function render_crew_group_subtitle_field() {
-		$this->render_text_field(
-			'ys_crew_group_subtitle',
-			__( 'Subtitle shown below the crew section title.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render currently on board text field.
-	 *
-	 * @return void
-	 */
-	public function render_currently_on_board_text_field() {
-		$this->render_text_field(
-			'ys_currently_on_board_text',
-			__( 'Status line template. Use {crew_member} as the placeholder.', 'yacht-selector' )
-		);
-	}
-
-	/**
-	 * Render currently offline text field.
-	 *
-	 * @return void
-	 */
-	public function render_currently_offline_text_field() {
-		$this->render_text_field(
-			'ys_currently_offline_text',
-			__( 'Offline status line template. Use {crew_member} as the placeholder.', 'yacht-selector' )
 		);
 	}
 
@@ -1834,17 +1571,6 @@ class YS_Settings {
 			'ys_use_existing_post_type' => '0',
 			'ys_selected_post_type'      => '',
 			'ys_location_taxonomy_slug'  => 'ys_location',
-			'ys_watch_me_text'           => __( 'Watch Me', 'yacht-selector' ),
-			'ys_book_now_text'           => __( 'Book Now', 'yacht-selector' ),
-			'ys_call_crew_text'          => __( 'Call the Crew', 'yacht-selector' ),
-			'ys_booked_text'             => __( 'Booked', 'yacht-selector' ),
-			'ys_all_label_text'          => __( 'All', 'yacht-selector' ),
-			'ys_empty_state_text'        => __( 'No results found', 'yacht-selector' ),
-			'ys_connect_with_top_title'  => __( 'Connect with', 'yacht-selector' ),
-			'ys_crew_group_title'        => __( 'The Crew', 'yacht-selector' ),
-			'ys_crew_group_subtitle'     => __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' ),
-			'ys_currently_on_board_text' => __( 'Currently on board: {crew_member}', 'yacht-selector' ),
-			'ys_currently_offline_text'  => __( 'Currently offline: {crew_member}', 'yacht-selector' ),
 			'ys_online_status_icon'      => '',
 			'ys_model_options'           => [
 				__( 'Gulet', 'yacht-selector' ),

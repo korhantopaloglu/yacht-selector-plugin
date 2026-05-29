@@ -8,17 +8,18 @@ $countries      = is_array( $countries ?? null ) ? $countries : [];
 $months         = is_array( $months ?? null ) ? $months : [];
 $contact_tools  = is_array( $contact_tools ?? null ) ? $contact_tools : [];
 $container_id   = isset( $container_id ) ? (string) $container_id : '';
-$watch_text     = isset( $watch_text ) ? (string) $watch_text : __( 'Watch Me', 'yacht-selector' );
-$call_text      = isset( $call_text ) ? (string) $call_text : __( 'Call the Crew', 'yacht-selector' );
-$book_text      = isset( $book_text ) ? (string) $book_text : __( 'Book Now', 'yacht-selector' );
-$booked_text    = isset( $booked_text ) ? (string) $booked_text : __( 'Booked', 'yacht-selector' );
-$all_label_text = isset( $all_label_text ) ? (string) $all_label_text : __( 'All', 'yacht-selector' );
-$empty_text     = isset( $empty_text ) ? (string) $empty_text : __( 'No results found', 'yacht-selector' );
-$crew_top_title = isset( $crew_top_title ) ? (string) $crew_top_title : __( 'Connect with', 'yacht-selector' );
-$crew_title     = isset( $crew_title ) ? (string) $crew_title : __( 'The Crew', 'yacht-selector' );
-$crew_subtitle  = isset( $crew_subtitle ) ? (string) $crew_subtitle : __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' );
-$on_board_text  = isset( $on_board_text ) ? (string) $on_board_text : __( 'Currently on board: {crew_member}', 'yacht-selector' );
-$offline_text   = isset( $offline_text ) ? (string) $offline_text : __( 'Currently offline: {crew_member}', 'yacht-selector' );
+$display_labels = function_exists( 'ys_frontend_display_strings' ) ? ys_frontend_display_strings() : [];
+$watch_text     = isset( $watch_text ) ? (string) $watch_text : ( $display_labels['watch_text'] ?? __( 'Watch Video', 'yacht-selector' ) );
+$call_text      = isset( $call_text ) ? (string) $call_text : ( $display_labels['call_text'] ?? __( 'Call the Crew', 'yacht-selector' ) );
+$book_text      = isset( $book_text ) ? (string) $book_text : ( $display_labels['book_text'] ?? __( 'Book Now', 'yacht-selector' ) );
+$booked_text    = isset( $booked_text ) ? (string) $booked_text : ( $display_labels['booked_text'] ?? __( 'Booked', 'yacht-selector' ) );
+$all_label_text = isset( $all_label_text ) ? (string) $all_label_text : ( $display_labels['all_label_text'] ?? __( 'All', 'yacht-selector' ) );
+$empty_text     = isset( $empty_text ) ? (string) $empty_text : ( $display_labels['empty_text'] ?? __( 'No results found', 'yacht-selector' ) );
+$crew_top_title = isset( $crew_top_title ) ? (string) $crew_top_title : ( $display_labels['crew_top_title'] ?? __( 'Connect with', 'yacht-selector' ) );
+$crew_title     = isset( $crew_title ) ? (string) $crew_title : ( $display_labels['crew_title'] ?? __( 'The Crew', 'yacht-selector' ) );
+$crew_subtitle  = isset( $crew_subtitle ) ? (string) $crew_subtitle : ( $display_labels['crew_subtitle'] ?? __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' ) );
+$on_board_text  = isset( $on_board_text ) ? (string) $on_board_text : ( $display_labels['on_board_text'] ?? __( 'Currently on board: {crew_member}', 'yacht-selector' ) );
+$offline_text   = isset( $offline_text ) ? (string) $offline_text : ( $display_labels['offline_text'] ?? __( 'Currently offline: {crew_member}', 'yacht-selector' ) );
 $online_icon    = isset( $online_icon ) ? (string) $online_icon : '';
 $ui_class       = isset( $ui_class ) ? sanitize_html_class( (string) $ui_class ) : '';
 $root_classes   = 'ys-selector ys-selector-block-container is-loading' . ( '' !== $ui_class ? ' ' . $ui_class : '' );
@@ -321,16 +322,16 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Model', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $model ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( ! empty( $dimensions ) ) : ?>
-									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Olculer', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( implode( ' / ', $dimensions ) ); ?></span></div>
+									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Dimensions', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( implode( ' / ', $dimensions ) ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( '' !== $engine ) : ?>
-									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Motor', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $engine ); ?></span></div>
+									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Engine', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $engine ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( '' !== $year_value ) : ?>
-									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Uretim / R', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $year_value ); ?></span></div>
+									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Build / Refit Year', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $year_value ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( '' !== $port ) : ?>
-									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Liman', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $port ); ?></span></div>
+									<div class="ys-card-spec-item"><span class="ys-card-spec-label"><?php esc_html_e( 'Port', 'yacht-selector' ); ?></span><span class="ys-card-spec-value"><?php echo esc_html( $port ); ?></span></div>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -339,13 +340,13 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 							<div class="ys-card-group-title"><?php esc_html_e( 'Capacity', 'yacht-selector' ); ?></div>
 							<div class="ys-card-capacity-items">
 								<?php if ( isset( $item['cabins'] ) && null !== $item['cabins'] ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['cabins'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Kabin', 'yacht-selector' ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['cabins'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Cabins', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( isset( $item['guests'] ) && null !== $item['guests'] ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['guests'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Misafir', 'yacht-selector' ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( (string) (int) $item['guests'] ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Guests', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 								<?php if ( '' !== $crew ) : ?>
-									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( $crew ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Murettebat', 'yacht-selector' ); ?></span></div>
+									<div class="ys-card-capacity-item"><span class="ys-card-capacity-value"><?php echo esc_html( $crew ); ?></span><span class="ys-card-capacity-label"><?php esc_html_e( 'Crew', 'yacht-selector' ); ?></span></div>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -382,7 +383,7 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 								<?php // Display overflow indicator if there are hidden features ?>
 								<?php if ( ! empty( $hidden_features ) ) : ?>
 									<span class="ys-card-feature-overflow" data-features="<?php echo esc_attr( implode( ', ', $hidden_features ) ); ?>">
-										+<?php echo count( $hidden_features ); ?> <?php esc_html_e( 'Fazlasi', 'yacht-selector' ); ?>
+										+<?php echo count( $hidden_features ); ?> <?php esc_html_e( 'More', 'yacht-selector' ); ?>
 									</span>
 								<?php endif; ?>
 							</div>

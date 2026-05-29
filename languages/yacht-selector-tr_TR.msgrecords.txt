@@ -13,7 +13,6 @@ Seçim için sunulan yat modellerini (ör. Gulet veya Trawler) ekleyin.
 Tümü
 Tüm iletişim araçları
 Tüm günler
-Tüm etiket metni
 Tüm konumlar
 Bu yata bir veya daha fazla mürettebat üyesi atayın.
 Yatı bir ülke ve limana atayın; eklentinin konum taksonomisini kullanın.
@@ -22,14 +21,12 @@ Konumlara dön
 Genişlik
 Davranış
 Şimdi rezervasyon yap
-«Şimdi rezervasyon yap» düğmesi metni
-Rezerve
-Rezerve etiketi metni
+Dolu
 Rezerve aylar
 Diğer simgelere göz at
-Üretim yılı
-Kabinler
-«Ara» düğmesi metni
+Yapım / Yenileme Yılı
+Yapım Yılı
+Kabin
 Mürettebatı ara
 Kapasite
 Kart görseli
@@ -37,15 +34,15 @@ Kart görseli üzerine yaz
 Bayrağı değiştir
 Simgesini değiştir
 Görseli değiştir
-Yerel WordPress Konum kutusundan liman seçin. Eklentinin kontrolündeki taksonomi kalıcı adı şu anda "%s"; üst düzeyde ülkeler ve alt düzeyde limanlar tanımlanır.
+Limanı yerleşik Konum kutusundan seçin. Eklentinin yönettiği taksonomi kalıcı adı şu anda "%s"; üst terimler ülkeyi, alt terimler limanı temsil eder.
 En çok kullanılan iletişim araçlarından seçin
-Yacht Selector’un kayıtlı bir yazı türünü mü yoksa kendi dahili yazı türünü mü kullanacağını seçin.
+Yacht Selector'un kayıtlı bir yazı türünü mü yoksa kendi dahili yazı türünü mü kullanacağını seçin.
 Yalnızca tam saatleri seçin. Değer, 09-18 biçimi gibi normalleştirilmiş bir aralık olarak kaydedilir.
 Temizle
 Mürettebat panelini kapat
 Virgülle ayrılmış YYYY-AA değerleri. Örnek: 2026-06, 2026-07
-Yazı türünü, eklentinin kontrolündeki konum taksonomisi kalıcı adını ve yat veri yönetimi için kullanılacak seçenek listelerini yapılandırın.
-Şununla iletişime geç
+Yazı türünü, eklentinin yönettiği konum taksonomisi kalıcı adını ve yat veri yönetimi için yeniden kullanılabilir seçenek listelerini yapılandırın.
+İletişim kur
 İletişimin uygun olduğu zamanlar
 Mürettebatla iletişim kur
 İletişim aracı
@@ -54,22 +51,16 @@ Mürettebatla iletişim kur
 JSON şablonunu kopyalayın
 Ülke bayrağı
 Mürettebat
-Mürettebat grubu alt başlığı
-Mürettebat grubu başlığı
 Mürettebat üyeleri
-Mürettebat üst başlığı
 Mürettebatlar
-Şu an çevrimdışı metni
 Şu an çevrimdışı: {crew_member}
-Şu an gemide metni
 Şu an gemide: {crew_member}
-Daha sonra shortcode çıktısı için ön yüzdeki yeniden kullanılabilir etiketleri ve boş durum metnini özelleştirin.
 Ondalıklar desteklenir; örneğin 28,5.
 Ondalıklar desteklenir; örneğin 6,2.
 Varsayılan URL
 Eklentinin kullandığı yat modeli etiketlerini tanımlayın. Satır başına tek öğe ekleyin.
 Yatlar için kullanılabilen yeniden kullanılabilir ek özellik etiketlerini tanımlayın. Satır başına tek öğe ekleyin.
-Boyutlar
+Ölçüler
 Duş
 Her bir JSON öğesi bir nesne olmalıdır. %d öğesi geçersiz.
 İletişim aracını düzenleyin
@@ -77,7 +68,6 @@ Mürettebatı düzenleyin
 Konumu düzenleyin
 Yatı düzenleyin
 E-posta
-Boş durum metni
 Bu mürettebat üyesinin daha sonra iletişim kişisi olarak kullanılabilmesi gerekiyorsa etkinleştirin.
 Mürettebat üyesi çevrimdışı ya da uygun olmadığında bu aracın farklı davranması gerekiyorsa etkinleştirin.
 Bitiş
@@ -89,17 +79,14 @@ Bu mürettebat üyesi ve seçilen araç için doğrudan iletişim URL'sini girin
 Ek özellikler
 FaceTime
 Bu araç için mürettebata özel URL yoksa kullanılacak yedek URL.
-Fazlası
 Özellikler
 Web bağlantıları için https:// kullanın; e-posta için mailto:; telefon için tel:; desteklenen uygulamalarda resmi doğrudan bağlantı biçimi.
 Cuma
-Ön yüz metinleri ayarları
-Ön yüz metinleri
 Genel
 Varsayılan
 Geri dönün
 Google Meet
-Misafirler
+Misafir
 Gulet
 Daha yüksek değerler daha sonra sıralamanın başına gelir.
 Simge
@@ -115,10 +102,8 @@ JSON verisi
 JSON veri içe aktarma
 JSON verisi, kökte yat öğeleri dizisi içermelidir.
 JSON içe aktarma
-Kabin
 Kano
 Uzunluk
-Liman
 Listeler
 Konum
 Konum ve rezerve
@@ -126,18 +111,15 @@ Konum taksonomisi kullanılabilir değil.
 Konum taksonomisi kalıcı adı
 Konumlar
 Harika seçim!
-Mürettebat bölümündeki ana başlık.
 Medya ve eyleme çağrısı
 minder
-Misafir
 Model
 Model seçenekleri
 Modeller
 Pazartesi
-Motor
+Fazlası
 Motoryat
 Motoryat
-Mürettebat
 Yeni iletişim aracı adı
 Yeni konum adı
 Değişiklik yok
@@ -148,8 +130,6 @@ Görsel seçilmedi.
 Konum bulunamadı.
 Henüz model seçeneği yok. Yacht Selector ayarlarından tek tek ekleyin.
 Sonuç yok
-Çevrimdışı durum şablonu; yer tutucu olarak {crew_member} kullanın.
-Ölçüler
 Çevrimiçi günleri
 Çevrimiçi saatleri
 Çevrimiçi durum simgesi
@@ -165,9 +145,10 @@ Telefon
 Geçerli bir .json dosyası yükleyin.
 Ülke → liman için eklenti taksonomisi. Kalıcı ad sanitize_key() ile temizlenecektir.
 Sık kullanılan araçlar
+Liman
 Yat seçiminiz hazırlanıyor…
 Öncelik
-Yenileme yılı
+Yenileme Yılı
 Kaldır
 Rezerve ayları sil
 Rezerve aylarını yenile
@@ -201,17 +182,9 @@ Kısa yat özeti
 Signal
 Teknik özellikler
 Başlangıç
-Durum satırı şablonu; yer tutucu olarak {crew_member} kullanın.
-Üst başlığın altındaki alt başlık.
 Pazar
 Telegram
 Şablon bulunamadı.
-Seçili ay rezerveyken kartlarda kullanılacak metin.
-Filtreler hiçbir karta denk düşmezken gösterilecek boş liste metni.
-«Şimdi rezervasyon yap» düğmesi için kullanılacak metin.
-«Mürettebatı ara» düğmesi için metin.
-Ülke filtresinin varsayılan etiketi için metin.
-«İzlemek için tıklayın» düğmesi için kullanılacak metin.
 Mürettebat
 Aşağıdaki örnek, eklentinin güncel meta kutularını ve ön yüz veri şemasını yansıtır.
 JSON yüklenemedi. Tekrar deneyin.
@@ -222,7 +195,6 @@ Bu alan JSON biçiminde yapılandırılmış yat verisi kabul eder.
 Bu yazı türüne Yacht Selector taksonomisi ve meta kutuları eklenir.
 Perşembe
 Araç iletişim URL'leri
-Mürettebat bölümünün üzerinde görünen üst başlık.
 Trawler
 Salı
 Televizyon
@@ -233,7 +205,6 @@ Kaydedilmiş JSON'un yerine geçmek için bir .json dosyası yükleyin veya yuka
 Ülkeye bayrak görseli yükleyin. Alt düzey (çocuk) konumlarda bayrak kullanılamaz.
 JSON verisi yükle
 JSON dosyası yükle
-Üretim · Yenileme
 Uygun ise doğrudan profil ya da davet URL'sini kullanın.
 Tam geçerli URL ya da şema kullanın.
 Var olan yazı türünü kullan
@@ -244,14 +215,13 @@ Görsel göster
 mailto bağlantılarını kullanın; gerekli ise konu parametresi ekleyin.
 Desteklenen cihazlarda tel bağlantılarını kullanın.
 wa.me doğrudan bağlantı biçimini kullanın; isteğe bağlı sabit ileti ekleyin.
-facetime: şemasında e‑posta ya da GSM.
+facetime: şemasında e-posta ya da telefon numarası kullanın.
 UTC farkı
 Mürettebatı görüntüle
 Konumu görüntüle
 Yatı görüntüle
 Görsel
-İzlemek için tıklayın
-«İzlemek için tıklayın» düğmesi metni
+Video İzle
 Çarşamba
 Hafta içi
 Hafta sonu
@@ -260,9 +230,9 @@ Yat
 Yat %d
 Yat seçenekleri
 Yacht Selector
-Yacht Selector var olan bir yazı türü kullanılacak şekilde ayarlı, ancak geçerli bir seçim yapılmamış. Eklenti ayarlarını güncelleyin.
-Kaydedilen "%s" yazı türü artık mevcut olmadığından Yacht Selector konum taksonomisi etkin değil. Yacht Selector ayarlarında uygun yazı türünü seçin.
-Yacht Selector konum taksonomisi kaydedildi ama henüz bir yazı türüne bağlanmadı. Yacht Selector ayarlarından yazı türünü seçin.
+Yacht Selector mevcut bir yazı türü kullanılacak şekilde ayarlı, ancak geçerli bir seçim yapılmamış. Eklenti ayarlarını güncelleyin.
+Kaydedilen "%s" yazı türü artık mevcut olmadığından Yacht Selector konum taksonomisi etkin değil. Yacht Selector ayarlarında geçerli bir yazı türü seçin.
+Yacht Selector konum taksonomisi kayıtlıdır ancak henüz bir yazı türüne bağlanmadı. Yacht Selector ayarlarında yazı türü seçin.
 Yacht Selector bölümleri
 Yacht Selector ayarları bölümleri
 Yacht Selector kendi dahili yazı türünü kullanır: %s

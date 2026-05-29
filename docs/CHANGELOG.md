@@ -1,5 +1,14 @@
 # Yacht Selector Plugin — CHANGELOG
 
+## v1.1.5 — Frontend UI text via gettext only
+
+- Removed **Frontend Text Settings** admin section/tab and all related settings fields (`ys_watch_me_text`, `ys_book_now_text`, `ys_call_crew_text`, `ys_booked_text`, `ys_all_label_text`, `ys_empty_state_text`, crew/connect strings, etc.). **Online Status Icon** (`ys_online_status_icon`) remains under **General**.
+- Frontend shortcode/template output uses **`ys_frontend_display_strings()`** and template **`__()`** calls only; legacy option values are not read for rendering and are not deleted from the database on save (`wp_parse_args( $output, $current )` preserves unused stored keys).
+- Fixed frontend template labels that used Turkish as msgid (`Olculer`, `Kabin`, `Murettebat`, …) — canonical English msgids (`Dimensions`, `Cabins`, `Crew`, `Watch Video`, `Build / Refit Year`, `Port`, `More`, …).
+- Regenerated **`languages/yacht-selector.pot`** (`python3 tools/make-pot.py`, 242 strings); updated **`languages/yacht-selector-tr_TR.po`/`.mo`** via **`tools/sync_tr_from_pot.py`** + **`tools/build_tr_pack.py`**.
+- **`includes/compatibility/multilingual.php`**: removed option-backed frontend string registration; helpers **`ys_register_multilingual_string()`** / **`ys_translate_multilingual_string()`** kept for optional custom use. WPML/Polylang should translate via standard gettext/`.po` workflow.
+- No taxonomy, CPT, meta/import schema, hook, CSS, or data-attribute changes.
+
 ## v1.1.4 — WPML / Polylang compatibility (optional)
 
 - Added `includes/compatibility/multilingual.php` (loaded early from bootstrap) exposing **`ys_register_multilingual_string()`, `ys_translate_multilingual_string()`, `ys_frontend_option_display_text()`** plus internal registration on `init` / `admin_init` and immediately after **`ys_settings`** updates (`updated_option`).

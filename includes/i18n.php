@@ -23,6 +23,27 @@ function ys_plugin_load_textdomain() {
 }
 
 /**
+ * Frontend display strings for the yacht selector shortcode (gettext only).
+ *
+ * @return array<string, string>
+ */
+function ys_frontend_display_strings() {
+	return [
+		'watch_text'     => __( 'Watch Video', 'yacht-selector' ),
+		'call_text'      => __( 'Call the Crew', 'yacht-selector' ),
+		'book_text'      => __( 'Book Now', 'yacht-selector' ),
+		'booked_text'    => __( 'Booked', 'yacht-selector' ),
+		'all_label_text' => __( 'All', 'yacht-selector' ),
+		'empty_text'     => __( 'No results found', 'yacht-selector' ),
+		'crew_top_title' => __( 'Connect with', 'yacht-selector' ),
+		'crew_title'     => __( 'The Crew', 'yacht-selector' ),
+		'crew_subtitle'  => __( 'See the yacht live - choose how you\'d like to connect. The crew is currently on board.', 'yacht-selector' ),
+		'on_board_text'  => __( 'Currently on board: {crew_member}', 'yacht-selector' ),
+		'offline_text'   => __( 'Currently offline: {crew_member}', 'yacht-selector' ),
+	];
+}
+
+/**
  * Strings passed to frontend JavaScript via wp_localize_script (ys-frontend-selector).
  *
  * @return array<string, string>

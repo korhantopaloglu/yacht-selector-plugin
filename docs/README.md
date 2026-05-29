@@ -21,7 +21,9 @@ Start from **[Project overview](00-project-overview.md)** for the full baseline 
 
 ### Internationalization (developers)
 
-**WordPress gettext** (`.pot` / bundled `.mo` catalogs, domain `yacht-selector`) translates plugin UI literals shipped with Yacht Selector:
+**Frontend UI labels** (buttons, card spec headings, crew status templates, empty state, etc.) are **gettext-only** — there is no admin settings screen for them. Source strings live in PHP (`includes/i18n.php` → `ys_frontend_display_strings()`, templates, admin copy) as English **`msgid`s**.
+
+Regenerate the template catalog:
 
 ```bash
 python3 tools/make-pot.py
@@ -29,19 +31,19 @@ python3 tools/make-pot.py
 
 **Bundled `tr_TR` pack**
 
-- `languages/yacht-selector-tr_TR.po` / `.mo` — maintain ordered `msgstr` rows in `languages/yacht-selector-tr_TR.msgrecords.txt` (use `languages/.mid_index.tsv` as a numbered audit trail) or **`tools/emit_msgrecords_txt.py`** tuples, then run:
+- Edit **`tools/tr_translations.json`**, then sync and compile:
 
 ```bash
-python3 tools/emit_msgrecords_txt.py && python3 tools/build_tr_pack.py
+python3 tools/sync_tr_from_pot.py && python3 tools/build_tr_pack.py
 ```
 
 Preserve every placeholder (`%s`, `%d`, `%1$s`, `{crew_member}`, …) exactly.
 
 **WPML / Polylang** (optional, no dependency)
 
-- `includes/compatibility/multilingual.php` registers **Frontend Text Settings** option-backed strings (`ys_watch_me_text`, `ys_book_now_text`, `{crew_member}` templates, etc.) into WPML String Translation **or** Polylang Strings. Resolve at runtime with **`ys_frontend_option_display_text()`** alongside **`ys_register_multilingual_string()` / `ys_translate_multilingual_string()`**. Stored **`ys_settings` values remain source-of-truth**; multilingual outputs do not overwrite options.
+- Translate frontend/admin UI through the **normal gettext / `.po` workflow** (bundled `tr_TR` pack or your own `.mo` files). `includes/compatibility/multilingual.php` exposes optional **`ys_register_multilingual_string()`** / **`ys_translate_multilingual_string()`** helpers only — it does **not** register frontend text from plugin options.
 
-**Explicit non-goals:** model option rows and extra-feature rows stay **repeatable settings text**, **not taxonomy terms** — compatibility hooks do **not** auto-convert them.
+**Explicit non-goals:** model option rows and extra-feature rows stay **repeatable settings text**, **not taxonomy terms**.
 
 (`package.json` / `composer.json` are not bundled in this repo; if you add aliases there, mirror that command.)
 
