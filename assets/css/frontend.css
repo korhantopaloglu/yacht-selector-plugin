@@ -1123,11 +1123,9 @@
     margin-top: 0.125rem;
 }
 
-.booked .ys-book-now-button,
-.crew-online .ys-call-button,
-.booked .ys-call-button,
-.ys-tool-card.disabled,
-.ys-book-now-button.disabled {
+.ys-call-crew-button.disabled,
+.ys-book-now-button.disabled,
+.ys-tool-card.disabled {
   opacity: 0.30;
   pointer-events: none;
   filter: grayscale(0.5);
@@ -1174,13 +1172,6 @@
 
 .ys-book-button {
   border-radius: 0 0 var(--ys-shell-radius-bottom) 0;
-}
-
-.ys-card-actions-container > .ys-call-button {
-  pointer-events: none;
-  opacity: 0.5;
-  cursor: not-allowed;
-  user-select: none;
 }
 
 .ys-card-nav-container {

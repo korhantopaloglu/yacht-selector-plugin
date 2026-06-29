@@ -260,25 +260,8 @@ if ( ! function_exists( 'ys_render_contact_tool_icon_svg' ) ) {
 					}
 				}
 				?>
-				<?php 
-				// Check if any crew member is online
-				$any_crew_online = false;
-				if ( ! empty( $crew_members ) ) {
-					foreach ( $crew_members as $crew_member ) {
-						$online_start = isset( $crew_member['online_start'] ) ? (string) $crew_member['online_start'] : '';
-						$online_end = isset( $crew_member['online_end'] ) ? (string) $crew_member['online_end'] : '';
-						
-						if ( '' !== $online_start && '' !== $online_end ) {
-							$any_crew_online = true;
-							break;
-						}
-					}
-				}
-				
+				<?php
 				$card_classes = 'ys-card' . ( 0 === $index ? ' selected' : '' );
-				if ( $any_crew_online ) {
-					$card_classes .= ' crew-online';
-				}
 				?>
 				<article
 					class="<?php echo esc_attr( $card_classes ); ?>"

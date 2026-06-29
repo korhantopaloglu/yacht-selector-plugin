@@ -108,29 +108,78 @@ function getActiveCrewSelectedTools(card) {
   }
 }
 
+function isCrewOnlineFromSchedule(start, end) {
+  var startMinutes = parseTimeToMinutes(start);
+  var endMinutes = parseTimeToMinutes(end);
+  if (startMinutes === null || endMinutes === null) {
+    return false;
+  }
+
+  var current = getCurrentMinutes();
+
+  if (startMinutes === endMinutes) {
+    return true;
+  }
+
+  if (startMinutes < endMinutes) {
+    return current >= startMinutes && current <= endMinutes;
+  }
+
+  return current >= startMinutes || current <= endMinutes;
+}
+
 function isCrewOnline(card) {
   var crew = getActiveCrewState(card);
   if (!crew) {
     return false;
   }
 
-  var start = parseTimeToMinutes(crew.start);
-  var end = parseTimeToMinutes(crew.end);
-  if (start === null || end === null) {
+  return isCrewOnlineFromSchedule(crew.start, crew.end);
+}
+
+function isAnyCrewOnline(card) {
+  var single = card.querySelector('.ys-card-crew-member-single');
+  if (single) {
+    return isCrewOnlineFromSchedule(
+      single.getAttribute('data-online-start'),
+      single.getAttribute('data-online-end')
+    );
+  }
+
+  var select = card.querySelector('.ys-card-crew-member-select');
+  if (!select) {
     return false;
   }
 
-  var current = getCurrentMinutes();
-
-  if (start === end) {
-    return true;
+  for (var i = 0; i < select.options.length; i++) {
+    var option = select.options[i];
+    if (isCrewOnlineFromSchedule(
+      option.getAttribute('data-online-start'),
+      option.getAttribute('data-online-end')
+    )) {
+      return true;
+    }
   }
 
-  if (start < end) {
-    return current >= start && current <= end;
+  return false;
+}
+
+function selectFirstOnlineCrew(card) {
+  var select = card.querySelector('.ys-card-crew-member-select');
+  if (!select) {
+    return;
   }
 
-  return current >= start || current <= end;
+  for (var i = 0; i < select.options.length; i++) {
+    var option = select.options[i];
+    if (isCrewOnlineFromSchedule(
+      option.getAttribute('data-online-start'),
+      option.getAttribute('data-online-end')
+    )) {
+      select.selectedIndex = i;
+      return;
+    }
+  }
 }
 
 function applyCrewStatusState(card, hasCrew, isOnline) {
@@ -166,8 +215,21 @@ function syncCardAvailabilityState(card) {
   var toolUrls = getActiveCrewToolUrls(card);
   var selectedTools = getActiveCrewSelectedTools(card);
   var crewOnline = hasCrew ? isCrewOnline(card) : false;
+  var anyCrewOnline = hasCrew ? isAnyCrewOnline(card) : false;
+  var callButton = card.querySelector('.ys-call-crew-button');
+  var bookButton = card.querySelector('.ys-book-now-button');
 
   applyCrewStatusState(card, hasCrew, crewOnline);
+
+  if (callButton) {
+    callButton.classList.toggle('disabled', !hasCrew || !anyCrewOnline);
+    callButton.setAttribute('aria-disabled', !hasCrew || !anyCrewOnline ? 'true' : 'false');
+  }
+
+  if (bookButton) {
+    bookButton.classList.toggle('disabled', !hasCrew);
+    bookButton.setAttribute('aria-disabled', !hasCrew ? 'true' : 'false');
+  }
 
   allTools.forEach(function(tool) {
     var toolKey = tool.getAttribute('data-tool-key') || '';
@@ -1548,11 +1610,21 @@ document.addEventListener('click', function(event) {
 
   var panelTrigger = event.target.closest('.ys-call-crew-button, .ys-book-now-button');
   if (panelTrigger) {
+    if (panelTrigger.classList.contains('disabled')) {
+      event.preventDefault();
+      return;
+    }
+
     var triggerCard = panelTrigger.closest('.ys-card');
     var triggerScope = getBlockScope(panelTrigger);
     var triggerPanel = triggerCard ? triggerCard.querySelector('.ys-card-contact-tools-group') : null;
 
     if (triggerCard) {
+      if (panelTrigger.classList.contains('ys-call-crew-button')) {
+        selectFirstOnlineCrew(triggerCard);
+        syncCardAvailabilityState(triggerCard);
+      }
+
       setSelectedCard(triggerCard, triggerScope);
       applySliderWindowState(triggerScope);
     }
